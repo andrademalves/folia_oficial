@@ -5,6 +5,37 @@ from django.urls import reverse
 from .models import PermissaoMenu, Menu
 
 
+def encontrar_menu(url_menu):
+    """
+    Busca um menu de forma inteligente:
+    1. Primeiro tenta URL exata
+    2. Se não encontrar e URL não começa com /, adiciona / no início e final
+    3. Se ainda não encontrar, busca pelo módulo
+    """
+    # Tenta URL exata primeiro
+    menu = Menu.objects.filter(url=url_menu, ativo=True).first()
+    if menu:
+        return menu
+    
+    # Se não começa com /, tenta adicionar barras
+    if not url_menu.startswith('/'):
+        url_com_barras = f'/{url_menu}/'
+        menu = Menu.objects.filter(url=url_com_barras, ativo=True).first()
+        if menu:
+            return menu
+        
+        # Tenta buscar pelo módulo (qualquer menu do módulo)
+        menu = Menu.objects.filter(
+            modulo__nome__iexact=url_menu,
+            ativo=True,
+            menu_pai__isnull=True  # Pega o menu principal (sem pai)
+        ).first()
+        if menu:
+            return menu
+    
+    return None
+
+
 def verificar_permissao_menu(url_menu):
     """
     Decorator para verificar se o usuário tem permissão para acessar um menu específico
@@ -26,9 +57,8 @@ def verificar_permissao_menu(url_menu):
                 return view_func(request, *args, **kwargs)
             
             # Verifica se o menu existe
-            try:
-                menu = Menu.objects.get(url=url_menu, ativo=True)
-            except Menu.DoesNotExist:
+            menu = encontrar_menu(url_menu)
+            if not menu:
                 messages.error(request, 'Menu não encontrado.')
                 return redirect('home_modulos')
             
@@ -80,9 +110,8 @@ def verificar_permissao_acao(url_menu, acao):
                 return view_func(request, *args, **kwargs)
             
             # Verifica se o menu existe
-            try:
-                menu = Menu.objects.get(url=url_menu, ativo=True)
-            except Menu.DoesNotExist:
+            menu = encontrar_menu(url_menu)
+            if not menu:
                 messages.error(request, 'Menu não encontrado.')
                 return redirect('home_modulos')
             

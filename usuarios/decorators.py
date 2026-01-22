@@ -176,10 +176,8 @@ def permissao_menu_required(url_menu, acao='visualizar'):
     if acao in mapa_acoes:
         acao = mapa_acoes[acao]
     
-    # Converte nome do módulo para URL se necessário
-    # Se url_menu não começa com '/', assume que é um nome de módulo
-    if not url_menu.startswith('/'):
-        url_menu = f'/{url_menu}/'
+    # Não precisa converter mais - encontrar_menu já faz isso
+    # A função encontrar_menu aceita tanto 'financeiro' quanto '/financeiro/' quanto '/financeiro/dashboard/'
     
     if acao == 'visualizar':
         return verificar_permissao_menu(url_menu)

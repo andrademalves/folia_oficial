@@ -1,0 +1,15 @@
+<div class="sidebar">
+  <nav class="nav flex-column">
+    <a class="nav-link" href="{% url 'home_modulos' %}"><i class="fas fa-arrow-left"></i> <span>Voltar aos Módulos</span></a>
+    <hr style="border-color: rgba(255,255,255,0.1); margin: 16px 8px;">
+  </nav>
+  <div class="sidebar-header"><i class="fas fa-barcode"></i> Boletos</div>
+  <nav class="nav flex-column">
+    <a class="nav-link {% if request.resolver_match.url_name == 'dashboard_boletos' %}active{% endif %}" href="{% url 'boletos:dashboard_boletos' %}"><i class="fas fa-home"></i> <span>Dashboard</span></a>
+    <a class="nav-link {% if request.resolver_match.url_name == 'selecionar_parcelas_boleto' %}active{% endif %}" href="{% url 'boletos:selecionar_parcelas_boleto' %}"><i class="fas fa-plus-circle"></i> <span>Gerar Boletos</span></a>
+    <a class="nav-link {% if request.resolver_match.url_name == 'lista_boletos' %}active{% endif %}" href="{% url 'boletos:lista_boletos' %}"><i class="fas fa-list"></i> <span>Listar Boletos</span></a>
+    <a class="nav-link {% if request.resolver_match.url_name == 'gerar_remessa_cnab' %}active{% endif %}" href="{% url 'boletos:gerar_remessa_cnab' %}"><i class="fas fa-file-export"></i> <span>Gerar Remessa</span></a>
+    <a class="nav-link {% if request.resolver_match.url_name == 'lista_remessas' %}active{% endif %}" href="{% url 'boletos:lista_remessas' %}"><i class="fas fa-folder-open"></i> <span>Remessas</span></a>
+    <a class="nav-link {% if request.resolver_match.url_name == 'lista_configuracoes' %}active{% endif %}" href="{% url 'boletos:lista_configuracoes' %}"><i class="fas fa-cog"></i> <span>Configurações</span></a>
+  </nav>
+</div>

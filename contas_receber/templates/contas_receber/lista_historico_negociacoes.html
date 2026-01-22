@@ -1,0 +1,200 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Histórico de Negociações{% endblock %}
+
+{% block extra_css %}
+<style>
+    body { background: radial-gradient(circle at 10% 20%, #0ea5e9 0%, #0f172a 35%, #0b1224 65%, #0a0f1e 100%); }
+    .sidebar { background: rgba(15, 23, 42, 0.85); border-right: 1px solid rgba(255,255,255,0.08); backdrop-filter: blur(12px); height: calc(100vh - 56px); position: sticky; top: 56px; padding: 20px 0; }
+    .sidebar .nav-link { color: #cbd5e1; padding: 12px 20px; margin: 4px 8px; border-radius: 10px; transition: all 0.2s ease; display: flex; align-items: center; gap: 12px; }
+    .sidebar .nav-link:hover { background: rgba(34,211,238,0.1); color: #7dd3fc; }
+    .sidebar .nav-link.active { background: linear-gradient(135deg, rgba(34,211,238,0.2), rgba(99,102,241,0.2)); color: #e0e7ff; font-weight: 600; box-shadow: 0 4px 12px rgba(99,102,241,0.25); }
+    .sidebar .sidebar-header { color: #7dd3fc; font-weight: 700; letter-spacing: 1px; padding: 0 20px 16px; border-bottom: 1px solid rgba(255,255,255,0.06); margin-bottom: 16px; font-size: 14px; text-transform: uppercase; }
+    .content-card { background: rgba(15, 23, 42, 0.78); border: 1px solid rgba(255,255,255,0.08); box-shadow: 0 18px 48px rgba(0,0,0,0.45); border-radius: 16px; backdrop-filter: blur(12px); padding: 24px; }
+    .table { color: #cbd5e1; }
+    .stats-card { background: linear-gradient(135deg, rgba(14, 165, 233, 0.1), rgba(99, 102, 241, 0.1)); border: 1px solid rgba(14, 165, 233, 0.3); border-radius: 12px; padding: 20px; margin-bottom: 20px; }
+    .stats-card h5 { color: #7dd3fc; font-size: 14px; margin-bottom: 8px; }
+    .stats-card .value { color: #fff; font-size: 24px; font-weight: 700; }
+    .badge-negociada { background: #f59e0b; color: #000; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-0">
+  <div class="row g-0">
+    <div class="col-md-2">
+      <div class="sidebar">
+        <nav class="nav flex-column">
+          <a class="nav-link" href="{% url 'home_modulos' %}"><i class="fas fa-arrow-left"></i> <span>Voltar aos Módulos</span></a>
+          <hr style="border-color: rgba(255,255,255,0.1); margin: 16px 8px;">
+        </nav>
+        <div class="sidebar-header"><i class="fas fa-receipt"></i> Contas a Receber</div>
+        <nav class="nav flex-column">
+          <a class="nav-link" href="{% url 'dashboard_contas_receber' %}"><i class="fas fa-home"></i> <span>Dashboard</span></a>
+          <a class="nav-link" href="{% url 'lista_notas_fiscais' %}"><i class="fas fa-file-invoice"></i> <span>Notas Fiscais</span></a>
+          <a class="nav-link" href="{% url 'parcelas_por_vencimento' %}"><i class="fas fa-clock"></i> <span>Por Vencimento</span></a>
+          <a class="nav-link" href="{% url 'lista_parcelas_baixa' %}"><i class="fas fa-check-circle"></i> <span>Dar Baixa</span></a>
+          <a class="nav-link active" href="{% url 'lista_historico_negociacoes' %}"><i class="fas fa-handshake"></i> <span>Negociações</span></a>
+          <a class="nav-link" href="{% url 'lista_creditos' %}"><i class="fas fa-credit-card"></i> <span>Créditos</span></a>
+          <a class="nav-link" href="{% url 'menu_relatorios' %}"><i class="fas fa-file-pdf"></i> <span>Relatórios</span></a>
+          <a class="nav-link" href="{% url 'relatorio_creditos' %}"><i class="fas fa-chart-line"></i> <span>Relatório Créditos</span></a>
+        </nav>
+      </div>
+    </div>
+    <div class="col-md-10">
+      <div class="p-4">
+        <div class="content-card">
+          <div class="d-flex justify-content-between align-items-center mb-4">
+            <h3 class="text-white mb-0"><i class="fas fa-handshake"></i> Histórico de Negociações</h3>
+            <div>
+              <a href="{% url 'gerar_pdf_negociacoes' %}?{{ request.GET.urlencode }}" class="btn btn-danger me-2" target="_blank">
+                <i class="fas fa-file-pdf"></i> Gerar PDF
+              </a>
+              <a href="{% url 'lista_parcelas_baixa' %}" class="btn btn-outline-primary">
+                <i class="fas fa-arrow-left"></i> Voltar para Baixas
+              </a>
+            </div>
+          </div>
+          
+          <!-- Resumo -->
+          <div class="row mb-4">
+            <div class="col-md-6">
+              <div class="stats-card">
+                <h5><i class="fas fa-list"></i> Total de Negociações</h5>
+                <div class="value">{{ total_negociacoes }}</div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="stats-card">
+                <h5><i class="fas fa-dollar-sign"></i> Total Renegociado</h5>
+                <div class="value">R$ {{ total_renegociado|floatformat:2 }}</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Legenda -->
+          <div class="alert alert-info mb-4">
+            <strong><i class="fas fa-info-circle"></i> Legenda:</strong>
+            <span class="badge badge-negociada ms-2">-N</span> = Parcela Negociada (recebeu pagamento parcial e foi renegociada)
+          </div>
+          
+          <!-- Filtros -->
+          <form method="get" class="mb-4">
+            <div class="row g-3">
+              <div class="col-md-3">
+                <label class="form-label text-white">Cliente</label>
+                <select name="cliente" class="form-select">
+                  <option value="">Todos</option>
+                  {% for cliente in clientes %}
+                  <option value="{{ cliente.id }}" {% if filtros.cliente == cliente.id|stringformat:"s" %}selected{% endif %}>{{ cliente.nome }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+              <div class="col-md-3">
+                <label class="form-label text-white">Usuário</label>
+                <select name="usuario" class="form-select">
+                  <option value="">Todos</option>
+                  {% for usuario in usuarios %}
+                  <option value="{{ usuario.id }}" {% if filtros.usuario == usuario.id|stringformat:"s" %}selected{% endif %}>{{ usuario.username }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+              <div class="col-md-2">
+                <label class="form-label text-white">Data Início</label>
+                <input type="date" name="data_inicio" class="form-control" value="{{ filtros.data_inicio }}">
+              </div>
+              <div class="col-md-2">
+                <label class="form-label text-white">Data Fim</label>
+                <input type="date" name="data_fim" class="form-control" value="{{ filtros.data_fim }}">
+              </div>
+              <div class="col-md-2 d-flex align-items-end">
+                <button type="submit" class="btn btn-primary w-100"><i class="fas fa-search"></i> Filtrar</button>
+              </div>
+            </div>
+          </form>
+          
+          <!-- Tabela -->
+          <div class="table-responsive">
+            <table class="table table-hover">
+              <thead>
+                <tr>
+                  <th>Data</th>
+                  <th>Parcela Negociada</th>
+                  <th>Cliente</th>
+                  <th>Valor Original</th>
+                  <th>Valor Pago</th>
+                  <th>Saldo Renegociado</th>
+                  <th>Juros</th>
+                  <th>Qtd Parcelas</th>
+                  <th>Usuário</th>
+                  <th>Ações</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for historico in historicos %}
+                <tr>
+                  <td>{{ historico.data_negociacao|date:"d/m/Y H:i" }}</td>
+                  <td>
+                    <span class="badge badge-negociada">{{ historico.parcela_negociada.codigo_identificador }}</span>
+                  </td>
+                  <td>{{ historico.parcela_negociada.cliente.nome|truncatechars:30 }}</td>
+                  <td>R$ {{ historico.valor_original|floatformat:2 }}</td>
+                  <td><strong class="text-success">R$ {{ historico.valor_pago|floatformat:2 }}</strong></td>
+                  <td><strong class="text-warning">R$ {{ historico.saldo_renegociado|floatformat:2 }}</strong></td>
+                  <td>
+                    {% if historico.juros_negociacao %}
+                      <strong class="text-danger">R$ {{ historico.juros_negociacao|floatformat:2 }}</strong>
+                    {% else %}
+                      <span class="text-muted">-</span>
+                    {% endif %}
+                  </td>
+                  <td>{{ historico.quantidade_parcelas }}</td>
+                  <td>{{ historico.usuario.username }}</td>
+                  <td>
+                    <a href="{% url 'gerar_pdf_negociacao_individual' historico.id %}" class="btn btn-sm btn-danger me-1" target="_blank" title="Gerar Acordo">
+                      <i class="fas fa-file-pdf"></i>
+                    </a>
+                  </td>
+                </tr>
+                {% empty %}
+                <tr>
+                  <td colspan="9" class="text-center">Nenhuma negociação encontrada</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+          
+          <!-- Paginação -->
+          {% if page_obj.has_other_pages %}
+          <nav>
+            <ul class="pagination justify-content-center">
+              {% if page_obj.has_previous %}
+              <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.previous_page_number }}&{{ request.GET.urlencode }}">Anterior</a>
+              </li>
+              {% endif %}
+              
+              {% for num in page_obj.paginator.page_range %}
+                {% if page_obj.number == num %}
+                <li class="page-item active"><a class="page-link" href="#">{{ num }}</a></li>
+                {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                <li class="page-item"><a class="page-link" href="?page={{ num }}&{{ request.GET.urlencode }}">{{ num }}</a></li>
+                {% endif %}
+              {% endfor %}
+              
+              {% if page_obj.has_next %}
+              <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.next_page_number }}&{{ request.GET.urlencode }}">Próximo</a>
+              </li>
+              {% endif %}
+            </ul>
+          </nav>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

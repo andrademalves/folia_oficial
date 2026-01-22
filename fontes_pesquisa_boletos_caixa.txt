@@ -1,0 +1,235 @@
+================================================================================
+FONTES DE PESQUISA - BOLETOS CAIXA ECONÔMICA FEDERAL
+================================================================================
+Data da Pesquisa: 24/12/2025
+Objetivo: Implementação de geração de boletos CNAB 240 em Django
+================================================================================
+
+--------------------------------------------------------------------------------
+1. DOCUMENTAÇÃO OFICIAL - CAIXA ECONÔMICA FEDERAL
+--------------------------------------------------------------------------------
+
+[1] Manual Web Service SOAP/XML - Cobrança Bancária SIGCB
+URL: https://www.caixa.gov.br/Downloads/cobranca-caixa/WEBSERVICE-XML-COBRANCA-BANCARIA.pdf
+Tipo: PDF - Documentação Oficial
+Descrição: Especificações técnicas da API SOAP/XML do SIGCB (Sistema de 
+           Gestão de Cobrança Bancária) da Caixa.  Contém estrutura XML, 
+           autenticação via HASH, exemplos de requisição/resposta, URLs de 
+           homologação e produção. 
+Relevância:  ALTA - Essencial para integração via Web Service
+
+[2] Manual CNAB 240 - Cobrança Bancária SIGCB
+URL: https://www.caixa.gov.br/Downloads/cobranca-caixa/Manual_de_Leiaute_de_Arquivo_Eletronico_CNAB_240.pdf
+Tipo: PDF - Documentação Oficial
+Descrição: Layout completo do arquivo CNAB 240 para cobrança bancária.  
+           Especificação posicional de todos os registros:  Header de Arquivo,
+           Header de Lote, Segmentos P/Q/R, Trailer de Lote, Trailer de 
+           Arquivo.  Define campos obrigatórios, formatos, tamanhos e validações.
+Relevância: CRÍTICA - Principal documento para implementação CNAB 240
+
+[3] Manual CNAB 400 - Cobrança Bancária SIGCB
+URL: https://www.caixa.gov.br/Downloads/cobranca-caixa/Manual_de_Leiaute_de_Arquivo_Eletronico_CNAB_400.pdf
+Tipo: PDF - Documentação Oficial
+Descrição: Layout do arquivo CNAB 400 (formato legado) para cobrança bancária. 
+           Especificação de campos, posições, registros de remessa e retorno. 
+Relevância: MÉDIA - Formato legado, útil para sistemas antigos
+
+[4] Especificações Técnicas - Código de Barras SIGCB
+URL: https://www.caixa.gov.br/Downloads/cobranca-caixa/ESP_COD_BARRAS_SIGCB_COBRANCA_CAIXA.pdf
+Tipo: PDF - Documentação Oficial
+Descrição: Regras para geração de código de barras e linha digitável.  
+           Inclui cálculo de dígitos verificadores, formação do código de 
+           barras de 44 posições, conversão para linha digitável de 47 posições.
+Relevância: CRÍTICA - Essencial para cálculo correto do código de barras
+
+
+--------------------------------------------------------------------------------
+2. DOCUMENTAÇÃO OFICIAL - FEBRABAN
+--------------------------------------------------------------------------------
+
+[5] Layout Padrão CNAB 240 - FEBRABAN (Versão 10.11 - Agosto/2023)
+URL: https://cmsarquivos.febraban.org.br/Arquivos/documentos/PDF/Layout%20padrao%20CNAB240%20V%2010%2011%20-%2021_08_2023.pdf
+Tipo: PDF - Documentação Oficial FEBRABAN
+Descrição:  Padrão nacional CNAB 240 definido pela FEBRABAN, válido para 
+           todos os bancos brasileiros. Especificação completa do padrão 
+           CNAB 240, segmentos, códigos de movimento, tabelas de domínio. 
+Relevância: ALTA - Complementa a documentação da Caixa com padrão nacional
+
+[6] Portal FEBRABAN - Layout CNAB 240
+URL:  https://portal.febraban.org.br/pagina/3053/33/pt-br/layout-240
+Tipo: Portal Web - Documentação Oficial
+Descrição:  Página oficial FEBRABAN com informações e downloads do layout 
+           CNAB 240. Links para documentação, histórico de versões, 
+           orientações gerais.
+Relevância: MÉDIA - Portal de acesso à documentação oficial
+
+
+--------------------------------------------------------------------------------
+3. MATERIAIS TÉCNICOS DE TERCEIROS (CÓPIAS DE DOCUMENTOS OFICIAIS)
+--------------------------------------------------------------------------------
+
+[7] Manual CNAB 400 Caixa - FB Solutions
+URL: http://www.fbsolutions.com. br/wp-content/uploads/2023/02/Manual_de_Leiaute_de_Arquivo_Eletronico_CNAB_400.pdf
+Tipo: PDF - Cópia hospedada por terceiros
+Descrição: Cópia do manual CNAB 400 da Caixa hospedada por empresa de software. 
+Relevância: BAIXA - Mesma informação do documento oficial [3]
+
+[8] Manual CNAB 240 SIGCB - Cybersul
+URL: http://www.cybersul.net/download/Bancos/CEF/Manual_de_Leiaute_de_Arquivo_Eletronico_CNAB_240-1.pdf
+Tipo: PDF - Cópia hospedada por terceiros
+Descrição:  Cópia do manual CNAB 240 da Caixa hospedada por empresa de TI.
+Relevância: BAIXA - Mesma informação do documento oficial [2]
+
+[9] Manual CNAB 240 SIGCB - UserManual Wiki
+URL: https://usermanual.wiki/Document/ManualLeiauteCNAB240SIGCB. 231067002. pdf
+Tipo: PDF - Cópia hospedada por terceiros
+Descrição: Cópia do manual CNAB 240 em repositório de manuais técnicos.
+Relevância: BAIXA - Mesma informação do documento oficial [2]
+
+
+--------------------------------------------------------------------------------
+4. TUTORIAIS E DOCUMENTAÇÃO DE SISTEMAS ERP
+--------------------------------------------------------------------------------
+
+[10] Boleto Rápido por API - Caixa Econômica Federal (Sankhya)
+URL: https://ajuda.sankhya.com.br/hc/pt-br/articles/32097122017431-Boleto-r%C3%A1pido-por-API-Caixa-Econ%C3%B4mica-Federal
+Tipo:  Artigo de Ajuda - Sistema ERP Sankhya
+Descrição:  Tutorial de integração com API de boletos da Caixa no sistema 
+           Sankhya.  Passo a passo de configuração, credenciamento, exemplos 
+           práticos de uso.
+Relevância: MÉDIA - Bom para entender processo de credenciamento e uso prático
+
+[11] Fórum Projeto ACBr - API Caixa Econômica Federal
+URL: https://www.projetoacbr.com.br/forum/topic/81521-boletos-api-caixa-econ%C3%B4mica-federal/
+Tipo: Fórum de Discussão - Projeto ACBr (Delphi)
+Descrição: Discussão técnica sobre implementação de boletos API da Caixa. 
+           Problemas comuns, soluções, dúvidas de desenvolvedores da 
+           comunidade ACBr.
+Relevância: MÉDIA - Útil para troubleshooting e problemas comuns
+
+[12] Layout Integração Bancária Caixa (CEF) - Mercosistem Wiki
+URL: https://mercosistem.com. br/wiki/index.php? title=Layout_Integra%C3%A7%C3%A3o_Banc%C3%A1ria_Caixa_(CEF)
+Tipo: Wiki - Sistema ERP Mercosistem
+Descrição: Documentação de integração com a Caixa no sistema Mercosistem. 
+           Explicações sobre campos, códigos, particularidades do SIGCB.
+Relevância: MÉDIA - Exemplos práticos de implementação
+
+[13] CEF - Caixa Econômica Federal - Wiki HubSoft
+URL: https://wiki.hubsoft.com.br/pt-br/modulos/configuracao/financeiro/forma_cobranca/boleto/caixa
+Tipo: Wiki - Sistema de Gestão HubSoft
+Descrição:  Documentação de configuração de boletos Caixa no sistema HubSoft.
+           Parâmetros de configuração, campos necessários, exemplos. 
+Relevância: MÉDIA - Referência de configurações práticas
+
+[14] Caixa Econômica Federal - Configuração Boletos - FINA710 (TOTVS)
+URL: https://tdn.totvs.com/pages/viewpage.action?pageId=652406360
+Tipo:  Documentação Técnica - TOTVS
+Descrição: Documentação técnica TOTVS para configuração de boletos Caixa.
+           Parâmetros, códigos de configuração, troubleshooting. 
+Relevância: MÉDIA - Referência de ERP consolidado no mercado
+
+
+--------------------------------------------------------------------------------
+5. REPOSITÓRIOS E CÓDIGO OPEN SOURCE
+--------------------------------------------------------------------------------
+
+[15] GitHub - devLopez/caixa-webservice
+URL: https://github.com/devLopez/caixa-webservice
+Tipo:  Repositório GitHub - Código Open Source
+Linguagem: PHP
+Descrição:  Implementação PHP de integração com Web Service SIGCB da Caixa.
+           Contém código-fonte, exemplos de XML, classes de integração SOAP.
+Relevância: ALTA - Referência prática de implementação Web Service
+Licença: Open Source
+
+
+================================================================================
+DOCUMENTOS PRIORITÁRIOS PARA IMPLEMENTAÇÃO
+================================================================================
+
+PARA CNAB 240 (RECOMENDADO):
+1. [CRÍTICO] Manual CNAB 240 - Caixa [2]
+2. [CRÍTICO] Especificações Código de Barras - Caixa [4]
+3. [IMPORTANTE] Layout FEBRABAN CNAB 240 [5]
+
+PARA WEB SERVICE SOAP/XML (ALTERNATIVA):
+1. [CRÍTICO] Manual Web Service XML - Caixa [1]
+2. [CRÍTICO] Especificações Código de Barras - Caixa [4]
+3. [REFERÊNCIA] GitHub devLopez/caixa-webservice [15]
+
+
+================================================================================
+OBSERVAÇÕES TÉCNICAS
+================================================================================
+
+1.  AMBIENTES: 
+   - Homologação: Requer credenciais fornecidas pela Caixa após contratação
+   - Produção:  Liberado após aprovação dos testes de homologação
+
+2. REQUISITOS PARA HOMOLOGAÇÃO:
+   - Contrato de cobrança ativo com a Caixa
+   - Código do Beneficiário (cedente)
+   - Convênio de cobrança
+   - Certificado digital (apenas para Web Service)
+   - Envio de amostras de boletos para aprovação
+
+3. PROCESSO DE CREDENCIAMENTO:
+   a) Contratar serviço de cobrança na Caixa
+   b) Receber credenciais de homologação
+   c) Desenvolver integração
+   d) Realizar testes em ambiente de homologação
+   e) Enviar casos de teste para validação da Caixa
+   f) Aguardar aprovação
+   g) Receber credenciais de produção
+   h) Deploy em produção
+
+4. PARTICULARIDADES DA CAIXA:
+   - Código do Banco:  104
+   - Nosso Número: 17 dígitos
+   - Carteira padrão: 1
+   - Modalidade comum: 14
+   - Campo livre do código de barras: 25 posições (específico da Caixa)
+
+5. VALIDAÇÕES IMPORTANTES:
+   - CPF/CNPJ deve ser validado
+   - Data de vencimento não pode ser retroativa
+   - Nosso Número deve ser único por beneficiário
+   - Código de barras:  44 posições
+   - Linha digitável: 47 posições
+   - Fator de vencimento calculado a partir de 07/10/1997
+
+
+================================================================================
+TECNOLOGIAS SUGERIDAS PARA IMPLEMENTAÇÃO DJANGO
+================================================================================
+
+1. Django REST Framework - APIs REST
+2. ReportLab ou WeasyPrint - Geração de PDF
+3. python-decouple ou django-environ - Variáveis de ambiente
+4. Celery (opcional) - Processamento assíncrono de remessa/retorno
+5. django-storages (opcional) - Armazenamento de arquivos CNAB
+
+
+================================================================================
+LINKS ÚTEIS ADICIONAIS
+================================================================================
+
+- Site oficial Caixa:  https://www.caixa.gov.br
+- Central de Downloads Cobrança: https://www.caixa.gov.br/Downloads/cobranca-caixa/
+- FEBRABAN: https://www.febraban.org. br
+- Projeto ACBr: https://www.projetoacbr.com. br
+
+
+================================================================================
+HISTÓRICO DE VERSÕES DESTE DOCUMENTO
+================================================================================
+
+Versão 1.0 - 24/12/2025
+- Documento inicial com 15 fontes pesquisadas
+- Categorização por tipo de fonte
+- Priorização de documentos críticos
+
+
+================================================================================
+FIM DO DOCUMENTO
+================================================================================

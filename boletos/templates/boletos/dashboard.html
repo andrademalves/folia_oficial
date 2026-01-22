@@ -1,0 +1,164 @@
+{% extends 'base.html' %}
+
+{% block title %}Boletos Bancários - Dashboard{% endblock %}
+
+{% block extra_css %}
+{% include 'boletos/includes/styles.html' %}
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-0">
+  <div class="row g-0">
+    <div class="col-md-2">
+      {% include 'boletos/includes/sidebar.html' %}
+    </div>
+    <div class="col-md-10">
+      <div class="p-4">
+        <div class="content-card mb-4">
+          <h3 class="text-white mb-0"><i class="fas fa-barcode"></i> Dashboard de Boletos</h3>
+        </div>
+        
+        {% if messages %}
+          {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+              {{ message }}
+              <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+          {% endfor %}
+        {% endif %}
+        
+        <!-- Cards de Resumo -->
+        <div class="row g-3 mb-4">
+          <div class="col-md-3">
+            <div class="content-card text-center">
+              <div style="color: #7dd3fc;">
+                <i class="fas fa-file-invoice fa-2x mb-2"></i>
+                <h4 class="text-white mb-0">{{ total_boletos }}</h4>
+                <small class="text-white-50">Total de Boletos</small>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="content-card text-center">
+              <div style="color: #fbbf24;">
+                <i class="fas fa-clock fa-2x mb-2"></i>
+                <h4 class="text-white mb-0">{{ boletos_emitidos }}</h4>
+                <small class="text-white-50">Emitidos</small>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="content-card text-center">
+              <div style="color: #34d399;">
+                <i class="fas fa-check-circle fa-2x mb-2"></i>
+                <h4 class="text-white mb-0">{{ boletos_pagos }}</h4>
+                <small class="text-white-50">Pagos</small>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="content-card text-center">
+              <div style="color: #f87171;">
+                <i class="fas fa-exclamation-triangle fa-2x mb-2"></i>
+                <h4 class="text-white mb-0">{{ boletos_vencidos }}</h4>
+                <small class="text-white-50">Vencidos</small>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="row g-3">
+          <!-- Boletos Vencendo -->
+          <div class="col-md-6">
+            <div class="content-card">
+              <h5 class="text-warning mb-3"><i class="fas fa-calendar-alt"></i> Vencendo nos Próximos 7 Dias</h5>
+              {% if boletos_vencendo %}
+                <div class="table-responsive">
+                  <table class="table table-custom">
+                    <thead>
+                      <tr>
+                        <th>Nosso Número</th>
+                        <th>Cliente</th>
+                        <th>Vencimento</th>
+                        <th>Valor</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {% for boleto in boletos_vencendo %}
+                        <tr>
+                          <td><a href="{% url 'boletos:detalhe_boleto' boleto.id %}" class="text-info">{{ boleto.nosso_numero }}</a></td>
+                          <td>{{ boleto.cliente.nome|truncatewords:3 }}</td>
+                          <td>{{ boleto.data_vencimento|date:"d/m/Y" }}</td>
+                          <td class="text-end">R$ {{ boleto.valor_documento|floatformat:2 }}</td>
+                        </tr>
+                      {% endfor %}
+                    </tbody>
+                  </table>
+                </div>
+              {% else %}
+                <p class="text-white-50">Nenhum boleto vencendo nos próximos dias.</p>
+              {% endif %}
+            </div>
+          </div>
+          
+          <!-- Remessas Recentes -->
+          <div class="col-md-6">
+            <div class="content-card">
+              <h5 class="text-info mb-3"><i class="fas fa-folder-open"></i> Remessas Recentes</h5>
+              {% if remessas_recentes %}
+                <div class="table-responsive">
+                  <table class="table table-custom">
+                    <thead>
+                      <tr>
+                        <th>Arquivo</th>
+                        <th>Títulos</th>
+                        <th>Status</th>
+                        <th>Data</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {% for remessa in remessas_recentes %}
+                        <tr>
+                          <td><a href="{% url 'boletos:detalhe_remessa' remessa.id %}" class="text-info">{{ remessa.nome_arquivo|truncatewords:2 }}</a></td>
+                          <td>{{ remessa.quantidade_titulos }}</td>
+                          <td>
+                            {% if remessa.status == 'GERADO' %}
+                              <span class="badge bg-warning">{{ remessa.status }}</span>
+                            {% elif remessa.status == 'ENVIADO' %}
+                              <span class="badge bg-info">{{ remessa.status }}</span>
+                            {% elif remessa.status == 'PROCESSADO' %}
+                              <span class="badge bg-success">{{ remessa.status }}</span>
+                            {% else %}
+                              <span class="badge bg-danger">{{ remessa.status }}</span>
+                            {% endif %}
+                          </td>
+                          <td>{{ remessa.data_geracao|date:"d/m/Y H:i" }}</td>
+                        </tr>
+                      {% endfor %}
+                    </tbody>
+                  </table>
+                </div>
+              {% else %}
+                <p class="text-white-50">Nenhuma remessa gerada ainda.</p>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+        
+        <!-- Ações Rápidas -->
+        <div class="content-card mt-4">
+          <h5 class="text-white mb-3"><i class="fas fa-bolt"></i> Ações Rápidas</h5>
+          <div class="d-flex gap-2">
+            <a href="{% url 'boletos:gerar_remessa_cnab' %}" class="btn btn-primary">
+              <i class="fas fa-file-export"></i> Gerar Remessa CNAB
+            </a>
+            <a href="{% url 'boletos:lista_boletos' %}" class="btn btn-outline-primary">
+              <i class="fas fa-list"></i> Ver Todos os Boletos
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

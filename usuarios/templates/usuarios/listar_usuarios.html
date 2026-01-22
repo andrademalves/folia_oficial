@@ -1,0 +1,130 @@
+{% extends 'base.html' %}
+{% load permissoes_tags %}
+
+{% block title %}Gestão de Acessos{% endblock %}
+
+{% block extra_css %}
+<style>
+    body { background: radial-gradient(circle at 10% 20%, #0ea5e9 0%, #0f172a 35%, #0b1224 65%, #0a0f1e 100%); }
+    .glass-card { background: rgba(15, 23, 42, 0.78); border: 1px solid rgba(255,255,255,0.08); box-shadow: 0 18px 48px rgba(0,0,0,0.45); border-radius: 16px; backdrop-filter: blur(12px); }
+    .table thead th { color: #e5e7eb; border-bottom: 1px solid rgba(255,255,255,0.18); background: linear-gradient(90deg, rgba(34,211,238,0.16), rgba(99,102,241,0.16)); }
+    .table tbody td { color: #f8fafc; border-bottom: 1px solid rgba(255,255,255,0.06); background: rgba(255,255,255,0.015); }
+    .table tbody tr:hover td { background: rgba(34,211,238,0.06); }
+    .badge.bg-success { background: linear-gradient(135deg, #22c55e, #16a34a); box-shadow: 0 6px 16px rgba(34,197,94,0.35); }
+    .badge.bg-danger { background: linear-gradient(135deg, #ef4444, #dc2626); box-shadow: 0 6px 16px rgba(239,68,68,0.35); }
+    .btn-primary { background: linear-gradient(135deg, #22d3ee, #6366f1); border: none; box-shadow: 0 10px 28px rgba(99,102,241,0.45); }
+    .btn-warning { background: #f59e0b; border: none; }
+    .btn-info { background: #0ea5e9; border: none; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="glass-card mb-4 p-4">
+        <div class="d-flex flex-wrap justify-content-between align-items-center" style="gap: 12px;">
+            <div>
+                <p class="mb-1 text-uppercase" style="letter-spacing: 1px; color: #7dd3fc; font-weight: 700;">Sistema</p>
+                <h3 class="mb-0" style="color: #e2e8f0; font-weight: 800;">Gestão de Acessos</h3>
+                <small style="color: #cbd5e1;">Controle de usuários e permissões.</small>
+            </div>
+            <div class="d-flex flex-wrap align-items-center" style="gap: 8px;">
+                <form method="get" class="d-flex" style="gap: 6px;">
+                    <input type="hidden" name="sort" value="{{ sort }}">
+                    <input type="text" name="q" class="form-control form-control-sm" placeholder="Filtrar usuário" value="{{ q }}" style="background: rgba(255,255,255,0.08); color: #e2e8f0; border: 1px solid rgba(255,255,255,0.15);">
+                    <button class="btn btn-primary btn-sm" type="submit"><i class="fas fa-search"></i></button>
+                </form>
+                {% if q %}
+                    <a href="{% url 'listar_usuarios' %}" class="btn btn-outline-light btn-sm">Limpar</a>
+                {% endif %}
+                {% tem_permissao_menu '/usuarios/' 'criar' as pode_criar %}
+                {% if pode_criar %}
+                <a href="{% url 'criar_usuario' %}" class="btn btn-primary btn-sm">
+                    <i class="fas fa-plus"></i> Novo Usuário
+                </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="glass-card p-0">
+        <div class="table-responsive">
+            <table class="table mb-0 align-middle">
+                <thead>
+                    <tr>
+                        <th>
+                            Username
+                            <a href="?sort={% if sort == 'username' %}-username{% else %}username{% endif %}{% if q %}&q={{ q }}{% endif %}" class="text-decoration-none text-light"><i class="fas fa-sort"></i></a>
+                        </th>
+                        <th>
+                            Nome
+                            <a href="?sort={% if sort == 'nome' %}-nome{% elif sort == '-nome' %}nome{% else %}nome{% endif %}{% if q %}&q={{ q }}{% endif %}" class="text-decoration-none text-light"><i class="fas fa-sort"></i></a>
+                        </th>
+                        <th>
+                            Sobrenome
+                            <a href="?sort={% if sort == 'sobrenome' %}-sobrenome{% elif sort == '-sobrenome' %}sobrenome{% else %}sobrenome{% endif %}{% if q %}&q={{ q }}{% endif %}" class="text-decoration-none text-light"><i class="fas fa-sort"></i></a>
+                        </th>
+                        <th>
+                            Email
+                            <a href="?sort={% if sort == 'email' %}-email{% elif sort == '-email' %}email{% else %}email{% endif %}{% if q %}&q={{ q }}{% endif %}" class="text-decoration-none text-light"><i class="fas fa-sort"></i></a>
+                        </th>
+                        <th>
+                            Cargo
+                            <a href="?sort={% if sort == 'cargo' %}-cargo{% elif sort == '-cargo' %}cargo{% else %}cargo{% endif %}{% if q %}&q={{ q }}{% endif %}" class="text-decoration-none text-light"><i class="fas fa-sort"></i></a>
+                        </th>
+                        <th>
+                            Departamento
+                            <a href="?sort={% if sort == 'departamento' %}-departamento{% elif sort == '-departamento' %}departamento{% else %}departamento{% endif %}{% if q %}&q={{ q }}{% endif %}" class="text-decoration-none text-light"><i class="fas fa-sort"></i></a>
+                        </th>
+                        <th>
+                            Status
+                            <a href="?sort={% if sort == 'status' %}-status{% elif sort == '-status' %}status{% else %}status{% endif %}{% if q %}&q={{ q }}{% endif %}" class="text-decoration-none text-light"><i class="fas fa-sort"></i></a>
+                        </th>
+                        <th class="text-end">Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for usuario in usuarios %}
+                    <tr>
+                        <td>{{ usuario.username }}</td>
+                        <td>{{ usuario.first_name|default:"-" }}</td>
+                        <td>{{ usuario.last_name|default:"-" }}</td>
+                        <td>{{ usuario.email|default:"-" }}</td>
+                        <td>{{ usuario.perfil.cargo|default:"-" }}</td>
+                        <td>{{ usuario.perfil.departamento|default:"-" }}</td>
+                        <td>
+                            {% if usuario.is_active %}
+                                <span class="badge bg-success">Ativo</span>
+                            {% else %}
+                                <span class="badge bg-danger">Inativo</span>
+                            {% endif %}
+                        </td>
+                        <td class="text-end">
+                            {% tem_permissao_menu '/usuarios/' 'editar' as pode_editar %}
+                            {% if pode_editar %}
+                            <a href="{% url 'alternar_status_usuario' usuario.id %}" class="btn btn-sm {% if usuario.is_active %}btn-outline-danger{% else %}btn-outline-success{% endif %}" title="{% if usuario.is_active %}Inativar{% else %}Ativar{% endif %}">
+                                <i class="fas {% if usuario.is_active %}fa-user-slash{% else %}fa-user-check{% endif %}"></i>
+                            </a>
+                            <a href="{% url 'editar_usuario' usuario.id %}" class="btn btn-sm btn-warning" title="Editar">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            {% endif %}
+                            
+                            {% tem_permissao_menu '/permissoes/' 'visualizar' as pode_ver_permissoes %}
+                            {% if pode_ver_permissoes or request.user.is_superuser %}
+                            <a href="{% url 'gerenciar_permissoes' usuario.id %}" class="btn btn-sm btn-info" title="Permissões">
+                                <i class="fas fa-key"></i>
+                            </a>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="8" class="text-center text-muted">Nenhum usuário encontrado.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

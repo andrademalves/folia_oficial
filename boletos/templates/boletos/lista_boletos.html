@@ -1,0 +1,295 @@
+{% extends 'base.html' %}
+
+{% block title %}Lista de Boletos - Boletos{% endblock %}
+
+{% block extra_css %}
+{% include 'boletos/includes/styles.html' %}
+<style>
+    .badge-secondary {
+        background: rgba(148, 163, 184, 0.2);
+        color: #94a3b8;
+        border: 1px solid rgba(148, 163, 184, 0.3);
+    }
+    .btn-sm {
+        font-size: 0.875rem;
+        padding: 0.25rem 0.5rem;
+    }
+    .form-label {
+        color: #cbd5e1;
+        font-weight: 600;
+    }
+    .form-control, .form-select {
+        background: rgba(15, 23, 42, 0.6);
+        border: 1px solid rgba(255,255,255,0.1);
+        color: #f8fafc;
+    }
+    .form-control:focus, .form-select:focus {
+        background: rgba(15, 23, 42, 0.8);
+        border-color: #22d3ee;
+        color: #f8fafc;
+        box-shadow: 0 0 0 0.2rem rgba(34,211,238,0.25);
+    }
+    
+    /* Select2 Dark Theme - Mesmas dimensões do .form-select */
+    .select2-container--default .select2-selection--single {
+        background: rgba(15, 23, 42, 0.6) !important;
+        border: 1px solid rgba(255,255,255,0.1) !important;
+        border-radius: 0.375rem !important;
+        height: 38px !important;
+        padding: 0 !important;
+    }
+    
+    .select2-container--default .select2-selection--single .select2-selection__rendered {
+        color: #f8fafc !important;
+        line-height: 36px !important;
+        padding-left: 12px !important;
+        padding-right: 20px !important;
+    }
+    
+    .select2-container--default .select2-selection--single .select2-selection__placeholder {
+        color: #94a3b8 !important;
+    }
+    
+    .select2-container--default .select2-selection--single .select2-selection__arrow {
+        height: 36px !important;
+        right: 10px !important;
+    }
+    
+    .select2-container--default .select2-selection--single .select2-selection__arrow b {
+        border-color: #f8fafc transparent transparent transparent !important;
+        border-width: 6px 5px 0 5px !important;
+    }
+    
+    .select2-container--default.select2-container--focus .select2-selection--single,
+    .select2-container--default.select2-container--open .select2-selection--single {
+        background: rgba(15, 23, 42, 0.8) !important;
+        border-color: #22d3ee !important;
+        box-shadow: 0 0 0 0.2rem rgba(34, 211, 238, 0.25) !important;
+    }
+    
+    /* Dropdown do Select2 - Fundo Escuro */
+    .select2-dropdown {
+        background: #1e293b !important;
+        border: 1px solid rgba(34, 211, 238, 0.3) !important;
+        border-radius: 8px !important;
+    }
+    
+    .select2-container--default .select2-search--dropdown .select2-search__field {
+        background: rgba(255, 255, 255, 0.1) !important;
+        border: 1px solid rgba(255,255,255,0.2) !important;
+        color: #f8fafc !important;
+        border-radius: 6px !important;
+        padding: 8px !important;
+    }
+    
+    .select2-container--default .select2-search--dropdown .select2-search__field:focus {
+        background: rgba(255, 255, 255, 0.15) !important;
+        border-color: #22d3ee !important;
+        outline: none !important;
+    }
+    
+    .select2-container--default .select2-results__option {
+        background: #1e293b !important;
+        color: #f8fafc !important;
+        padding: 10px !important;
+    }
+    
+    .select2-container--default .select2-results__option--highlighted[aria-selected] {
+        background: linear-gradient(135deg, #22d3ee, #6366f1) !important;
+        color: white !important;
+    }
+    
+    .select2-container--default .select2-results__option[aria-selected=true] {
+        background: rgba(34, 211, 238, 0.2) !important;
+        color: #22d3ee !important;
+    }
+    
+    .select2-results__message {
+        color: #94a3b8 !important;
+    }
+</style>
+
+<!-- Select2 CSS -->
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-0">
+  <div class="row g-0">
+    <div class="col-md-2">
+      {% include 'boletos/includes/sidebar.html' %}
+    </div>
+    <div class="col-md-10">
+      <div class="p-4">
+        <div class="content-card mb-4">
+          <h3 class="text-white mb-0"><i class="fas fa-list"></i> Lista de Boletos</h3>
+          <p class="text-muted mb-0">Gerencie todos os boletos bancários</p>
+        </div>
+        
+        {% if messages %}
+          {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+              {{ message }}
+              <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+          {% endfor %}
+        {% endif %}
+
+        <!-- Filtros -->
+        <div class="content-card mb-4">
+          <h5 class="text-white mb-3">Filtros</h5>
+          <form method="get" class="row g-3">
+            <div class="col-md-3">
+              <label for="status" class="form-label">Status</label>
+              <select name="status" id="status" class="form-select">
+                <option value="">Todos</option>
+                <option value="PENDENTE" {% if request.GET.status == 'PENDENTE' %}selected{% endif %}>Pendente</option>
+                <option value="EMITIDO" {% if request.GET.status == 'EMITIDO' %}selected{% endif %}>Emitido</option>
+                <option value="REGISTRADO" {% if request.GET.status == 'REGISTRADO' %}selected{% endif %}>Registrado</option>
+                <option value="PAGO" {% if request.GET.status == 'PAGO' %}selected{% endif %}>Pago</option>
+                <option value="CANCELADO" {% if request.GET.status == 'CANCELADO' %}selected{% endif %}>Cancelado</option>
+              </select>
+            </div>
+            <div class="col-md-3">
+              <label for="cliente" class="form-label">Cliente</label>
+              <select name="cliente" id="cliente" class="form-select select2-cliente">
+                <option value="">Todos</option>
+                {% for cliente in clientes %}
+                <option value="{{ cliente.id }}" {% if request.GET.cliente == cliente.id|stringformat:"s" %}selected{% endif %}>
+                  {{ cliente.nome }}
+                </option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="col-md-3">
+              <label for="nosso_numero" class="form-label">Nosso Número</label>
+              <input type="text" name="nosso_numero" id="nosso_numero" class="form-control" placeholder="Nosso número" value="{{ request.GET.nosso_numero }}">
+            </div>
+            <div class="col-md-3 d-flex align-items-end">
+              <button type="submit" class="btn btn-primary me-2"><i class="fas fa-search"></i> Filtrar</button>
+              <a href="{% url 'boletos:lista_boletos' %}" class="btn btn-outline-primary"><i class="fas fa-times"></i> Limpar</a>
+            </div>
+          </form>
+        </div>
+
+        <!-- Tabela de Boletos -->
+        <div class="content-card">
+          {% if boletos %}
+            <div class="table-responsive">
+              <table class="table table-hover">
+                <thead>
+                  <tr>
+                    <th>Nosso Número</th>
+                    <th>Cliente</th>
+                    <th>Vencimento</th>
+                    <th>Valor</th>
+                    <th>Status</th>
+                    <th>Ações</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for boleto in boletos %}
+                    <tr>
+                      <td>{{ boleto.numero_documento }}</td>
+                      <td>{{ boleto.cliente.nome }}</td>
+                      <td>{{ boleto.data_vencimento|date:"d/m/Y" }}</td>
+                      <td>R$ {{ boleto.valor_documento|floatformat:2 }}</td>
+                      <td>
+                        {% if boleto.status == 'PENDENTE' %}
+                          <span class="badge badge-warning">Pendente</span>
+                        {% elif boleto.status == 'EMITIDO' %}
+                          <span class="badge badge-info">Emitido</span>
+                        {% elif boleto.status == 'REGISTRADO' %}
+                          <span class="badge badge-success">Registrado</span>
+                        {% elif boleto.status == 'PAGO' %}
+                          <span class="badge badge-success">Pago</span>
+                        {% elif boleto.status == 'CANCELADO' %}
+                          <span class="badge badge-danger">Cancelado</span>
+                        {% endif %}
+                      </td>
+                      <td>
+                        <a href="{% url 'boletos:detalhe_boleto' boleto.id %}" class="btn btn-sm btn-outline-primary" title="Detalhes">
+                          <i class="fas fa-eye"></i>
+                        </a>
+                        {% if boleto.status != 'CANCELADO' %}
+                          <a href="{% url 'boletos:imprimir_boleto' boleto.id %}" class="btn btn-sm btn-outline-primary" title="Imprimir" target="_blank">
+                            <i class="fas fa-print"></i>
+                          </a>
+                        {% endif %}
+                        {% if boleto.status == 'EMITIDO' or boleto.status == 'REGISTRADO' %}
+                          <form method="post" action="{% url 'boletos:cancelar_boleto' boleto.id %}" style="display:inline;" onsubmit="return confirm('Deseja realmente cancelar este boleto?');">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-sm btn-outline-primary" title="Cancelar">
+                              <i class="fas fa-ban"></i>
+                            </button>
+                          </form>
+                        {% endif %}
+                      </td>
+                    </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Paginação -->
+            {% if boletos.has_other_pages %}
+              <nav aria-label="Navegação de páginas" class="mt-4">
+                <ul class="pagination justify-content-center">
+                  {% if boletos.has_previous %}
+                    <li class="page-item">
+                      <a class="page-link" href="?page={{ boletos.previous_page_number }}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}{% if request.GET.cliente %}&cliente={{ request.GET.cliente }}{% endif %}{% if request.GET.nosso_numero %}&nosso_numero={{ request.GET.nosso_numero }}{% endif %}">Anterior</a>
+                    </li>
+                  {% endif %}
+                  
+                  {% for num in boletos.paginator.page_range %}
+                    {% if boletos.number == num %}
+                      <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                    {% else %}
+                      <li class="page-item">
+                        <a class="page-link" href="?page={{ num }}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}{% if request.GET.cliente %}&cliente={{ request.GET.cliente }}{% endif %}{% if request.GET.nosso_numero %}&nosso_numero={{ request.GET.nosso_numero }}{% endif %}">{{ num }}</a>
+                      </li>
+                    {% endif %}
+                  {% endfor %}
+                  
+                  {% if boletos.has_next %}
+                    <li class="page-item">
+                      <a class="page-link" href="?page={{ boletos.next_page_number }}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}{% if request.GET.cliente %}&cliente={{ request.GET.cliente }}{% endif %}{% if request.GET.nosso_numero %}&nosso_numero={{ request.GET.nosso_numero }}{% endif %}">Próximo</a>
+                    </li>
+                  {% endif %}
+                </ul>
+              </nav>
+            {% endif %}
+          {% else %}
+            <div class="alert alert-info">
+              <i class="fas fa-info-circle"></i> Nenhum boleto encontrado.
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<!-- Select2 JS -->
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+<script>
+// Inicializar Select2 no campo Cliente
+$(document).ready(function() {
+    $('#cliente').select2({
+        placeholder: 'Selecione um cliente',
+        allowClear: true,
+        language: {
+            noResults: function() {
+                return "Nenhum cliente encontrado";
+            },
+            searching: function() {
+                return "Buscando...";
+            }
+        }
+    });
+});
+</script>
+{% endblock %}

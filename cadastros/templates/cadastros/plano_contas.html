@@ -1,0 +1,354 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Plano de Contas{% endblock %}
+
+{% block extra_css %}
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<style>
+  body { background: radial-gradient(circle at 10% 20%, #0ea5e9 0%, #0f172a 35%, #0b1224 65%, #0a0f1e 100%); }
+  .sidebar { background: rgba(15, 23, 42, 0.85); border-right: 1px solid rgba(255,255,255,0.08); backdrop-filter: blur(12px); height: calc(100vh - 56px); position: sticky; top: 56px; padding: 20px 0; }
+  .sidebar .nav-link { color: #cbd5e1; padding: 12px 20px; margin: 4px 8px; border-radius: 10px; transition: all 0.2s ease; display: flex; align-items: center; gap: 12px; }
+  .sidebar .nav-link:hover { background: rgba(34,211,238,0.1); color: #7dd3fc; }
+  .sidebar .nav-link.active { background: linear-gradient(135deg, rgba(34,211,238,0.2), rgba(99,102,241,0.2)); color: #e0e7ff; font-weight: 600; box-shadow: 0 4px 12px rgba(99,102,241,0.25); }
+  .sidebar .sidebar-header { color: #7dd3fc; font-weight: 700; letter-spacing: 1px; padding: 0 20px 16px; border-bottom: 1px solid rgba(255,255,255,0.06); margin-bottom: 16px; font-size: 14px; text-transform: uppercase; }
+  .content-card { background: rgba(15, 23, 42, 0.78); border: 1px solid rgba(255,255,255,0.08); box-shadow: 0 18px 48px rgba(0,0,0,0.45); border-radius: 16px; backdrop-filter: blur(12px); padding: 24px; }
+  .table thead th { color: #e5e7eb; border-bottom: 1px solid rgba(255,255,255,0.18); background: linear-gradient(90deg, rgba(34,211,238,0.16), rgba(99,102,241,0.16)); cursor: pointer; user-select: none; position: relative; }
+  .table thead th:hover { background: linear-gradient(90deg, rgba(34,211,238,0.25), rgba(99,102,241,0.25)); }
+  .table thead th.sortable::after { content: '\f0dc'; font-family: 'Font Awesome 5 Free'; font-weight: 900; margin-left: 8px; opacity: 0.3; font-size: 12px; }
+  .table thead th.sort-asc::after { content: '\f0de'; opacity: 1; color: #22d3ee; }
+  .table thead th.sort-desc::after { content: '\f0dd'; opacity: 1; color: #22d3ee; }
+  .table tbody td { color: #f8fafc; border-bottom: 1px solid rgba(255,255,255,0.06); background: rgba(255,255,255,0.015); }
+  .table tbody tr:hover td { background: rgba(34,211,238,0.06); }
+  .conta-pai { font-weight: 600; background: rgba(34,211,238,0.05) !important; }
+  .conta-filho { background: rgba(99,102,241,0.03) !important; }
+  .conta-nivel-1 { padding-left: 30px !important; }
+  .conta-nivel-2 { padding-left: 50px !important; }
+  .conta-nivel-3 { padding-left: 70px !important; }
+  .btn-expandir { cursor: pointer; color: #22d3ee; margin-right: 8px; transition: transform 0.2s; }
+  .btn-expandir.expandido { transform: rotate(90deg); }
+  .search-input { background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255,255,255,0.1); color: #f8fafc; }
+  .search-input:focus { background: rgba(15, 23, 42, 0.8); border-color: #22d3ee; color: #f8fafc; box-shadow: 0 0 0 0.2rem rgba(34,211,238,0.25); }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-0">
+  <div class="row g-0">
+    <div class="col-md-2">
+      <div class="sidebar">
+        <div class="sidebar-header"><i class="fas fa-list"></i> Cadastros</div>
+        <nav class="nav flex-column">
+          <a class="nav-link" href="{% url 'cadastros:dashboard' %}"><i class="fas fa-home"></i> <span>Dashboard</span></a>
+          <a class="nav-link active" href="{% url 'cadastros:plano_contas' %}"><i class="fas fa-sitemap"></i> <span>Plano de Contas</span></a>
+          <a class="nav-link" href="{% url 'cadastros:contas_financeiras' %}"><i class="fas fa-university"></i> <span>Contas Bancárias/Factory</span></a>
+          <a class="nav-link" href="{% url 'cadastros:metodos_pagamento' %}"><i class="fas fa-credit-card"></i> <span>Métodos de Pagamento</span></a>
+          <a class="nav-link" href="{% url 'cadastros:relatorios' %}"><i class="fas fa-file-alt"></i> <span>Relatórios</span></a>
+          <hr style="border-color: rgba(255,255,255,0.1); margin: 16px 8px;">
+          <a class="nav-link" href="{% url 'home_modulos' %}"><i class="fas fa-arrow-left"></i> <span>Voltar aos Módulos</span></a>
+        </nav>
+      </div>
+    </div>
+    <div class="col-md-10">
+      <div class="p-4">
+        <div class="content-card mb-4">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <p class="mb-1 text-uppercase" style="letter-spacing:1px;color:#7dd3fc;font-weight:700;">Plano de Contas</p>
+            </div>
+            <button class="btn btn-primary btn-sm" data-bs-toggle="collapse" data-bs-target="#novoPlanoConta"><i class="fas fa-plus"></i> Novo</button>
+          </div>
+        </div>
+        <div id="novoPlanoConta" class="collapse{% if editando %} show{% endif %} content-card mb-4">
+          <form method="post" class="">
+            {% csrf_token %}
+            <div class="row g-3">
+              <div class="col-md-2">
+                <label class="form-label" style="color:#cbd5e1;">ID {% if not editando %}(opcional){% endif %}</label>
+                {% if editando %}
+                  <input type="number" name="id" class="form-control" value="{{ form.id.value }}" readonly>
+                {% else %}
+                  <input type="number" name="id" min="1" class="form-control" value="{{ form.id.value|default:'' }}">
+                {% endif %}
+              </div>
+              <div class="col-md-3">
+                <label class="form-label" style="color:#cbd5e1;">Código</label>
+                {{ form.codigo }}
+              </div>
+              <div class="col-md-5">
+                <label class="form-label" style="color:#cbd5e1;">Nome da Conta</label>
+                {{ form.nome }}
+              </div>
+              <div class="col-md-2">
+                <label class="form-label" style="color:#cbd5e1;">Conta Pai</label>
+                {{ form.pai }}
+              </div>
+              <div class="col-md-12 d-flex align-items-center gap-3">
+                <div class="form-check">
+                  {{ form.ativo }}
+                  <label class="form-check-label" style="color:#cbd5e1;">Ativo</label>
+                </div>
+                <button class="btn btn-primary btn-sm" type="submit"><i class="fas fa-save"></i> Salvar</button>
+                {% if editando %}
+                  <a href="{% url 'cadastros:plano_contas' %}" class="btn btn-secondary btn-sm"><i class="fas fa-times"></i> Cancelar</a>
+                {% endif %}
+              </div>
+            </div>
+          </form>
+        </div>
+        <div class="content-card">
+          <div class="row mb-3 g-2">
+            <div class="col-md-6">
+              <input type="text" id="searchInput" class="form-control search-input" placeholder="🔍 Buscar por ID, Código, Nome ou Conta Pai...">
+            </div>
+            <div class="col-md-6 text-end">
+              <button class="btn btn-sm btn-info" id="expandirTodos"><i class="fas fa-plus-square"></i> Expandir Todos</button>
+              <button class="btn btn-sm btn-secondary" id="colapsarTodos"><i class="fas fa-minus-square"></i> Colapsar Todos</button>
+            </div>
+          </div>
+          <div class="table-responsive">
+            <table class="table mb-0 align-middle" id="tabelaPlanoContas">
+              <thead>
+                <tr>
+                  <th class="sortable" data-column="0">ID</th>
+                  <th class="sortable" data-column="1">Código</th>
+                  <th class="sortable" data-column="2">Nome da Conta</th>
+                  <th class="sortable" data-column="3">Conta Pai</th>
+                  <th class="sortable" data-column="4">Ativo</th>
+                  <th style="width: 180px;">Ações</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% if registros %}
+                  {% for r in registros %}
+                  <tr data-id="{{ r.id }}" data-pai="{{ r.pai.id|default:'0' }}" class="{% if not r.pai %}conta-pai{% else %}conta-filho conta-nivel-1 hidden{% endif %}" data-codigo="{{ r.codigo }}" data-nome="{{ r.nome }}" data-conta-pai="{{ r.pai.nome|default:'-' }}">
+                    <td>{{ r.id }}</td>
+                    <td>{{ r.codigo }}</td>
+                    <td>
+                      {% if not r.pai %}
+                        <i class="fas fa-caret-right btn-expandir" data-conta-id="{{ r.id }}"></i>
+                      {% endif %}
+                      {{ r.nome }}
+                    </td>
+                    <td>{{ r.pai.nome|default:"-" }}</td>
+                    <td>
+                      {% if r.ativo %}
+                        <span class="badge bg-success">Ativo</span>
+                      {% else %}
+                        <span class="badge bg-danger">Inativo</span>
+                      {% endif %}
+                    </td>
+                    <td>
+                      <a href="{% url 'cadastros:editar_plano_conta' r.id %}" class="btn btn-sm btn-warning" title="Editar">
+                        <i class="fas fa-edit"></i>
+                      </a>
+                      {% if r.ativo %}
+                        <a href="{% url 'cadastros:inativar_plano_conta' r.id %}" class="btn btn-sm btn-danger btn-inativar" title="Inativar" data-nome="{{ r.nome }}">
+                          <i class="fas fa-ban"></i>
+                        </a>
+                      {% else %}
+                        <a href="{% url 'cadastros:ativar_plano_conta' r.id %}" class="btn btn-sm btn-success btn-ativar" title="Ativar" data-nome="{{ r.nome }}">
+                          <i class="fas fa-check-circle"></i>
+                        </a>
+                      {% endif %}
+                    </td>
+                  </tr>
+                  {% endfor %}
+                {% else %}
+                  <tr>
+                    <td colspan="6" class="text-center text-muted">Nenhum registro.</td>
+                  </tr>
+                {% endif %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Inativar conta com SweetAlert2
+  document.querySelectorAll('.btn-inativar').forEach(function(btn) {
+    btn.addEventListener('click', function(e) {
+      e.preventDefault();
+      const url = this.href;
+      const nomeConta = this.dataset.nome;
+      
+      Swal.fire({
+        title: 'Confirmar Inativação',
+        text: `Deseja realmente inativar a conta "${nomeConta}"?`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Sim, inativar',
+        cancelButtonText: 'Cancelar',
+        background: 'rgba(15, 23, 42, 0.95)',
+        color: '#f8fafc'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          window.location.href = url;
+        }
+      });
+    });
+  });
+
+  // Ativar conta com SweetAlert2
+  document.querySelectorAll('.btn-ativar').forEach(function(btn) {
+    btn.addEventListener('click', function(e) {
+      e.preventDefault();
+      const url = this.href;
+      const nomeConta = this.dataset.nome;
+      
+      Swal.fire({
+        title: 'Confirmar Ativação',
+        text: `Deseja realmente ativar a conta "${nomeConta}"?`,
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#22c55e',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Sim, ativar',
+        cancelButtonText: 'Cancelar',
+        background: 'rgba(15, 23, 42, 0.95)',
+        color: '#f8fafc'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          window.location.href = url;
+        }
+      });
+    });
+  });
+
+  // Expandir/Colapsar hierarquia
+  document.querySelectorAll('.btn-expandir').forEach(function(btn) {
+    btn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      const contaId = this.dataset.contaId;
+      const filhos = document.querySelectorAll(`tr[data-pai="${contaId}"]`);
+      const isExpandido = this.classList.contains('expandido');
+      
+      if (isExpandido) {
+        // Colapsar
+        this.classList.remove('expandido');
+        filhos.forEach(function(filho) {
+          filho.classList.add('hidden');
+          const btnFilho = filho.querySelector('.btn-expandir');
+          if (btnFilho && btnFilho.classList.contains('expandido')) {
+            btnFilho.click();
+          }
+        });
+      } else {
+        // Expandir
+        this.classList.add('expandido');
+        filhos.forEach(function(filho) {
+          filho.classList.remove('hidden');
+        });
+      }
+    });
+  });
+
+  // Expandir todos
+  document.getElementById('expandirTodos').addEventListener('click', function() {
+    document.querySelectorAll('.btn-expandir').forEach(function(btn) {
+      if (!btn.classList.contains('expandido')) {
+        btn.click();
+      }
+    });
+  });
+
+  // Colapsar todos
+  document.getElementById('colapsarTodos').addEventListener('click', function() {
+    document.querySelectorAll('.btn-expandir.expandido').forEach(function(btn) {
+      btn.click();
+    });
+  });
+
+  // Ordenação de colunas
+  let ordemAtual = { coluna: null, direcao: 'asc' };
+  
+  document.querySelectorAll('th.sortable').forEach(function(th) {
+    th.addEventListener('click', function() {
+      const coluna = parseInt(this.dataset.column);
+      
+      // Remove classes de ordenação de todos os headers
+      document.querySelectorAll('th.sortable').forEach(function(h) {
+        h.classList.remove('sort-asc', 'sort-desc');
+      });
+      
+      // Define direção
+      if (ordemAtual.coluna === coluna) {
+        ordemAtual.direcao = ordemAtual.direcao === 'asc' ? 'desc' : 'asc';
+      } else {
+        ordemAtual.direcao = 'asc';
+      }
+      ordemAtual.coluna = coluna;
+      
+      // Adiciona classe de ordenação
+      this.classList.add(ordemAtual.direcao === 'asc' ? 'sort-asc' : 'sort-desc');
+      
+      // Ordena
+      const tbody = document.querySelector('#tabelaPlanoContas tbody');
+      const linhas = Array.from(tbody.querySelectorAll('tr'));
+      
+      linhas.sort(function(a, b) {
+        let valorA = a.cells[coluna].innerText.trim();
+        let valorB = b.cells[coluna].innerText.trim();
+        
+        // Tenta converter para número se possível
+        const numA = parseFloat(valorA);
+        const numB = parseFloat(valorB);
+        
+        if (!isNaN(numA) && !isNaN(numB)) {
+          return ordemAtual.direcao === 'asc' ? numA - numB : numB - numA;
+        }
+        
+        // Comparação de string
+        if (ordemAtual.direcao === 'asc') {
+          return valorA.localeCompare(valorB);
+        } else {
+          return valorB.localeCompare(valorA);
+        }
+      });
+      
+      // Reinsere linhas ordenadas
+      linhas.forEach(function(linha) {
+        tbody.appendChild(linha);
+      });
+    });
+  });
+
+  // Busca/Filtro
+  const searchInput = document.getElementById('searchInput');
+  searchInput.addEventListener('input', function() {
+    const filtro = this.value.toLowerCase();
+    const linhas = document.querySelectorAll('#tabelaPlanoContas tbody tr');
+    
+    linhas.forEach(function(linha) {
+      const id = linha.cells[0]?.innerText.toLowerCase() || '';
+      const codigo = linha.dataset.codigo?.toLowerCase() || '';
+      const nome = linha.dataset.nome?.toLowerCase() || '';
+      const contaPai = linha.dataset.contaPai?.toLowerCase() || '';
+      
+      const match = id.includes(filtro) || 
+                   codigo.includes(filtro) || 
+                   nome.includes(filtro) || 
+                   contaPai.includes(filtro);
+      
+      if (match) {
+        linha.style.display = '';
+      } else {
+        linha.style.display = 'none';
+      }
+    });
+  });
+});
+</script>
+<style>
+  .hidden { display: none; }
+</style>
+{% endblock %}

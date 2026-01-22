@@ -1,0 +1,264 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Configurações Bancárias{% endblock %}
+
+{% block extra_css %}
+<style>
+    :root {
+        --primary-color: #667eea;
+        --secondary-color: #764ba2;
+        --success-color: #48bb78;
+        --danger-color: #f56565;
+    }
+    
+    body {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+    }
+    
+    .main-container {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        border-radius: 20px;
+        padding: 30px;
+        margin: 20px 0;
+        box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+    }
+    
+    .page-header {
+        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        color: white;
+        padding: 25px;
+        border-radius: 15px;
+        margin-bottom: 30px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .btn-add {
+        background: white;
+        color: var(--primary-color);
+        border: none;
+        border-radius: 10px;
+        padding: 10px 25px;
+        font-weight: 600;
+        transition: all 0.3s;
+    }
+    
+    .btn-add:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(255, 255, 255, 0.4);
+    }
+    
+    .table-container {
+        background: white;
+        border-radius: 15px;
+        padding: 20px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        overflow-x: auto;
+    }
+    
+    .table thead th {
+        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        color: white;
+        border: none;
+        padding: 15px;
+        font-weight: 600;
+    }
+    
+    .table tbody tr {
+        transition: all 0.3s;
+    }
+    
+    .table tbody tr:hover {
+        background: rgba(102, 126, 234, 0.05);
+        transform: scale(1.01);
+    }
+    
+    .badge {
+        padding: 5px 10px;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 600;
+    }
+    
+    .badge-success {
+        background: var(--success-color);
+        color: white;
+    }
+    
+    .badge-danger {
+        background: var(--danger-color);
+        color: white;
+    }
+    
+    .btn-action {
+        padding: 5px 10px;
+        border-radius: 5px;
+        margin: 0 2px;
+        border: none;
+        transition: all 0.3s;
+    }
+    
+    .btn-action:hover {
+        transform: translateY(-2px);
+    }
+    
+    .sidebar-module {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        border-radius: 15px;
+        padding: 20px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        position: sticky;
+        top: 20px;
+    }
+    
+    .sidebar-module .nav-link {
+        color: #4a5568;
+        padding: 12px 15px;
+        border-radius: 10px;
+        margin-bottom: 5px;
+        transition: all 0.3s;
+        display: flex;
+        align-items: center;
+        text-decoration: none;
+    }
+    
+    .sidebar-module .nav-link:hover,
+    .sidebar-module .nav-link.active {
+        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        color: white;
+        transform: translateX(5px);
+    }
+    
+    .sidebar-module .nav-link i {
+        margin-right: 10px;
+        font-size: 1.1rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar -->
+        {% if not hide_sidebar %}
+        <div class="col-md-2">
+            <div class="sidebar-module">
+                <h5 class="mb-3"><i class="fas fa-barcode"></i> Boletos</h5>
+                <nav class="nav flex-column">
+                    <a class="nav-link" href="{% url 'boletos:dashboard_boletos' %}">
+                        <i class="fas fa-home"></i> Dashboard
+                    </a>
+                    <a class="nav-link" href="{% url 'boletos:selecionar_parcelas_boleto' %}">
+                        <i class="fas fa-plus-circle"></i> Gerar Boletos
+                    </a>
+                    <a class="nav-link" href="{% url 'boletos:lista_boletos' %}">
+                        <i class="fas fa-list"></i> Listar Boletos
+                    </a>
+                    <a class="nav-link" href="{% url 'boletos:gerar_remessa_cnab' %}">
+                        <i class="fas fa-file-export"></i> Gerar Remessa
+                    </a>
+                    <a class="nav-link" href="{% url 'boletos:lista_remessas' %}">
+                        <i class="fas fa-archive"></i> Remessas CNAB
+                    </a>
+                    <a class="nav-link active" href="{% url 'boletos:lista_configuracoes' %}">
+                        <i class="fas fa-cog"></i> Configurações
+                    </a>
+                </nav>
+            </div>
+        </div>
+        {% endif %}
+        
+        <!-- Conteúdo -->
+        <div class="{% if hide_sidebar %}col-md-12{% else %}col-md-10{% endif %}">
+            <div class="main-container">
+                <div class="page-header">
+                    <div>
+                        <h2><i class="fas fa-university"></i> Configurações Bancárias</h2>
+                        <p class="mb-0">Gerencie as configurações para emissão de boletos</p>
+                    </div>
+                    <div>
+                        <a href="{% url 'boletos:dashboard_boletos' %}" class="btn btn-add me-2" style="background: rgba(255,255,255,0.2); color: white;">
+                            <i class="fas fa-arrow-left"></i> Voltar
+                        </a>
+                        <a href="{% url 'boletos:criar_configuracao' %}" class="btn btn-add">
+                            <i class="fas fa-plus"></i> Nova Configuração
+                        </a>
+                    </div>
+                </div>
+                
+                {% if messages %}
+                    {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                    {% endfor %}
+                {% endif %}
+                
+                <div class="table-container">
+                    {% if configuracoes %}
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Status</th>
+                                <th>Nome</th>
+                                <th>Conta Financeira</th>
+                                <th>Banco</th>
+                                <th>Agência/Conta</th>
+                                <th>Convênio</th>
+                                <th>Nosso Número</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for config in configuracoes %}
+                            <tr>
+                                <td>
+                                    {% if config.ativo %}
+                                    <span class="badge badge-success">Ativa</span>
+                                    {% else %}
+                                    <span class="badge badge-danger">Inativa</span>
+                                    {% endif %}
+                                </td>
+                                <td><strong>{{ config.nome }}</strong></td>
+                                <td>
+                                    {% if config.conta_financeira %}
+                                    <i class="fas fa-link text-success"></i> {{ config.conta_financeira.nome }}
+                                    {% else %}
+                                    <span class="text-muted">Não vinculada</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ config.codigo_banco }}</td>
+                                <td>{{ config.agencia }}{% if config.agencia_dv %}-{{ config.agencia_dv }}{% endif %} / {{ config.conta }}{% if config.conta_dv %}-{{ config.conta_dv }}{% endif %}</td>
+                                <td>{{ config.convenio|default:"-" }}</td>
+                                <td>{{ config.nosso_numero_atual }} / {{ config.nosso_numero_fim|default:"∞" }}</td>
+                                <td>
+                                    <a href="{% url 'boletos:editar_configuracao' config.id %}" class="btn btn-action btn-sm btn-primary" title="Editar">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <a href="{% url 'boletos:excluir_configuracao' config.id %}" class="btn btn-action btn-sm btn-danger" title="Excluir">
+                                        <i class="fas fa-trash"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    {% else %}
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle"></i> Nenhuma configuração bancária cadastrada.
+                        <a href="{% url 'boletos:criar_configuracao' %}" class="alert-link">Criar a primeira configuração</a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

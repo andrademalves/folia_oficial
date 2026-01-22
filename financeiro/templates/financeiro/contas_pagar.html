@@ -1,0 +1,697 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Contas a Pagar - Financeiro{% endblock %}
+
+{% block extra_css %}
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<style>
+    body {
+        background: radial-gradient(circle at 10% 20%, #0ea5e9 0%, #0f172a 35%, #0b1224 65%, #0a0f1e 100%);
+    }
+    .financial-sidebar {
+        background: rgba(15, 23, 42, 0.85);
+        border-right: 1px solid rgba(255,255,255,0.08);
+        backdrop-filter: blur(12px);
+        height: calc(100vh - 56px);
+        position: sticky;
+        top: 56px;
+        padding: 20px 0;
+    }
+    .financial-sidebar .nav-link {
+        color: #cbd5e1;
+        padding: 12px 20px;
+        margin: 4px 8px;
+        border-radius: 10px;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+    .financial-sidebar .nav-link:hover {
+        background: rgba(34,211,238,0.1);
+        color: #7dd3fc;
+    }
+    .financial-sidebar .nav-link.active {
+        background: linear-gradient(135deg, rgba(34,211,238,0.2), rgba(99,102,241,0.2));
+        color: #e0e7ff;
+        font-weight: 600;
+        box-shadow: 0 4px 12px rgba(99,102,241,0.25);
+    }
+    .financial-sidebar .sidebar-header {
+        color: #7dd3fc;
+        font-weight: 700;
+        letter-spacing: 1px;
+        padding: 0 20px 16px;
+        border-bottom: 1px solid rgba(255,255,255,0.06);
+        margin-bottom: 16px;
+        font-size: 14px;
+        text-transform: uppercase;
+    }
+    .content-card {
+        background: rgba(15, 23, 42, 0.78);
+        border: 1px solid rgba(255,255,255,0.08);
+        box-shadow: 0 18px 48px rgba(0,0,0,0.45);
+        border-radius: 16px;
+        backdrop-filter: blur(12px);
+        padding: 24px;
+    }
+    .table thead th {
+        color: #e5e7eb;
+        border-bottom: 1px solid rgba(255,255,255,0.18);
+        background: linear-gradient(90deg, rgba(34,211,238,0.16), rgba(99,102,241,0.16));
+    }
+    .table thead th:hover {
+        background: linear-gradient(90deg, rgba(34,211,238,0.25), rgba(99,102,241,0.25));
+    }
+    .table tbody td {
+        color: #f8fafc;
+        border-bottom: 1px solid rgba(255,255,255,0.06);
+        background: rgba(255,255,255,0.015);
+    }
+    .table tbody tr:hover td {
+        background: rgba(34,211,238,0.06);
+    }
+    .badge-pago {
+        background: rgba(134, 239, 172, 0.2);
+        color: #86efac;
+        border: 1px solid rgba(134, 239, 172, 0.3);
+        padding: 5px 10px;
+        border-radius: 6px;
+        font-size: 11px;
+    }
+    .badge-pendente {
+        background: rgba(250, 204, 21, 0.2);
+        color: #facc15;
+        border: 1px solid rgba(250, 204, 21, 0.3);
+        padding: 5px 10px;
+        border-radius: 6px;
+        font-size: 11px;
+    }
+    .badge-atrasado {
+        background: rgba(252, 165, 165, 0.2);
+        color: #fca5a5;
+        border: 1px solid rgba(252, 165, 165, 0.3);
+        padding: 5px 10px;
+        border-radius: 6px;
+        font-size: 11px;
+    }
+    
+    /* Inputs e Form Controls */
+    .form-control, .form-select {
+        background: rgba(255, 255, 255, 0.08) !important;
+        border: 1px solid rgba(255, 255, 255, 0.15) !important;
+        color: #fff !important;
+        border-radius: 8px;
+        padding: 10px 14px;
+    }
+    
+    /* Select nativo - padrão aprovado */
+    select, select.form-control, select.form-select {
+        background: rgba(255, 255, 255, 0.08) !important;
+        border: 1px solid rgba(255, 255, 255, 0.15) !important;
+        color: #fff !important;
+    }
+    
+    select option {
+        background: #1e293b !important;
+        color: #e5e7eb !important;
+    }
+    
+    .form-control:focus, .form-select:focus {
+        background: rgba(255, 255, 255, 0.12) !important;
+        border-color: rgba(34, 211, 238, 0.5) !important;
+        color: #fff !important;
+        box-shadow: 0 0 0 0.2rem rgba(34, 211, 238, 0.25);
+    }
+    
+    .form-control::placeholder {
+        color: rgba(255, 255, 255, 0.4);
+    }
+    
+    .form-label {
+        color: #cbd5e1 !important;
+        font-weight: 600;
+        margin-bottom: 8px;
+        display: block;
+        font-size: 12px;
+    }
+    
+    /* Select2 Styling */
+    .select2-container--default .select2-selection--single {
+        background: rgba(255, 255, 255, 0.08) !important;
+        border: 1px solid rgba(255, 255, 255, 0.15) !important;
+        height: auto !important;
+        padding: 10px 14px !important;
+        border-radius: 8px !important;
+    }
+
+    .select2-container--default.select2-container--focus .select2-selection--single {
+        border-color: rgba(34, 211, 238, 0.5) !important;
+        box-shadow: 0 0 0 0.2rem rgba(34, 211, 238, 0.25) !important;
+    }
+
+    .select2-container--default .select2-selection--single .select2-selection__rendered {
+        color: #fff !important;
+        line-height: 1.5 !important;
+        padding: 0 !important;
+    }
+
+    .select2-container--default .select2-selection--single .select2-selection__arrow {
+        height: 100% !important;
+        right: 10px !important;
+    }
+
+    .select2-dropdown {
+        background: #0f172a !important;
+        border: 1px solid rgba(255, 255, 255, 0.15) !important;
+        border-radius: 8px !important;
+    }
+
+    .select2-container--default .select2-results {
+        background: #0f172a !important;
+    }
+
+    .select2-container--default .select2-results__options {
+        background: #0f172a !important;
+    }
+
+    .select2-search--dropdown {
+        background: #0f172a !important;
+        padding: 8px;
+    }
+
+    .select2-search--dropdown .select2-search__field {
+        background: rgba(255, 255, 255, 0.08) !important;
+        border: 1px solid rgba(255, 255, 255, 0.15) !important;
+        color: #fff !important;
+    }
+
+    .select2-results__option {
+        color: rgba(255, 255, 255, 0.8) !important;
+        background: #0f172a !important;
+    }
+
+    .select2-results__option--highlighted {
+        background: rgba(34, 211, 238, 0.3) !important;
+        color: #fff !important;
+    }
+
+    .select2-results__option--selected {
+        background: rgba(34, 211, 238, 0.2) !important;
+        color: #fff !important;
+    }
+
+    .select2-container--default .select2-results__option[aria-selected=true] {
+        background-color: rgba(34, 211, 238, 0.2) !important;
+        color: #fff !important;
+    }
+
+    .select2-container--default .select2-results__option--highlighted[aria-selected] {
+        background-color: rgba(34, 211, 238, 0.3) !important;
+        color: #fff !important;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid p-0">
+    <div class="row g-0">
+        <!-- Sidebar -->
+        <div class="col-2">
+            <div class="financial-sidebar">
+                <div class="sidebar-header">
+                    <i class="fas fa-money-bill-wave me-2"></i>Financeiro
+                </div>
+                <nav class="nav flex-column">
+                    <a class="nav-link" href="/"><i class="fas fa-home"></i> <span>Voltar aos Módulos</span></a>
+                    <a class="nav-link" href="{% url 'financeiro:dashboard' %}"><i class="fas fa-tachometer-alt"></i> <span>Dashboard</span></a>
+                    <a class="nav-link active" href="{% url 'financeiro:contaspagar_list' %}"><i class="fas fa-file-invoice-dollar"></i> <span>Contas a Pagar</span></a>
+                    <a class="nav-link" href="{% url 'financeiro:dar_baixa' %}"><i class="fas fa-money-check-alt"></i> <span>Dar Baixa</span></a>
+                    <a class="nav-link" href="{% url 'financeiro:conta_corrente_list' %}"><i class="fas fa-university"></i> <span>Conta Corrente</span></a>
+                    <a class="nav-link" href="{% url 'financeiro:relatorios' %}"><i class="fas fa-chart-bar"></i> <span>Relatórios</span></a>
+                </nav>
+            </div>
+        </div>
+
+        <!-- Conteúdo Principal -->
+        <div class="col-10 p-4">
+            <!-- Cabeçalho -->
+            <div class="content-card mb-4">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <p class="mb-1 text-uppercase" style="letter-spacing:1px;color:#7dd3fc;font-weight:700;">Contas a Pagar</p>
+                        <small style="color:#cbd5e1;">Gerenciamento de contas a pagar</small>
+                    </div>
+                    <a href="{% url 'financeiro:contaspagar_create' %}" class="btn btn-success">
+                        <i class="fas fa-plus me-2"></i>Nova Conta
+                    </a>
+                </div>
+            </div>
+
+            <!-- Filtros -->
+            <div class="content-card mb-4">
+                <form method="get" class="row g-3">
+                    <div class="col-md-2">
+                        <label class="form-label" style="color:#cbd5e1; font-size:12px;">Status</label>
+                        {{ form.status }}
+                    </div>
+                    
+                    <div class="col-md-2">
+                        <label class="form-label" style="color:#cbd5e1; font-size:12px;">Classificação</label>
+                        {{ form.classificacao }}
+                    </div>
+                    
+                    <div class="col-md-3">
+                        <label class="form-label" style="color:#cbd5e1; font-size:12px;">Fornecedor</label>
+                        {{ form.fornecedor }}
+                    </div>
+                    
+                    <div class="col-md-2">
+                        <label class="form-label" style="color:#cbd5e1; font-size:12px;">Data Início</label>
+                        {{ form.data_inicio }}
+                    </div>
+                    
+                    <div class="col-md-2">
+                        <label class="form-label" style="color:#cbd5e1; font-size:12px;">Data Fim</label>
+                        {{ form.data_fim }}
+                    </div>
+                    
+                    <div class="col-md-1 d-flex align-items-end">
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Barra de Busca Rápida -->
+            <div id="secao-busca" class="content-card mb-3" style="display: block !important; visibility: visible !important;">
+                <div class="mb-2">
+                    <h6 style="color: #7dd3fc; margin-bottom: 15px;">
+                        <i class="fas fa-filter"></i> Busca Rápida
+                    </h6>
+                </div>
+                <form method="get" class="row g-2 align-items-end">
+                    <!-- Manter filtros existentes -->
+                    {% for key, value in request.GET.items %}
+                        {% if key != 'campo_busca' and key != 'termo_busca' and key != 'page' %}
+                            <input type="hidden" name="{{ key }}" value="{{ value }}">
+                        {% endif %}
+                    {% endfor %}
+                    
+                    <div class="col-md-3">
+                        <label class="form-label" style="color:#cbd5e1; font-size:12px;">Campo de Busca</label>
+                        <select name="campo_busca" class="form-select">
+                            <option value="">Selecione...</option>
+                            <option value="id" {% if campo_busca == 'id' %}selected{% endif %}>ID</option>
+                            <option value="fornecedor" {% if campo_busca == 'fornecedor' %}selected{% endif %}>Fornecedor</option>
+                            <option value="descricao" {% if campo_busca == 'descricao' %}selected{% endif %}>Descrição</option>
+                            <option value="conta" {% if campo_busca == 'conta' %}selected{% endif %}>Conta</option>
+                            <option value="valor" {% if campo_busca == 'valor' %}selected{% endif %}>Valor</option>
+                        </select>
+                    </div>
+                    
+                    <div class="col-md-7">
+                        <label class="form-label" style="color:#cbd5e1; font-size:12px;">Termo de Busca</label>
+                        <input type="text" name="termo_busca" class="form-control" value="{{ termo_busca }}" placeholder="Digite o termo..." id="input-termo-busca">
+                    </div>
+                    
+                    <div class="col-md-2">
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="fas fa-search"></i> Buscar
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Debug Info (remover em produção) -->
+            {% if campo_busca and termo_busca %}
+            <div class="mb-2" style="font-size: 11px; color: #94a3b8;">
+                <small>Debug: Campo = "{{ campo_busca }}", Termo = "{{ termo_busca }}"</small>
+            </div>
+            {% endif %}
+
+            <!-- Total de Registros -->
+            <div class="mb-3 d-flex justify-content-between align-items-center">
+                <small style="color:#cbd5e1;">
+                    Total de registros: <strong style="color:#7dd3fc;">{{ total }}</strong>
+                    {% if contas.has_other_pages %}
+                    | Página {{ contas.number }} de {{ contas.paginator.num_pages }}
+                    {% endif %}
+                </small>
+                
+                {% if campo_busca and termo_busca %}
+                <a href="?{% for key, value in request.GET.items %}{% if key != 'campo_busca' and key != 'termo_busca' and key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}" class="btn btn-sm btn-outline-secondary">
+                    <i class="fas fa-times"></i> Limpar Busca
+                </a>
+                {% endif %}
+            </div>
+
+            <!-- Mensagem de Busca Aproximada -->
+            {% if mensagem_busca_valor %}
+            <div class="alert alert-warning d-flex align-items-center mb-3" role="alert" style="background: rgba(245, 158, 11, 0.15); border: 1px solid rgba(245, 158, 11, 0.3); color: #fbbf24;">
+                <i class="fas fa-info-circle me-2"></i>
+                <div>{{ mensagem_busca_valor }}</div>
+            </div>
+            {% endif %}
+
+            <!-- Tabela -->
+            <div class="content-card">
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Fornecedor</th>
+                                <th>Conta</th>
+                                <th>Vencimento</th>
+                                <th>Valor</th>
+                                <th>Status</th>
+                                <th>Classificação</th>
+                                <th width="180">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for conta in contas %}
+                            <tr>
+                                <td><small>#{{ conta.id }}</small></td>
+                                <td>
+                                    <strong>{{ conta.fornecedor }}</strong>
+                                    {% if conta.em_atraso %}
+                                    <br><small style="color:#fca5a5;">⚠️ Atrasada ({{ conta.dias_vencimento }} dias)</small>
+                                    {% endif %}
+                                </td>
+                                <td>{{ conta.conta.codigo }} - {{ conta.conta.nome }}</td>
+                                <td>
+                                    <strong>{{ conta.vencimento|date:"d/m/Y" }}</strong>
+                                    {% if conta.dias_vencimento > 0 %}
+                                    <br><small style="color:#facc15;">Faltam {{ conta.dias_vencimento }} dias</small>
+                                    {% endif %}
+                                </td>
+                                <td>R$ {{ conta.valor|floatformat:2 }}</td>
+                                <td>
+                                    <span class="badge {% if conta.pago %}badge-pago{% else %}{% if conta.em_atraso %}badge-atrasado{% else %}badge-pendente{% endif %}{% endif %}">
+                                        {% if conta.pago %}✓ Pago{% else %}⟳ Pendente{% endif %}
+                                    </span>
+                                </td>
+                                <td><small style="color:#cbd5e1;">{{ conta.get_classificacao_display }}</small></td>
+                                <td>
+                                    <div class="btn-group btn-group-sm" role="group">
+                                        {% if conta.pago %}
+                                        <button class="btn btn-outline-secondary btn-sm disabled" title="Não é possível editar conta paga" disabled>
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        {% else %}
+                                        <a href="{% url 'financeiro:contaspagar_edit' conta.pk %}" 
+                                           class="btn btn-outline-primary btn-sm" title="Editar">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        {% endif %}
+                                        
+                                        {% if not conta.pago %}
+                                        <button type="button" class="btn btn-outline-success btn-sm" 
+                                                onclick="marcarPago({{ conta.pk }})" title="Marcar como Pago">
+                                            <i class="fas fa-check"></i>
+                                        </button>
+                                        {% else %}
+                                        <button type="button" class="btn btn-outline-warning btn-sm" 
+                                                onclick="desmarcarPago({{ conta.pk }})" title="Desfazer Pagamento">
+                                            <i class="fas fa-undo"></i>
+                                        </button>
+                                        {% endif %}
+                                        
+                                        {% if conta.pago %}
+                                        <button class="btn btn-outline-secondary btn-sm disabled" title="Não é possível excluir conta paga" disabled>
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                        {% else %}
+                                        <button type="button" class="btn btn-outline-danger btn-sm" 
+                                                onclick="deletarConta({{ conta.pk }})" title="Deletar">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="7" class="text-center py-4" style="color:#94a3b8;">
+                                    <i class="fas fa-inbox me-2"></i>Nenhuma conta encontrada
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- Paginação -->
+                {% if contas.has_other_pages %}
+                <div class="d-flex justify-content-between align-items-center mt-3 p-3" style="background: rgba(255,255,255,0.02); border-radius: 8px;">
+                    <div>
+                        <small style="color:#cbd5e1;">
+                            Exibindo {{ contas.start_index }} a {{ contas.end_index }} de {{ contas.paginator.count }} registros
+                        </small>
+                    </div>
+                    
+                    <nav>
+                        <ul class="pagination mb-0">
+                            {% if contas.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page=1{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" style="background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); color: #fff;">
+                                    <i class="fas fa-angle-double-left"></i>
+                                </a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ contas.previous_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" style="background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); color: #fff;">
+                                    <i class="fas fa-angle-left"></i>
+                                </a>
+                            </li>
+                            {% endif %}
+                            
+                            {% for num in contas.paginator.page_range %}
+                                {% if contas.number == num %}
+                                <li class="page-item active">
+                                    <span class="page-link" style="background: linear-gradient(135deg, rgba(34,211,238,0.3), rgba(99,102,241,0.3)); border: 1px solid rgba(34,211,238,0.5); color: #fff;">{{ num }}</span>
+                                </li>
+                                {% elif num > contas.number|add:'-3' and num < contas.number|add:'3' %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ num }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" style="background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); color: #fff;">{{ num }}</a>
+                                </li>
+                                {% endif %}
+                            {% endfor %}
+                            
+                            {% if contas.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ contas.next_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" style="background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); color: #fff;">
+                                    <i class="fas fa-angle-right"></i>
+                                </a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ contas.paginator.num_pages }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" style="background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); color: #fff;">
+                                    <i class="fas fa-angle-double-right"></i>
+                                </a>
+                            </li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Marcar Pago -->
+<div class="modal fade" id="modalPagar" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content" style="background: rgba(15, 23, 42, 0.95); border: 1px solid rgba(255,255,255,0.1);">
+            <div class="modal-header" style="border-bottom: 1px solid rgba(255,255,255,0.1);">
+                <h5 class="modal-title" style="color:#7dd3fc;">Registrar Pagamento</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="formPagar">
+                {% csrf_token %}
+                <input type="hidden" id="pkPagar" name="pk">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="dataPagamento" class="form-label" style="color:#cbd5e1;">Data do Pagamento</label>
+                        <input type="date" class="form-control" id="dataPagamento" name="data_pagamento" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="valorPago" class="form-label" style="color:#cbd5e1;">Valor Pago</label>
+                        <input type="number" class="form-control" id="valorPago" name="valor_pago" 
+                               step="0.01" min="0" required placeholder="0.00">
+                    </div>
+                </div>
+                <div class="modal-footer" style="border-top: 1px solid rgba(255,255,255,0.1);">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-success">Confirmar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    $(document).ready(function() {
+        // Inicializar Select2 em todos os selects do formulário de filtro
+        $('#id_status, #id_classificacao, #id_fornecedor').select2({
+            theme: 'default',
+            width: '100%',
+            placeholder: 'Selecione...',
+            allowClear: true
+        });
+    });
+
+    function marcarPago(pk) {
+        document.getElementById('pkPagar').value = pk;
+        const modal = new bootstrap.Modal(document.getElementById('modalPagar'));
+        modal.show();
+    }
+    
+    function desmarcarPago(pk) {
+        Swal.fire({
+            title: 'Remover Pagamento?',
+            text: 'Esta ação marcará a conta como pendente novamente.',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#ef4444',
+            cancelButtonColor: '#6b7280',
+            confirmButtonText: 'Sim, remover',
+            cancelButtonText: 'Cancelar',
+            background: 'rgba(15, 23, 42, 0.95)',
+            color: '#cbd5e1'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                fetch(`/financeiro/contas-pagar/${pk}/desmarcar-pago/`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                        'Content-Type': 'application/json'
+                    }
+                })
+                .then(r => r.json())
+                .then(data => {
+                    if (data.success) {
+                        Swal.fire({
+                            title: 'Sucesso!',
+                            text: data.mensagem,
+                            icon: 'success',
+                            background: 'rgba(15, 23, 42, 0.95)',
+                            color: '#cbd5e1'
+                        }).then(() => location.reload());
+                    } else {
+                        Swal.fire({
+                            title: 'Erro!',
+                            text: data.mensagem,
+                            icon: 'error',
+                            background: 'rgba(15, 23, 42, 0.95)',
+                            color: '#cbd5e1'
+                        });
+                    }
+                });
+            }
+        });
+    }
+    
+    function deletarConta(pk) {
+        Swal.fire({
+            title: 'Deletar Conta?',
+            text: 'Esta ação não pode ser desfeita.',
+            icon: 'error',
+            showCancelButton: true,
+            confirmButtonColor: '#ef4444',
+            cancelButtonColor: '#6b7280',
+            confirmButtonText: 'Sim, deletar',
+            cancelButtonText: 'Cancelar',
+            background: 'rgba(15, 23, 42, 0.95)',
+            color: '#cbd5e1'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                fetch(`/financeiro/contas-pagar/${pk}/deletar/`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                    }
+                }).then(() => {
+                    Swal.fire({
+                        title: 'Deletado!',
+                        text: 'Conta removida com sucesso.',
+                        icon: 'success',
+                        background: 'rgba(15, 23, 42, 0.95)',
+                        color: '#cbd5e1'
+                    }).then(() => location.reload());
+                });
+            }
+        });
+    }
+    
+    document.getElementById('formPagar').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const pk = document.getElementById('pkPagar').value;
+        const data = new FormData(this);
+        
+        fetch(`/financeiro/contas-pagar/${pk}/pagar/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': data.get('csrfmiddlewaretoken')
+            },
+            body: data
+        })
+        .then(r => r.json())
+        .then(data => {
+            const modal = bootstrap.Modal.getInstance(document.getElementById('modalPagar'));
+            modal.hide();
+            
+            if (data.success) {
+                Swal.fire({
+                    title: 'Sucesso!',
+                    text: data.mensagem,
+                    icon: 'success',
+                    background: 'rgba(15, 23, 42, 0.95)',
+                    color: '#cbd5e1'
+                }).then(() => location.reload());
+            } else {
+                Swal.fire({
+                    title: 'Erro!',
+                    text: data.mensagem,
+                    icon: 'error',
+                    background: 'rgba(15, 23, 42, 0.95)',
+                    color: '#cbd5e1'
+                });
+            }
+        });
+    });
+
+    // Scroll automático para a tabela após busca
+    document.addEventListener('DOMContentLoaded', function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const campoBusca = urlParams.get('campo_busca');
+        const termoBusca = urlParams.get('termo_busca');
+        
+        console.log('Busca detectada:', { campoBusca, termoBusca });
+        
+        // Se há busca ativa, rolar até a seção de busca
+        if (campoBusca && termoBusca) {
+            setTimeout(function() {
+                // Tentar encontrar a seção de busca
+                const secaoBusca = document.getElementById('secao-busca');
+                
+                if (secaoBusca) {
+                    console.log('Seção de busca encontrada, fazendo scroll...');
+                    secaoBusca.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    window.scrollBy(0, -80); // Ajuste para deixar margem superior
+                } else {
+                    console.log('Seção de busca não encontrada');
+                }
+            }, 200);
+        }
+    });
+</script>
+{% endblock %}

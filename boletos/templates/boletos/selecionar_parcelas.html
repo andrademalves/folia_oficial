@@ -1,0 +1,373 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Gerar Boletos em Lote{% endblock %}
+
+{% block extra_css %}
+{% include 'boletos/includes/styles.html' %}
+<style>
+    .form-control, .form-select {
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255,255,255,0.2);
+        color: #f8fafc;
+        border-radius: 8px;
+        padding: 10px 15px;
+    }
+    
+    .form-control:focus, .form-select:focus {
+        background: rgba(255, 255, 255, 0.15);
+        border-color: #22d3ee;
+        color: #f8fafc;
+        box-shadow: 0 0 0 0.2rem rgba(34, 211, 238, 0.25);
+    }
+    
+    .form-control::placeholder {
+        color: #94a3b8;
+    }
+    
+    .form-select option {
+        background: #1e293b;
+        color: #f8fafc;
+    }
+    
+    .form-label {
+        color: #e5e7eb;
+        font-weight: 500;
+        margin-bottom: 8px;
+    }
+    
+    .table-container {
+        background: rgba(15, 23, 42, 0.78);
+        border: 1px solid rgba(255,255,255,0.08);
+        border-radius: 12px;
+        padding: 20px;
+        margin-top: 20px;
+    }
+    
+    .checkbox-parcela {
+        width: 18px;
+        height: 18px;
+        cursor: pointer;
+        accent-color: #22d3ee;
+    }
+    
+    .select-all-container {
+        background: rgba(34, 211, 238, 0.1);
+        border: 1px solid rgba(34, 211, 238, 0.2);
+        padding: 12px 15px;
+        border-radius: 8px;
+        margin-bottom: 15px;
+    }
+    
+    .select-all-container label {
+        color: #7dd3fc;
+        font-weight: 500;
+        margin: 0;
+    }
+    
+    .btn-filtrar {
+        background: linear-gradient(135deg, #22d3ee, #6366f1);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        padding: 10px 25px;
+        font-weight: 600;
+        transition: all 0.3s;
+    }
+    
+    .btn-filtrar:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(99, 102, 241, 0.4);
+    }
+    
+    .btn-gerar {
+        background: linear-gradient(135deg, #10b981, #059669);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        padding: 12px 30px;
+        font-weight: 600;
+        transition: all 0.3s;
+    }
+    
+    .btn-gerar:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(16, 185, 129, 0.4);
+    }
+    
+    .alert {
+        background: rgba(59, 130, 246, 0.15);
+        border: 1px solid rgba(59, 130, 246, 0.3);
+        color: #93c5fd;
+        border-radius: 8px;
+    }
+    
+    /* Select2 Dark Theme - Mesmas dimensões do .form-select */
+    .select2-container--default .select2-selection--single {
+        background: rgba(255, 255, 255, 0.1) !important;
+        border: 1px solid rgba(255,255,255,0.2) !important;
+        border-radius: 8px !important;
+        height: 42px !important;
+        padding: 0 !important;
+    }
+    
+    .select2-container--default .select2-selection--single .select2-selection__rendered {
+        color: #f8fafc !important;
+        line-height: 40px !important;
+        padding-left: 15px !important;
+        padding-right: 20px !important;
+    }
+    
+    .select2-container--default .select2-selection--single .select2-selection__placeholder {
+        color: #94a3b8 !important;
+    }
+    
+    .select2-container--default .select2-selection--single .select2-selection__arrow {
+        height: 40px !important;
+        right: 10px !important;
+    }
+    
+    .select2-container--default .select2-selection--single .select2-selection__arrow b {
+        border-color: #f8fafc transparent transparent transparent !important;
+        border-width: 6px 5px 0 5px !important;
+    }
+    
+    .select2-container--default.select2-container--focus .select2-selection--single,
+    .select2-container--default.select2-container--open .select2-selection--single {
+        background: rgba(255, 255, 255, 0.15) !important;
+        border-color: #22d3ee !important;
+        box-shadow: 0 0 0 0.2rem rgba(34, 211, 238, 0.25) !important;
+    }
+    
+    /* Dropdown do Select2 - Fundo Escuro */
+    .select2-dropdown {
+        background: #1e293b;
+        border: 1px solid rgba(34, 211, 238, 0.3);
+        border-radius: 8px;
+    }
+    
+    .select2-container--default .select2-search--dropdown .select2-search__field {
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255,255,255,0.2);
+        color: #f8fafc;
+        border-radius: 6px;
+        padding: 8px;
+    }
+    
+    .select2-container--default .select2-search--dropdown .select2-search__field:focus {
+        background: rgba(255, 255, 255, 0.15);
+        border-color: #22d3ee;
+        outline: none;
+    }
+    
+    .select2-container--default .select2-results__option {
+        background: #1e293b;
+        color: #f8fafc;
+        padding: 10px;
+    }
+    
+    .select2-container--default .select2-results__option--highlighted[aria-selected] {
+        background: linear-gradient(135deg, #22d3ee, #6366f1);
+        color: white;
+    }
+    
+    .select2-container--default .select2-results__option[aria-selected=true] {
+        background: rgba(34, 211, 238, 0.2);
+        color: #22d3ee;
+    }
+    
+    .select2-results__message {
+        color: #94a3b8;
+    }
+</style>
+
+<!-- Select2 CSS -->
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-0">
+  <div class="row g-0">
+    <div class="col-md-2">
+      {% include 'boletos/includes/sidebar.html' %}
+    </div>
+    <div class="col-md-10">
+      <div class="p-4">
+        <div class="content-card mb-4">
+          <h3 class="text-white mb-0"><i class="fas fa-barcode"></i> Gerar Boletos em Lote</h3>
+          <p class="text-muted mb-0">Selecione as parcelas para emissão de boletos</p>
+        </div>
+                
+        <!-- Filtros -->
+        <div class="content-card mb-4">
+          <h5 class="text-white mb-3"><i class="fas fa-filter"></i> Filtros</h5>
+                    <form method="GET" action="{% url 'boletos:selecionar_parcelas_boleto' %}">
+                        <div class="row">
+                            <div class="col-md-3">
+                                <label class="form-label">Tipo de Parcela</label>
+                                <select name="tipo_parcela" class="form-select">
+                                    <option value="">Todos</option>
+                                    <option value="NF" {% if tipo_parcela == 'NF' %}selected{% endif %}>Nota Fiscal</option>
+                                    <option value="CARTEIRA" {% if tipo_parcela == 'CARTEIRA' %}selected{% endif %}>Carteira</option>
+                                </select>
+                            </div>
+                            
+                            <div class="col-md-3">
+                                <label class="form-label">Cliente</label>
+                                <select name="cliente" class="form-select select2-cliente" id="selectCliente">
+                                    <option value="">Todos</option>
+                                    {% for cliente in clientes %}
+                                    <option value="{{ cliente.id }}" {% if cliente_id == cliente.id|stringformat:"s" %}selected{% endif %}>
+                                        {{ cliente.nome }}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            
+                            <div class="col-md-2">
+                                <label class="form-label">Data Venc. Início</label>
+                                <input type="date" name="data_venc_ini" class="form-control" value="{{ data_venc_ini }}">
+                            </div>
+                            
+                            <div class="col-md-2">
+                                <label class="form-label">Data Venc. Fim</label>
+                                <input type="date" name="data_venc_fim" class="form-control" value="{{ data_venc_fim }}">
+                            </div>
+                            
+                            <div class="col-md-2 d-flex align-items-end">
+                                <button type="submit" class="btn btn-filtrar w-100">
+                                    <i class="fas fa-search"></i> Filtrar
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                
+                <!-- Formulário de geração -->
+                <form method="POST" action="{% url 'boletos:gerar_boletos_lote' %}" id="formGerarBoletos">
+                    {% csrf_token %}
+                    
+                    <!-- Configuração Bancária -->
+                <div class="content-card mb-4">
+                  <h5 class="text-white mb-3"><i class="fas fa-university"></i> Configuração Bancária</h5>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <label class="form-label">Selecione a Configuração</label>
+                                <select name="configuracao" class="form-select" required>
+                                    <option value="">-- Selecione --</option>
+                                    {% for config in configuracoes %}
+                                    <option value="{{ config.id }}">
+                                        {{ config.nome_exibicao }} - Convênio: {{ config.convenio }}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Lista de parcelas -->
+                    <div class="table-container">
+                        <div class="select-all-container">
+                            <div class="form-check">
+                                <input class="form-check-input checkbox-parcela" type="checkbox" id="selectAll">
+                                <label class="form-check-label" for="selectAll">
+                                    <strong>Selecionar todas as parcelas</strong>
+                                </label>
+                            </div>
+                        </div>
+                        
+                        {% if parcelas %}
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th width="50"></th>
+                                    <th>Tipo</th>
+                                    <th>Código</th>
+                                    <th>Cliente</th>
+                                    <th>NF</th>
+                                    <th>Vencimento</th>
+                                    <th>Valor</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for parcela in parcelas %}
+                                <tr>
+                                    <td>
+                                        <input type="checkbox" name="parcelas" value="{{ parcela.id }}" 
+                                               class="form-check-input checkbox-parcela parcela-checkbox">
+                                    </td>
+                                    <td>
+                                        {% if parcela.tipo_parcela == 'NF' %}
+                                        <span class="badge badge-nf">NF</span>
+                                        {% else %}
+                                        <span class="badge badge-carteira">Carteira</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ parcela.codigo_identificador }}</td>
+                                    <td>{{ parcela.cliente.nome }}</td>
+                                    <td>{{ parcela.nota_fiscal.numero_nota }}</td>
+                                    <td>{{ parcela.data_vencimento|date:"d/m/Y" }}</td>
+                                    <td>R$ {{ parcela.valor|floatformat:2 }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                        
+                        <div class="text-center mt-4">
+                            <button type="submit" class="btn btn-gerar">
+                                <i class="fas fa-check"></i> Gerar Boletos Selecionados
+                            </button>
+                        </div>
+                        {% else %}
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle"></i> Nenhuma parcela encontrada com os filtros selecionados.
+                        </div>
+                        {% endif %}
+                    </div>
+                </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<!-- Select2 JS -->
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+<script>
+// Inicializar Select2 no campo Cliente
+$(document).ready(function() {
+    $('#selectCliente').select2({
+        placeholder: 'Selecione um cliente',
+        allowClear: true,
+        language: {
+            noResults: function() {
+                return "Nenhum cliente encontrado";
+            },
+            searching: function() {
+                return "Buscando...";
+            }
+        }
+    });
+});
+
+// Selecionar/Desselecionar todas
+document.getElementById('selectAll').addEventListener('change', function() {
+    const checkboxes = document.querySelectorAll('.parcela-checkbox');
+    checkboxes.forEach(checkbox => {
+        checkbox.checked = this.checked;
+    });
+});
+
+// Validação do formulário
+document.getElementById('formGerarBoletos').addEventListener('submit', function(e) {
+    const checkboxes = document.querySelectorAll('.parcela-checkbox:checked');
+    if (checkboxes.length === 0) {
+        e.preventDefault();
+        alert('Selecione pelo menos uma parcela para gerar boleto.');
+        return false;
+    }
+});
+</script>
+{% endblock %}

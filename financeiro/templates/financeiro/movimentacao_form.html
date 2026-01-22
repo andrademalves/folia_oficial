@@ -1,0 +1,385 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{% if acao == 'criar' %}Nova Movimentação{% else %}Editar Movimentação{% endif %}{% endblock %}
+
+{% block extra_css %}
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar -->
+        <nav id="sidebar" class="col-md-3 col-lg-2 d-md-block sidebar">
+            <div class="position-sticky pt-3">
+                <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-white">
+                    <span>Financeiro</span>
+                </h6>
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">
+                            <i class="fas fa-home"></i> <span>Voltar aos Módulos</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'financeiro:dashboard' %}">
+                            <i class="fas fa-tachometer-alt"></i> <span>Dashboard</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'financeiro:contaspagar_list' %}">
+                            <i class="fas fa-file-invoice-dollar"></i> <span>Contas a Pagar</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'financeiro:dar_baixa' %}">
+                            <i class="fas fa-money-check-alt"></i> <span>Dar Baixa</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="{% url 'financeiro:conta_corrente_list' %}">
+                            <i class="fas fa-university"></i> <span>Conta Corrente</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'financeiro:relatorios' %}">
+                            <i class="fas fa-chart-bar"></i> <span>Relatórios</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+
+        <!-- Main content -->
+        <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 main-content">
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2" style="color: #7dd3fc;">
+        <i class="fas fa-{% if acao == 'criar' %}plus-circle{% else %}edit{% endif %}"></i>
+        {% if acao == 'criar' %}Nova Movimentação{% else %}Editar Movimentação{% endif %}
+    </h1>
+    <a href="{% if movimentacao %}{% url 'financeiro:extrato_conta' movimentacao.conta_financeira.pk %}{% else %}{% url 'financeiro:conta_corrente_list' %}{% endif %}" class="btn btn-outline-secondary">
+        <i class="fas fa-arrow-left"></i> Voltar
+    </a>
+</div>
+
+            <form method="post">
+                {% csrf_token %}
+                
+                {% if form.non_field_errors %}
+                    <div class="alert alert-danger mb-4">
+                        {{ form.non_field_errors }}
+                    </div>
+                {% endif %}
+
+                <!-- Dados da Movimentação -->
+                <div class="content-card">
+                    <div class="card-header">
+                        <h5 class="mb-0" style="color: #7dd3fc;">
+                            <i class="fas fa-file-invoice"></i> Dados da Movimentação
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label">{{ form.conta_financeira.label }} *</label>
+                                {{ form.conta_financeira }}
+                                {% if form.conta_financeira.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.conta_financeira.errors }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">{{ form.data.label }} *</label>
+                                {{ form.data }}
+                                {% if form.data.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.data.errors }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">{{ form.tipo.label }} *</label>
+                                {{ form.tipo }}
+                                {% if form.tipo.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.tipo.errors }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">{{ form.valor.label }} *</label>
+                                {{ form.valor }}
+                                {% if form.valor.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.valor.errors }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">{{ form.categoria.label }}</label>
+                                {{ form.categoria }}
+                                {% if form.categoria.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.categoria.errors }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-12">
+                                <label class="form-label">{{ form.descricao.label }} *</label>
+                                {{ form.descricao }}
+                                {% if form.descricao.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.descricao.errors }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Transferência (Opcional) -->
+                <div class="content-card">
+                    <div class="card-header">
+                        <h5 class="mb-0" style="color: #7dd3fc;">
+                            <i class="fas fa-exchange-alt"></i> Transferência (Opcional)
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="alert alert-info mb-3">
+                            <i class="fas fa-info-circle"></i> 
+                            Se esta movimentação for uma transferência entre contas, selecione a conta de destino. 
+                            Será criada automaticamente a movimentação inversa na conta destino.
+                        </div>
+                        <div class="row g-3">
+                            <div class="col-md-12">
+                                <label class="form-label">{{ form.conta_destino.label }}</label>
+                                {{ form.conta_destino }}
+                                {% if form.conta_destino.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.conta_destino.errors }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Observações -->
+                <div class="content-card">
+                    <div class="card-header">
+                        <h5 class="mb-0" style="color: #7dd3fc;">
+                            <i class="fas fa-sticky-note"></i> Observações
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-md-12">
+                                <label class="form-label">{{ form.observacoes.label }}</label>
+                                {{ form.observacoes }}
+                                {% if form.observacoes.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.observacoes.errors }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Botões -->
+                <div class="mb-4">
+                    <button type="submit" class="btn btn-success">
+                        <i class="fas fa-save"></i> Salvar
+                    </button>
+                    <a href="{% if movimentacao %}{% url 'financeiro:extrato_conta' movimentacao.conta_financeira.pk %}{% else %}{% url 'financeiro:conta_corrente_list' %}{% endif %}" class="btn btn-secondary">
+                        <i class="fas fa-times"></i> Cancelar
+                    </a>
+                </div>
+            </form>
+        </main>
+    </div>
+</div>
+
+<style>
+    /* Sidebar */
+    #sidebar {
+        background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+        min-height: 100vh;
+        box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    #sidebar .nav-link {
+        color: rgba(255, 255, 255, 0.8);
+        padding: 12px 20px;
+        border-radius: 8px;
+        margin: 4px 8px;
+        transition: all 0.3s ease;
+    }
+
+    #sidebar .nav-link:hover {
+        background: rgba(125, 211, 252, 0.1);
+        color: #7dd3fc;
+        transform: translateX(5px);
+    }
+
+    #sidebar .nav-link.active {
+        background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+        color: white;
+    }
+
+    #sidebar .nav-link i {
+        width: 20px;
+        margin-right: 10px;
+    }
+
+    /* Main content */
+    .main-content {
+        background: #0f172a;
+        min-height: 100vh;
+        color: #e2e8f0;
+    }
+
+    /* Content card */
+    .content-card {
+        background: rgba(30, 41, 59, 0.6);
+        border-radius: 12px;
+        padding: 0;
+        margin-bottom: 24px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        border: 1px solid rgba(125, 211, 252, 0.1);
+    }
+
+    .content-card .card-header {
+        background: linear-gradient(135deg, rgba(14, 165, 233, 0.1) 0%, rgba(2, 132, 199, 0.1) 100%);
+        border-bottom: 1px solid rgba(125, 211, 252, 0.2);
+        padding: 1rem 1.5rem;
+        border-radius: 12px 12px 0 0;
+    }
+
+    .content-card .card-body {
+        padding: 1.5rem;
+    }
+
+    /* Form elements */
+    .form-label {
+        color: #94a3b8;
+        font-weight: 500;
+        margin-bottom: 0.5rem;
+    }
+
+    .form-control, .form-select, textarea {
+        background: rgba(15, 23, 42, 0.6);
+        border: 1px solid rgba(125, 211, 252, 0.3);
+        color: #e2e8f0;
+        padding: 0.75rem;
+        border-radius: 8px;
+    }
+
+    .form-control:focus, .form-select:focus, textarea:focus {
+        background: rgba(15, 23, 42, 0.8);
+        border-color: #7dd3fc;
+        color: #e2e8f0;
+        box-shadow: 0 0 0 0.2rem rgba(125, 211, 252, 0.25);
+    }
+
+    .form-control::placeholder, textarea::placeholder {
+        color: rgba(148, 163, 184, 0.6);
+    }
+
+    /* Select2 */
+    .select2-container--default .select2-selection--single {
+        background: rgba(15, 23, 42, 0.6) !important;
+        border: 1px solid rgba(125, 211, 252, 0.3) !important;
+        height: auto !important;
+        padding: 0.75rem !important;
+        border-radius: 8px !important;
+    }
+
+    .select2-container--default .select2-selection--single .select2-selection__rendered {
+        color: #e2e8f0 !important;
+        line-height: 1.5 !important;
+        padding: 0 !important;
+    }
+
+    .select2-dropdown {
+        background: #0f172a !important;
+        border: 1px solid rgba(125, 211, 252, 0.3) !important;
+        border-radius: 8px !important;
+    }
+
+    .select2-search--dropdown .select2-search__field {
+        background: rgba(15, 23, 42, 0.6) !important;
+        border: 1px solid rgba(125, 211, 252, 0.3) !important;
+        color: #e2e8f0 !important;
+    }
+
+    .select2-results__option {
+        color: #e2e8f0 !important;
+    }
+
+    .select2-results__option--highlighted {
+        background: rgba(14, 165, 233, 0.3) !important;
+    }
+
+    /* Buttons */
+    .btn-success {
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        border: none;
+        padding: 10px 24px;
+        border-radius: 8px;
+        color: white;
+    }
+
+    .btn-secondary {
+        background: rgba(71, 85, 105, 0.6);
+        border: 1px solid rgba(125, 211, 252, 0.3);
+        color: #e2e8f0;
+        padding: 10px 24px;
+        border-radius: 8px;
+    }
+
+    .btn-outline-secondary {
+        color: #94a3b8;
+        border-color: rgba(125, 211, 252, 0.3);
+        padding: 10px 20px;
+        border-radius: 8px;
+    }
+
+    /* Alert */
+    .alert-info {
+        background: rgba(14, 165, 233, 0.1);
+        border: 1px solid rgba(125, 211, 252, 0.3);
+        color: #7dd3fc;
+        border-radius: 8px;
+    }
+
+    .alert-danger {
+        background: rgba(239, 68, 68, 0.1);
+        border: 1px solid rgba(239, 68, 68, 0.3);
+        color: #fca5a5;
+        border-radius: 8px;
+    }
+
+    .invalid-feedback {
+        color: #fca5a5;
+        font-size: 0.875rem;
+        margin-top: 0.25rem;
+    }
+</style>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script>
+    $(document).ready(function() {
+        // Inicializar Select2
+        $('.select2-single').select2({
+            theme: 'default',
+            width: '100%',
+            placeholder: 'Selecione...',
+            allowClear: true
+        });
+    });
+</script>
+{% endblock %}

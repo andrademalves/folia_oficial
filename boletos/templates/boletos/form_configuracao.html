@@ -1,0 +1,380 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ titulo }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    :root {
+        --primary-color: #667eea;
+        --secondary-color: #764ba2;
+    }
+    
+    body {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+    }
+    
+    .main-container {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        border-radius: 20px;
+        padding: 30px;
+        margin: 20px 0;
+        box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+    }
+    
+    .page-header {
+        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        color: white;
+        padding: 25px;
+        border-radius: 15px;
+        margin-bottom: 30px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+    
+    .form-section {
+        background: white;
+        border-radius: 15px;
+        padding: 25px;
+        margin-bottom: 20px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    }
+    
+    .form-section h5 {
+        color: var(--primary-color);
+        margin-bottom: 20px;
+        padding-bottom: 10px;
+        border-bottom: 2px solid rgba(102, 126, 234, 0.2);
+    }
+    
+    .form-control, .form-select {
+        border-radius: 10px;
+        border: 2px solid #e2e8f0;
+        padding: 10px 15px;
+        transition: all 0.3s;
+    }
+    
+    .form-control:focus, .form-select:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+    }
+    
+    .btn-submit {
+        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        color: white;
+        border: none;
+        border-radius: 10px;
+        padding: 12px 40px;
+        font-weight: 600;
+        transition: all 0.3s;
+    }
+    
+    .btn-submit:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+    }
+    
+    .btn-cancel {
+        background: #e2e8f0;
+        color: #4a5568;
+        border: none;
+        border-radius: 10px;
+        padding: 12px 40px;
+        font-weight: 600;
+        transition: all 0.3s;
+    }
+    
+    .btn-cancel:hover {
+        background: #cbd5e0;
+    }
+    
+    .form-check-input {
+        width: 1.5em;
+        height: 1.5em;
+        margin-top: 0.25em;
+    }
+    
+    .form-check-input:checked {
+        background-color: var(--primary-color);
+        border-color: var(--primary-color);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-md-10">
+            <div class="main-container">
+                <div class="page-header">
+                    <h2><i class="fas fa-university"></i> {{ titulo }}</h2>
+                    <p class="mb-0">Preencha os dados da configuração bancária</p>
+                </div>
+                
+                {% if messages %}
+                    {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                    {% endfor %}
+                {% endif %}
+                
+                <form method="POST">
+                    {% csrf_token %}
+                    
+                    <!-- Identificação -->
+                    <div class="form-section">
+                        <h5><i class="fas fa-id-card"></i> Identificação</h5>
+                        <div class="row">
+                            <div class="col-md-8">
+                                <div class="mb-3">
+                                    <label class="form-label">Nome da Configuração *</label>
+                                    {{ form.nome }}
+                                    {% if form.nome.errors %}
+                                        <div class="text-danger">{{ form.nome.errors }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label class="form-label">Status</label>
+                                    <div class="form-check form-switch mt-2">
+                                        {{ form.ativo }}
+                                        <label class="form-check-label">Ativo</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Conta Financeira (Opcional)</label>
+                                    {{ form.conta_financeira }}
+                                    <small class="form-text text-muted">Vincular a uma conta existente</small>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Código do Banco</label>
+                                    {{ form.codigo_banco }}
+                                    <small class="form-text text-muted">104 = Caixa Econômica Federal</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Dados Bancários -->
+                    <div class="form-section">
+                        <h5><i class="fas fa-university"></i> Dados Bancários</h5>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Código do Beneficiário</label>
+                                    {{ form.codigo_beneficiario }}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Convênio</label>
+                                    {{ form.convenio }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label class="form-label">Agência</label>
+                                    {{ form.agencia }}
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+                                <div class="mb-3">
+                                    <label class="form-label">DV</label>
+                                    {{ form.agencia_dv }}
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label class="form-label">Conta</label>
+                                    {{ form.conta }}
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+                                <div class="mb-3">
+                                    <label class="form-label">DV</label>
+                                    {{ form.conta_dv }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Carteira</label>
+                                    {{ form.carteira }}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Modalidade</label>
+                                    {{ form.modalidade }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Nosso Número -->
+                    <div class="form-section">
+                        <h5><i class="fas fa-hashtag"></i> Controle de Nosso Número</h5>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label class="form-label">Início</label>
+                                    {{ form.nosso_numero_inicio }}
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label class="form-label">Atual</label>
+                                    {{ form.nosso_numero_atual }}
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label class="form-label">Fim (Opcional)</label>
+                                    {{ form.nosso_numero_fim }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Dados da Empresa -->
+                    <div class="form-section">
+                        <h5><i class="fas fa-building"></i> Dados da Empresa</h5>
+                        <div class="row">
+                            <div class="col-md-8">
+                                <div class="mb-3">
+                                    <label class="form-label">Razão Social</label>
+                                    {{ form.razao_social }}
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label class="form-label">CNPJ</label>
+                                    {{ form.cnpj }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="mb-3">
+                                    <label class="form-label">Endereço</label>
+                                    {{ form.endereco }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-5">
+                                <div class="mb-3">
+                                    <label class="form-label">Cidade</label>
+                                    {{ form.cidade }}
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+                                <div class="mb-3">
+                                    <label class="form-label">UF</label>
+                                    {{ form.uf }}
+                                </div>
+                            </div>
+                            <div class="col-md-5">
+                                <div class="mb-3">
+                                    <label class="form-label">CEP</label>
+                                    {{ form.cep }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Juros e Multa -->
+                    <div class="form-section">
+                        <h5><i class="fas fa-percentage"></i> Juros e Multa</h5>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label class="form-label">Juros ao Mês (%)</label>
+                                    {{ form.percentual_juros_mes }}
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label class="form-label">Multa (%)</label>
+                                    {{ form.percentual_multa }}
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label class="form-label">Dias para Multa</label>
+                                    {{ form.dias_para_multa }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Protesto e Baixa -->
+                    <div class="form-section">
+                        <h5><i class="fas fa-gavel"></i> Protesto e Baixa</h5>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Dias para Protesto</label>
+                                    {{ form.dias_para_protesto }}
+                                    <small class="form-text text-muted">0 = Não protestar</small>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Dias para Baixa Automática</label>
+                                    {{ form.dias_para_baixa }}
+                                    <small class="form-text text-muted">0 = Não baixar automaticamente</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Instruções -->
+                    <div class="form-section">
+                        <h5><i class="fas fa-info-circle"></i> Instruções do Boleto</h5>
+                        <div class="mb-3">
+                            <label class="form-label">Instrução 1</label>
+                            {{ form.instrucao1 }}
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Instrução 2 (Opcional)</label>
+                            {{ form.instrucao2 }}
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Instrução 3 (Opcional)</label>
+                            {{ form.instrucao3 }}
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Local de Pagamento</label>
+                            {{ form.local_pagamento }}
+                        </div>
+                    </div>
+                    
+                    <!-- Botões -->
+                    <div class="text-center mt-4">
+                        <button type="submit" class="btn btn-submit">
+                            <i class="fas fa-save"></i> Salvar Configuração
+                        </button>
+                        <a href="{% url 'boletos:lista_configuracoes' %}" class="btn btn-cancel">
+                            <i class="fas fa-times"></i> Cancelar
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

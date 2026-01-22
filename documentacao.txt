@@ -1,0 +1,124 @@
+PROJETO: Gestão TI
+ARQUIVO: documentacao.txt (documentação do sistema inteiro)
+DATA: 21/12/2025
+
+1) VISÃO GERAL
+- Arquitetura: Django (Python) com apps modulares: `usuarios`, `cadastros`, `financeiro`, `importacoes`.
+- UI: padrão unificado (fundo gradiente, sidebar escura, content-cards) e navegação com permissões.
+- Autenticação e Permissões: login padrão Django, controle fino de acesso a menus e ações (criar/editar/excluir).
+- Integrações: Firebird (Futura) via `fdb` para importações de dados.
+
+2) MÓDULO USUÁRIOS
+2.1 Modelos (usuarios/models.py)
+- `Modulo`: registra módulos do sistema (nome, ícone, ordem, ativo).
+- `Menu`: menus por módulo, com hierarquia (menu_pai), url, ícone, ordem e ativo; unique_together por (módulo, url).
+- `PermissaoMenu`: vincula permissões a usuário ou grupo (visualizar, criar, editar, excluir) por menu.
+- `PerfilUsuario`: dados adicionais (telefone, cargo, foto, ativo) via OneToOne com `User`.
+
+2.2 Permissões (usuarios/decorators.py; usuarios/templatetags/permissoes_tags.py)
+- Decorators: `permissao_menu_required(url, acao)` e variantes para negar acesso sem permissão.
+- Template tags: `get_menus_usuario` (monta módulos/menus permitidos), `tem_permissao_menu` (checa ação), `get_submenus`.
+
+2.3 URLs (usuarios/urls.py)
+- `''` → `modulos` (home dos módulos) [nome: home_modulos].
+- `dashboard/`, `usuarios/` (CRUD), e rotas auxiliares.
+
+3) MÓDULO CADASTROS
+3.1 Modelos (cadastros/models.py)
+- `PlanoConta`: hierárquico (self FK `pai`), `codigo` textual (ex.: 1.2.3), `id` preservado em importações.
+- `ContaFinanceira`: bancos/factory (tipo, agência, conta, ativo, timestamps).
+- `MetodoPagamento`: cadastro simples com usuário criador e status.
+
+3.2 Templates/Funcionalidades
+- Páginas com confirmações via SweetAlert2; geração de PDFs com ReportLab (ex.: relatórios em `cadastros/templates`).
+
+3.3 Management Commands (cadastros/management/commands)
+- `importar_plano_contas_futura`: importa plano de contas de tabela compatível (id, nome, codigo, ativo, pai_id). Suporta `--table`, `--schema`, `--truncate`, `--batch`.
+- `popular_cadastros`: dados iniciais dos cadastros (se aplicável).
+
+4) MÓDULO FINANCEIRO
+4.1 Modelos
+- Estrutura inicial presente; funcionalidades em expansão (ex.: Contas a Pagar).
+
+4.2 Templates
+- Dashboard com mesmo padrão visual (sidebar escura, cards estatísticos) e atalhos para áreas financeiras.
+
+4.3 URLs
+- Montadas em `gestaoTi/urls.py` sob `/financeiro/` (ex.: dashboard, relatórios, contas a pagar).
+
+5) MÓDULO IMPORTAÇÕES (Futura → Gestão TI)
+5.1 Modelos (importacoes/models.py)
+- `ImportacaoLog`: tipo, status, timestamps, usuário; progresso: total_registros, registros_criados/atualizados/erro, mensagem, erros_detalhe (JSON), filtros de data.
+- `CadastroFutura`, `NotaFiscalFutura`, `ContaParcelaFutura`: espelhos simplificados com FK para o log.
+
+5.2 Integração Firebird (importacoes/firebird_utils.py)
+- `FirebirdConnector` (import `fdb` opcional para não falhar em migrações): conectar/desconectar/executar.
+- Rotinas: `importar_cadastros`, `importar_notas_fiscais`, `importar_parcelas` usando `update_or_create` e persistindo progresso.
+- `executar_importacao(tipo, data_inicial, data_final, usuario, log=None)`: orquestra execução e atualiza status/mensagens.
+
+5.3 Views/URLs (importacoes/views.py; importacoes/urls.py)
+- Páginas: dashboard, cadastro_geral, notas_fiscais, parcelas, logs, detalhe_log.
+- APIs: `POST /importacoes/api/iniciar/` (cria log, dispara thread; retorna `log_id`) e `GET /importacoes/api/status/<id>/` (progresso: total, processados, percent etc.).
+
+5.4 Templates e UX
+- Páginas de importação com modal Bootstrap e barra de progresso “Importado X de Y”; polling ~1,5s; link para detalhes ao concluir.
+- Dashboard de Importações atualizado para o mesmo padrão (sidebar escura, cards, navegação e “Voltar aos Módulos”).
+
+6) NAVEGAÇÃO E ROTEAMENTO
+6.1 Raiz do projeto (gestaoTi/urls.py)
+- Admin: `/admin/`
+- Auth: `/accounts/` e logout custom em `/accounts/logout/`.
+- Módulos: `/` → `usuarios.urls`, `/financeiro/`, `/importacoes/`, `/cadastros/`.
+
+6.2 Rotas principais por módulo
+- Usuários: home de módulos (`home_modulos`) e gestão de usuários/permissões.
+- Cadastros: dashboard, plano de contas, contas financeiras, relatórios.
+- Financeiro: dashboard, contas a pagar, relatórios.
+- Importações: dashboard, páginas de importação (cadastros, notas, parcelas), logs e detalhe.
+
+7) COMANDOS DE GESTÃO (manage.py)
+- `migrate`, `check`, `createsuperuser` (padrão Django).
+- Usuários: `atribuir_permissoes` (popular permissões/módulos/menus).
+- Cadastros: `importar_plano_contas_futura [--table --schema --truncate --batch]` e `popular_cadastros`.
+- Financeiro: `popular_financeiro`.
+- Importações: `popular_importacoes` (se aplicável na pasta correspondente).
+
+8) AMBIENTE E DEPENDÊNCIAS
+- Python via venv do projeto (evitar rodar `manage.py` com Python 3.13 do sistema).
+- Banco e migrações aplicadas; `python manage.py check` sem erros.
+- Firebird: pacote `fdb` instalado e listado em `requirements.txt`; parâmetros de conexão centralizados em `importacoes/firebird_utils.py`.
+- Arquivos gerados: `requirements.txt`, `requiriments.txr` (cópia), `README.md`, `DOCUMENTACAO_STATUS_2025-12-21.txt` e este `documentacao.txt`.
+
+9) COMO RODAR (LOCAL)
+- Ativar venv e instalar dependências:
+  1) cd "C:\HD_Antigo\01- Projetos Dev\1.3 Gestao"
+  2) .\venv\Scripts\Activate
+  3) python -m pip install -r requirements.txt
+- Migrar banco: `python manage.py migrate`
+- Subir servidor: `python manage.py runserver`
+- Acessos:
+  - Home Módulos: `/`
+  - Importações: `/importacoes/` e páginas internas
+  - Cadastros: `/cadastros/` e páginas internas
+  - Financeiro: `/financeiro/`
+
+10) PADRÕES DE UI/UX
+- Sidebar escura com navegação por módulo/menus e botão “Voltar aos Módulos”.
+- Fundo gradiente e cartões translúcidos (content-card) padronizados.
+- Feedback ao usuário com alerts e modais; progresso em tempo real nas importações.
+
+11) PRÓXIMOS PASSOS SUGERIDOS
+- Uniformizar estilo dark em `importacoes/logs.html` e `importacoes/detalhe_log.html`.
+- Parametrizar credenciais do Firebird por variáveis de ambiente (segurança/deploy).
+- Paginar e filtrar logs de importação; opcional auto-redirect após conclusão.
+- Expandir modelo/funcionalidades do módulo Financeiro (relatórios, gráficos, KPIs).
+
+12) HISTÓRICO/OBSERVAÇÕES
+- Instalado `fdb` e protegido import opcional para não quebrar migrações.
+- Implementadas APIs assíncronas e modal de progresso com polling.
+- Padronização visual aplicada aos templates de Importações e dashboards.
+
+13)
+- Senha do DB: F0li@2026!
+
+FIM DO DOCUMENTO

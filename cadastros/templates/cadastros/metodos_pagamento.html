@@ -1,0 +1,267 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Métodos de Pagamento{% endblock %}
+
+{% block extra_css %}
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<style>
+  body { background: radial-gradient(circle at 10% 20%, #0ea5e9 0%, #0f172a 35%, #0b1224 65%, #0a0f1e 100%); }
+  .sidebar { background: rgba(15, 23, 42, 0.85); border-right: 1px solid rgba(255,255,255,0.08); backdrop-filter: blur(12px); height: calc(100vh - 56px); position: sticky; top: 56px; padding: 20px 0; }
+  .sidebar .nav-link { color: #cbd5e1; padding: 12px 20px; margin: 4px 8px; border-radius: 10px; transition: all 0.2s ease; display: flex; align-items: center; gap: 12px; }
+  .sidebar .nav-link:hover { background: rgba(34,211,238,0.1); color: #7dd3fc; }
+  .sidebar .nav-link.active { background: linear-gradient(135deg, rgba(34,211,238,0.2), rgba(99,102,241,0.2)); color: #e0e7ff; font-weight: 600; box-shadow: 0 4px 12px rgba(99,102,241,0.25); }
+  .sidebar .sidebar-header { color: #7dd3fc; font-weight: 700; letter-spacing: 1px; padding: 0 20px 16px; border-bottom: 1px solid rgba(255,255,255,0.06); margin-bottom: 16px; font-size: 14px; text-transform: uppercase; }
+  .content-card { background: rgba(15, 23, 42, 0.78); border: 1px solid rgba(255,255,255,0.08); box-shadow: 0 18px 48px rgba(0,0,0,0.45); border-radius: 16px; backdrop-filter: blur(12px); padding: 24px; }
+  .table thead th { color: #e5e7eb; border-bottom: 1px solid rgba(255,255,255,0.18); background: linear-gradient(90deg, rgba(34,211,238,0.16), rgba(99,102,241,0.16)); cursor: pointer; user-select: none; position: relative; }
+  .table thead th:hover { background: linear-gradient(90deg, rgba(34,211,238,0.25), rgba(99,102,241,0.25)); }
+  .table thead th.sortable::after { content: '\f0dc'; font-family: 'Font Awesome 5 Free'; font-weight: 900; margin-left: 8px; opacity: 0.3; font-size: 12px; }
+  .table thead th.sort-asc::after { content: '\f0de'; opacity: 1; color: #22d3ee; }
+  .table thead th.sort-desc::after { content: '\f0dd'; opacity: 1; color: #22d3ee; }
+  .table tbody td { color: #f8fafc; border-bottom: 1px solid rgba(255,255,255,0.06); background: rgba(255,255,255,0.015); }
+  .table tbody tr:hover td { background: rgba(34,211,238,0.06); }
+  .search-input { background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255,255,255,0.1); color: #f8fafc; }
+  .search-input:focus { background: rgba(15, 23, 42, 0.8); border-color: #22d3ee; color: #f8fafc; box-shadow: 0 0 0 0.2rem rgba(34,211,238,0.25); }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-0">
+  <div class="row g-0">
+    <div class="col-md-2">
+      <div class="sidebar">
+        <div class="sidebar-header"><i class="fas fa-list"></i> Cadastros</div>
+        <nav class="nav flex-column">
+          <a class="nav-link" href="{% url 'cadastros:dashboard' %}"><i class="fas fa-home"></i> <span>Dashboard</span></a>
+          <a class="nav-link" href="{% url 'cadastros:plano_contas' %}"><i class="fas fa-sitemap"></i> <span>Plano de Contas</span></a>
+          <a class="nav-link" href="{% url 'cadastros:contas_financeiras' %}"><i class="fas fa-university"></i> <span>Contas Bancárias/Factory</span></a>
+          <a class="nav-link active" href="{% url 'cadastros:metodos_pagamento' %}"><i class="fas fa-credit-card"></i> <span>Métodos de Pagamento</span></a>
+          <a class="nav-link" href="{% url 'cadastros:relatorios' %}"><i class="fas fa-file-alt"></i> <span>Relatórios</span></a>
+          <hr style="border-color: rgba(255,255,255,0.1); margin: 16px 8px;">
+          <a class="nav-link" href="{% url 'home_modulos' %}"><i class="fas fa-arrow-left"></i> <span>Voltar aos Módulos</span></a>
+        </nav>
+      </div>
+    </div>
+    <div class="col-md-10">
+      <div class="p-4">
+        <div class="content-card mb-4">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <p class="mb-1 text-uppercase" style="letter-spacing:1px;color:#7dd3fc;font-weight:700;">Métodos de Pagamento</p>
+              <small style="color:#cbd5e1;">Cadastro de formas de pagamento (Dinheiro, PIX, Cartão, etc.)</small>
+            </div>
+            <button class="btn btn-primary btn-sm" data-bs-toggle="collapse" data-bs-target="#novoMetodo"><i class="fas fa-plus"></i> Novo Método</button>
+          </div>
+        </div>
+        <div id="novoMetodo" class="collapse{% if editando %} show{% endif %} content-card mb-4">
+          <form method="post">
+            {% csrf_token %}
+            <div class="row g-3">
+              <div class="col-md-8">
+                <label class="form-label" style="color:#cbd5e1;">Nome{% if editando %} (Editando){% endif %}</label>
+                {{ form.nome }}
+              </div>
+              <div class="col-md-4 d-flex align-items-end gap-3">
+                <div class="form-check">
+                  {{ form.ativo }}
+                  <label class="form-check-label" style="color:#cbd5e1;">Ativo</label>
+                </div>
+                <button class="btn btn-primary btn-sm" type="submit"><i class="fas fa-save"></i> Salvar</button>
+                {% if editando %}
+                  <a href="{% url 'cadastros:metodos_pagamento' %}" class="btn btn-secondary btn-sm"><i class="fas fa-times"></i> Cancelar</a>
+                {% endif %}
+              </div>
+            </div>
+          </form>
+        </div>
+        <div class="content-card">
+          <div class="row mb-3">
+            <div class="col-md-12">
+              <input type="text" id="searchInput" class="form-control search-input" placeholder="🔍 Buscar por Nome...">
+            </div>
+          </div>
+          <div class="table-responsive">
+            <table class="table mb-0 align-middle" id="tabelaMetodos">
+              <thead>
+                <tr>
+                  <th class="sortable" data-column="0">ID</th>
+                  <th class="sortable" data-column="1">Nome</th>
+                  <th class="sortable" data-column="2">Ativo</th>
+                  <th class="sortable" data-column="3">Criado em</th>
+                  <th class="sortable" data-column="4">Usuário</th>
+                  <th style="width: 150px;">Ações</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% if metodos %}
+                  {% for m in metodos %}
+                  <tr data-id="{{ m.id }}" data-nome="{{ m.nome }}">
+                    <td>{{ m.id }}</td>
+                    <td>{{ m.nome }}</td>
+                    <td>
+                      {% if m.ativo %}
+                        <span class="badge bg-success">Ativo</span>
+                      {% else %}
+                        <span class="badge bg-danger">Inativo</span>
+                      {% endif %}
+                    </td>
+                    <td>{{ m.criado_em|date:"d/m/Y H:i" }}</td>
+                    <td>{{ m.usuario.username|default:"-" }}</td>
+                    <td>
+                      <a href="{% url 'cadastros:editar_metodo_pagamento' m.id %}" class="btn btn-sm btn-warning" title="Editar">
+                        <i class="fas fa-edit"></i>
+                      </a>
+                      {% if m.ativo %}
+                        <a href="#" class="btn btn-sm btn-danger btn-inativar" title="Inativar" data-id="{{ m.id }}" data-nome="{{ m.nome }}">
+                          <i class="fas fa-ban"></i>
+                        </a>
+                      {% else %}
+                        <a href="#" class="btn btn-sm btn-success btn-ativar" title="Ativar" data-id="{{ m.id }}" data-nome="{{ m.nome }}">
+                          <i class="fas fa-check-circle"></i>
+                        </a>
+                      {% endif %}
+                    </td>
+                  </tr>
+                  {% endfor %}
+                {% else %}
+                  <tr>
+                    <td colspan="6" class="text-center text-muted">Nenhum método cadastrado.</td>
+                  </tr>
+                {% endif %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Inativar método com SweetAlert2
+  document.querySelectorAll('.btn-inativar').forEach(function(btn) {
+    btn.addEventListener('click', function(e) {
+      e.preventDefault();
+      const nomeMetodo = this.dataset.nome;
+      const idMetodo = this.dataset.id;
+      
+      Swal.fire({
+        title: 'Confirmar Inativação',
+        text: `Deseja realmente inativar o método "${nomeMetodo}"?`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Sim, inativar',
+        cancelButtonText: 'Cancelar',
+        background: 'rgba(15, 23, 42, 0.95)',
+        color: '#f8fafc'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          window.location.href = `/cadastros/metodos-pagamento/inativar/${idMetodo}/`;
+        }
+      });
+    });
+  });
+
+  // Ativar método com SweetAlert2
+  document.querySelectorAll('.btn-ativar').forEach(function(btn) {
+    btn.addEventListener('click', function(e) {
+      e.preventDefault();
+      const nomeMetodo = this.dataset.nome;
+      const idMetodo = this.dataset.id;
+      
+      Swal.fire({
+        title: 'Confirmar Ativação',
+        text: `Deseja realmente ativar o método "${nomeMetodo}"?`,
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#22c55e',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Sim, ativar',
+        cancelButtonText: 'Cancelar',
+        background: 'rgba(15, 23, 42, 0.95)',
+        color: '#f8fafc'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          window.location.href = `/cadastros/metodos-pagamento/ativar/${idMetodo}/`;
+        }
+      });
+    });
+  });
+
+  // Ordenação de colunas
+  let ordemAtual = { coluna: null, direcao: 'asc' };
+  
+  document.querySelectorAll('th.sortable').forEach(function(th) {
+    th.addEventListener('click', function() {
+      const coluna = parseInt(this.dataset.column);
+      
+      // Remove classes de ordenação de todos os headers
+      document.querySelectorAll('th.sortable').forEach(function(h) {
+        h.classList.remove('sort-asc', 'sort-desc');
+      });
+      
+      // Define direção
+      if (ordemAtual.coluna === coluna) {
+        ordemAtual.direcao = ordemAtual.direcao === 'asc' ? 'desc' : 'asc';
+      } else {
+        ordemAtual.direcao = 'asc';
+      }
+      ordemAtual.coluna = coluna;
+      
+      // Adiciona classe de ordenação
+      this.classList.add(ordemAtual.direcao === 'asc' ? 'sort-asc' : 'sort-desc');
+      
+      // Ordena
+      const tbody = document.querySelector('#tabelaMetodos tbody');
+      const linhas = Array.from(tbody.querySelectorAll('tr'));
+      
+      linhas.sort(function(a, b) {
+        let valorA = a.cells[coluna].innerText.trim();
+        let valorB = b.cells[coluna].innerText.trim();
+        
+        // Trata valores vazios
+        if (valorA === '-') valorA = '';
+        if (valorB === '-') valorB = '';
+        
+        // Comparação de string
+        if (ordemAtual.direcao === 'asc') {
+          return valorA.localeCompare(valorB);
+        } else {
+          return valorB.localeCompare(valorA);
+        }
+      });
+      
+      // Reinsere linhas ordenadas
+      linhas.forEach(function(linha) {
+        tbody.appendChild(linha);
+      });
+    });
+  });
+
+  // Busca/Filtro
+  const searchInput = document.getElementById('searchInput');
+  searchInput.addEventListener('input', function() {
+    const filtro = this.value.toLowerCase();
+    const linhas = document.querySelectorAll('#tabelaMetodos tbody tr');
+    
+    linhas.forEach(function(linha) {
+      const id = linha.dataset.id?.toLowerCase() || '';
+      const nome = linha.dataset.nome?.toLowerCase() || '';
+      
+      const match = id.includes(filtro) || nome.includes(filtro);
+      
+      if (match) {
+        linha.style.display = '';
+      } else {
+        linha.style.display = 'none';
+      }
+    });
+  });
+});
+</script>
+{% endblock %}

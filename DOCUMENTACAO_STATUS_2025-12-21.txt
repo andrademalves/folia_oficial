@@ -1,0 +1,94 @@
+PROJETO: Gestão TI
+DOCUMENTO: Status e Resumo do Trabalho
+DATA: 21/12/2025
+
+1) SUMÁRIO EXECUTIVO
+- Módulo de Importações do Futura implementado com backend assíncrono, logs e acompanhamento de progresso em tempo real via modal.
+- Páginas de importação (Cadastros, Notas Fiscais, Parcelas) integradas às APIs de início e status, com barra de progresso e texto “Importado X de Y”.
+- Estilo unificado com os outros módulos (sidebar escura, fundo em gradiente, cards), incluindo “Voltar ao Principal”.
+- Dependências congeladas (requirements.txt) e cópia em requiriments.txr; README criado com instruções.
+
+2) APLICATIVOS/MÓDULOS
+- usuarios: autenticação, dashboards, permissões e home de módulos (rota nome: home_modulos).
+- cadastros: Plano de Contas (hierárquico), Contas Financeiras, Métodos de Pagamento, confirmações SweetAlert2, PDFs (ReportLab).
+- financeiro: base do módulo e páginas iniciais (ex.: Contas a Pagar), layout escuro padronizado.
+- importacoes: integração com banco Firebird (Futura), importação de dados, logs e UI de progresso.
+
+3) IMPORTAÇÕES — DETALHES TÉCNICOS
+3.1 Modelos (importacoes/models.py)
+- ImportacaoLog: tipo, status, data_inicio/fim, usuario, total_registros, registros_criados, registros_atualizados, registros_erro, mensagem, erros_detalhe (JSON), filtros (data_inicial, data_final).
+- CadastroFutura, NotaFiscalFutura, ContaParcelaFutura: espelhos simplificados do legado, com FK para ImportacaoLog.
+
+3.2 Conexão Firebird (importacoes/firebird_utils.py)
+- Classe FirebirdConnector: conectar/desconectar/executar_query usando driver fdb (import opcional para não quebrar migrações).
+- Rotinas de importação: cadastros, notas_fiscais, parcelas.
+  - Atualizam/Inserem dados no Django (update_or_create), contabilizando criados/atualizados/erros.
+  - Progresso salvo periodicamente (mensagem “Processando X de Y”) e total_registros definido antes do loop.
+- Função executar_importacao(tipo, datas, usuario, log): orquestra, atualiza status e finaliza log.
+
+3.3 Views e APIs (importacoes/views.py)
+- Páginas: dashboard_importacoes, importar_cadastro_geral, importar_notas_fiscais, importar_parcelas, logs_importacao, detalhe_log.
+- APIs:
+  - POST /importacoes/api/iniciar/: cria ImportacaoLog e dispara thread assíncrona (retorna log_id).
+  - GET /importacoes/api/status/<log_id>/: retorna JSON com total, processados, criados, atualizados, erros, percent, status, mensagem.
+
+3.4 URLs (importacoes/urls.py)
+- Páginas: /importacoes/, /cadastro-geral/, /notas-fiscais/, /parcelas/, /logs/, /logs/<id>/.
+- APIs: /api/iniciar/ e /api/status/<id>/.
+
+3.5 Templates e UI
+- importacoes/templates/importacoes/cadastro_geral.html: modal Bootstrap, intercepta submit, chama API iniciar e faz polling de status (1,5s), exibe “Importado X de Y”, progresso (%) e link “Ver Detalhes”. Botão “Voltar ao Principal”.
+- importacoes/templates/importacoes/notas_fiscais.html: igual ao acima; blocos corrigidos e estilos custom removidos para manter padrão.
+- importacoes/templates/importacoes/parcelas.html: igual ao acima.
+- importacoes/templates/importacoes/dashboard.html: redesenhado com sidebar escura (navegação: Dashboard, Cadastros, Notas, Parcelas, Logs) e cards no padrão dark; botão para “Voltar aos Módulos”.
+
+4) ESTILO/UX UNIFICADO
+- Remoção de estilos divergentes e uso das mesmas cores/padrões dos módulos Cadastros/Financeiro (fundo gradiente, sidebar escura, cards/transparências).
+- Inclusão do botão “Voltar ao Principal” (rota nome: home_modulos) nas páginas de importação.
+
+5) ADMINISTRAÇÃO
+- importacoes/admin.py: registros dos modelos ImportacaoLog, CadastroFutura, NotaFiscalFutura, ContaParcelaFutura com listas, filtros e buscas úteis.
+
+6) PERMISSÕES E LOGIN
+- Autenticação Django padrão (login em templates/registration) e logout custom.
+- Decorator de permissão (usuarios/decorators.py) aplicado às views do módulo Importações quando pertinente.
+
+7) MIGRAÇÕES E BANCO
+- Migrações criadas e aplicadas para os novos modelos de importações.
+- Verificação: manage.py check sem erros.
+
+8) AMBIENTE E DEPENDÊNCIAS
+- Virtualenv (Python 3.12 para o projeto; evitar usar Python 3.13 do sistema com manage.py).
+- Driver Firebird: fdb instalado (import opcional no código para não quebrar migrações se ausente).
+- requirements.txt gerado via pip freeze e replicado em requiriments.txr.
+
+9) COMO RODAR (LOCAL)
+1. Ativar ambiente e instalar dependências:
+   cd "C:\HD_Antigo\01- Projetos Dev\1.3 Gestao"
+   .\venv\Scripts\Activate
+   python -m pip install -r requirements.txt
+2. Migrar banco:
+   python manage.py migrate
+3. Executar servidor:
+   python manage.py runserver
+4. Acessos principais:
+   - Home módulos (usuarios:home_modulos): /
+   - Importações: /importacoes/
+   - Importar Cadastros: /importacoes/cadastro-geral/
+   - Importar Notas: /importacoes/notas-fiscais/
+   - Importar Parcelas: /importacoes/parcelas/
+   - Logs Importações: /importacoes/logs/
+
+10) PRÓXIMOS PASSOS SUGERIDOS
+- Uniformizar estilo dark também em importacoes/logs.html e importacoes/detalhe_log.html.
+- Parametrizar credenciais do Firebird via variáveis de ambiente.
+- Paginação e filtros mais ricos para a listagem de logs.
+- Opção de redirecionar automaticamente para o detalhe do log ao concluir a importação.
+
+11) HISTÓRICO RECENTE (PONTOS-CHAVE)
+- Correção de importações do pacote fdb (import opcional para não quebrar migrations).
+- Inclusão das APIs de início/status e do processamento assíncrono por thread.
+- Modal de progresso com polling nas três páginas de importação.
+- Padronização visual do dashboard e páginas de importação com botão “Voltar ao Principal”.
+
+FIM DO DOCUMENTO

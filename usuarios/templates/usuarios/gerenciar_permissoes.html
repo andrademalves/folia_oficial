@@ -1,0 +1,133 @@
+{% extends 'base.html' %}
+{% load permissoes_tags %}
+
+{% block title %}Gerenciar Permissões - Sistema de Gestão{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <h2><i class="fas fa-key"></i> Gerenciar Permissões</h2>
+            <p class="text-muted">Usuário: <strong>{{ usuario.username }}</strong></p>
+        </div>
+        <div class="col-md-6 text-end">
+            <a href="{% url 'listar_usuarios' %}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Voltar
+            </a>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <form method="post">
+                {% csrf_token %}
+                
+                {% for modulo in modulos %}
+                <div class="mb-4" data-modulo-id="{{ modulo.id }}">
+                    <div class="d-flex justify-content-between align-items-center border-bottom pb-2 mb-3">
+                        <h5 class="mb-0">
+                            {% if modulo.icone %}<i class="{{ modulo.icone }}"></i>{% endif %}
+                            {{ modulo.nome }}
+                        </h5>
+                        <div class="btn-group btn-group-sm" role="group">
+                            <button type="button" class="btn btn-outline-success btn-sm" onclick="marcarTodosModulo({{ modulo.id }}, true)">
+                                <i class="fas fa-check-double"></i> Marcar Todos
+                            </button>
+                            <button type="button" class="btn btn-outline-danger btn-sm" onclick="marcarTodosModulo({{ modulo.id }}, false)">
+                                <i class="fas fa-times"></i> Desmarcar Todos
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="table-responsive">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th style="width: 40%">Menu</th>
+                                    <th class="text-center">Visualizar</th>
+                                    <th class="text-center">Criar</th>
+                                    <th class="text-center">Editar</th>
+                                    <th class="text-center">Excluir</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for menu in modulo.menus.all %}
+                                {% if not menu.menu_pai %}
+                                <tr data-modulo-id="{{ modulo.id }}">
+                                    <td>
+                                        {% if menu.icone %}<i class="{{ menu.icone }}"></i>{% endif %}
+                                        {{ menu.nome }}
+                                    </td>
+                                    <td class="text-center">
+                                        <input type="checkbox" class="form-check-input permissao-checkbox visualizar-{{ modulo.id }}" name="menus" value="{{ menu.id }}"
+                                               {% if menu.id in menus_com_permissao %}checked{% endif %}>
+                                    </td>
+                                    <td class="text-center">
+                                        <input type="checkbox" class="form-check-input permissao-checkbox criar-{{ modulo.id }}" name="criar_{{ menu.id }}"
+                                               {% if menu.id in menus_com_permissao and menus_com_permissao|get_item:menu.id.pode_criar %}checked{% endif %}>
+                                    </td>
+                                    <td class="text-center">
+                                        <input type="checkbox" class="form-check-input permissao-checkbox editar-{{ modulo.id }}" name="editar_{{ menu.id }}"
+                                               {% if menu.id in menus_com_permissao and menus_com_permissao|get_item:menu.id.pode_editar %}checked{% endif %}>
+                                    </td>
+                                    <td class="text-center">
+                                        <input type="checkbox" class="form-check-input permissao-checkbox excluir-{{ modulo.id }}" name="excluir_{{ menu.id }}"
+                                               {% if menu.id in menus_com_permissao and menus_com_permissao|get_item:menu.id.pode_excluir %}checked{% endif %}>
+                                    </td>
+                                </tr>
+                                {% endif %}
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                {% endfor %}
+                
+                <div class="text-end">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Salvar Permissões
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+    // Função para marcar/desmarcar todos os checkboxes de um módulo
+    function marcarTodosModulo(moduloId, marcar) {
+        const modulo = document.querySelector(`div[data-modulo-id="${moduloId}"]`);
+        if (!modulo) return;
+        
+        // Selecionar todos os checkboxes do módulo
+        const checkboxes = modulo.querySelectorAll('.permissao-checkbox');
+        checkboxes.forEach(checkbox => {
+            checkbox.checked = marcar;
+        });
+        
+        // Feedback visual
+        const btnMarcar = event.target.closest('button');
+        if (btnMarcar) {
+            btnMarcar.classList.add('active');
+            setTimeout(() => btnMarcar.classList.remove('active'), 200);
+        }
+    }
+    
+    // Script para marcar/desmarcar todas as permissões de um menu
+    document.querySelectorAll('input[name="menus"]').forEach(checkbox => {
+        checkbox.addEventListener('change', function() {
+            const menuId = this.value;
+            const isChecked = this.checked;
+            
+            if (!isChecked) {
+                // Se desmarcar visualizar, desmarca todas as outras
+                document.querySelector(`input[name="criar_${menuId}"]`).checked = false;
+                document.querySelector(`input[name="editar_${menuId}"]`).checked = false;
+                document.querySelector(`input[name="excluir_${menuId}"]`).checked = false;
+            }
+        });
+    });
+</script>
+{% endblock %}
+{% endblock %}

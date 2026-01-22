@@ -1,0 +1,306 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Importar Notas Fiscais - Gestão TI{% endblock %}
+
+{% block extra_css %}
+<style>
+    body {
+        background: radial-gradient(circle at 10% 20%, #0ea5e9 0%, #0f172a 35%, #0b1224 65%, #0a0f1e 100%);
+    }
+    .content-card {
+        background: rgba(15, 23, 42, 0.78);
+        border: 1px solid rgba(255,255,255,0.08);
+        box-shadow: 0 18px 48px rgba(0,0,0,0.45);
+        border-radius: 16px;
+        backdrop-filter: blur(12px);
+        padding: 24px;
+        margin-bottom: 1.5rem;
+    }
+    .btn-primary { 
+        background: linear-gradient(135deg, #22d3ee, #6366f1); 
+        border: none; 
+        box-shadow: 0 10px 28px rgba(99,102,241,0.45); 
+    }
+    .btn-primary:hover {
+        background: linear-gradient(135deg, #0ea5e9, #4f46e5);
+        transform: translateY(-2px);
+    }
+    h1, h2, h3, h4, h5, h6 { color: #e2e8f0; }
+    .form-label { color: #cbd5e1; font-weight: 500; }
+    .form-control, .form-select {
+        background: rgba(15, 23, 42, 0.6);
+        border: 1px solid rgba(255,255,255,0.1);
+        color: #f8fafc;
+    }
+    .form-control:focus, .form-select:focus {
+        background: rgba(15, 23, 42, 0.8);
+        border-color: #22d3ee;
+        color: #f8fafc;
+        box-shadow: 0 0 0 0.25rem rgba(34, 211, 238, 0.25);
+    }
+    .swal2-popup {
+        background: rgba(15, 23, 42, 0.95) !important;
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(255,255,255,0.1);
+    }
+    .swal2-title {
+        color: #e2e8f0 !important;
+    }
+    .swal2-html-container {
+        color: #cbd5e1 !important;
+    }
+    .swal2-progress-steps .swal2-progress-step {
+        background: #22d3ee !important;
+    }
+</style>
+<!-- SweetAlert2 CSS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4 py-5">
+        <div class="mb-4 d-flex gap-2 flex-wrap">
+                <a href="{% url 'importacoes:dashboard' %}" class="btn btn-sm btn-outline-secondary mb-3">
+                        <i class="fas fa-arrow-left me-2"></i>Voltar
+                </a>
+                <a href="{% url 'home_modulos' %}" class="btn btn-sm btn-outline-primary mb-3">
+                        <i class="fas fa-home me-2"></i>Voltar ao Principal
+                </a>
+                <h1 class="h2 text-dark fw-bold">📥 Importar Notas Fiscais</h1>
+                <p class="text-muted">Importe notas fiscais do sistema Futura</p>
+        </div>
+
+        {% if messages %}
+                {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                {% endfor %}
+        {% endif %}
+
+        <div class="row">
+                <div class="col-lg-6">
+                        <div class="content-card">
+                                <h5 class="mb-3 fw-bold text-light">Configurar Importação</h5>
+                                <div>
+                                        <form id="form-importacao" method="post">
+                                                {% csrf_token %}
+
+                                                <div class="mb-3">
+                                                        <label for="{{ form.tipo.id_for_label }}" class="form-label fw-bold">{{ form.tipo.label }}</label>
+                                                        {{ form.tipo }}
+                                                </div>
+
+                                                <div class="mb-3">
+                                                        <label for="{{ form.data_inicial.id_for_label }}" class="form-label fw-bold">{{ form.data_inicial.label }}</label>
+                                                        {{ form.data_inicial }}
+                                                        <small class="text-muted d-block mt-1" style="opacity: 0.8;">Data de início do período</small>
+                                                </div>
+
+                                                <div class="mb-4">
+                                                        <label for="{{ form.data_final.id_for_label }}" class="form-label fw-bold">{{ form.data_final.label }}</label>
+                                                        {{ form.data_final }}
+                                                        <small class="text-muted d-block mt-1" style="opacity: 0.8;">Data de fim do período</small>
+                                                </div>
+
+                                                <button type="submit" class="btn btn-success w-100 py-2">
+                                                        <i class="fas fa-download me-2"></i>Iniciar Importação
+                                                </button>
+                                        </form>
+                                </div>
+                        </div>
+                </div>
+
+                <div class="col-lg-6">
+                        <div class="content-card">
+                                <h5 class="mb-3 fw-bold text-light">Informações</h5>
+                                <div>
+                                        <h6 class="text-light fw-bold mb-3">O que será importado?</h6>
+                                        <ul class="list-unstyled text-light" style="opacity: 0.9;">
+                                                <li class="mb-2"><i class="fas fa-check text-success me-2"></i><strong>Notas Fiscais Emitidas</strong></li>
+                                                <li class="mb-2"><i class="fas fa-check text-success me-2"></i><strong>Notas Fiscais Recebidas</strong></li>
+                                                <li class="mb-2"><i class="fas fa-check text-success me-2"></i><strong>Valores e Impostos</strong></li>
+                                                <li class="mb-3"><i class="fas fa-check text-success me-2"></i><strong>Dados de Transporte</strong></li>
+                                        </ul>
+
+                                        <hr style="border-color: rgba(255,255,255,0.1);">
+
+                                        <div class="alert alert-warning mb-0" style="background: rgba(251,191,36,0.15); border-color: rgba(251,191,36,0.3);">
+                                                <i class="fas fa-clock me-2"></i>
+                                                <strong>Aviso:</strong> A importação pode levar alguns minutos dependendo do volume de notas
+                                        </div>
+                                </div>
+                        </div>
+                </div>
+        </div>
+</div>
+
+<!-- SweetAlert2 JS -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+    function getCookie(name) {
+        const value = `; ${document.cookie}`;
+        const parts = value.split(`; ${name}=`);
+        if (parts.length === 2) return parts.pop().split(';').shift();
+    }
+
+    const form = document.getElementById('form-importacao');
+
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const tipoSel = form.querySelector('select[name="tipo"]');
+        const tipo = tipoSel ? tipoSel.value : 'nota_fiscal';
+        const data_inicial = form.querySelector('input[name="data_inicial"]').value;
+        const data_final = form.querySelector('input[name="data_final"]').value;
+
+        if (!data_inicial || !data_final) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Atenção',
+                text: 'Por favor, preencha as datas inicial e final.',
+                background: 'rgba(15, 23, 42, 0.95)',
+                color: '#e2e8f0',
+                confirmButtonColor: '#22d3ee'
+            });
+            return;
+        }
+
+        let timerInterval;
+        Swal.fire({
+            title: '<i class="fas fa-sync fa-spin me-2"></i> Importando Notas Fiscais',
+            html: `
+                <div class="mb-3">
+                    <p class="mb-2" id="swal-message">Iniciando importação...</p>
+                    <div class="progress" style="height: 25px;">
+                        <div id="swal-progress" class="progress-bar progress-bar-striped progress-bar-animated" 
+                             role="progressbar" style="width: 0%; background: linear-gradient(135deg, #22d3ee, #6366f1);">
+                            0%
+                        </div>
+                    </div>
+                    <small class="text-muted mt-2 d-block">
+                        Processados: <span id="swal-processed">0</span> de <span id="swal-total">0</span>
+                    </small>
+                </div>
+            `,
+            allowOutsideClick: false,
+            allowEscapeKey: false,
+            showConfirmButton: false,
+            background: 'rgba(15, 23, 42, 0.95)',
+            color: '#e2e8f0',
+            didOpen: () => {
+                Swal.showLoading();
+            }
+        });
+
+        try {
+            const resp = await fetch('{% url "importacoes:api_iniciar" %}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-CSRFToken': getCookie('csrftoken'),
+                },
+                body: new URLSearchParams({ tipo, data_inicial, data_final }).toString()
+            });
+            
+            const data = await resp.json();
+            
+            if (!data.ok) {
+                throw new Error(data.erro || 'Falha ao iniciar importação');
+            }
+            
+            const logId = data.log_id;
+
+            timerInterval = setInterval(async () => {
+                try {
+                    const statusResp = await fetch(`{% url "importacoes:api_status" 0 %}`.replace('/0/', `/${logId}/`));
+                    const status = await statusResp.json();
+                    
+                    console.log('Status importação:', status);
+                    
+                    if (!status.ok) return;
+
+                    const msgEl = document.getElementById('swal-message');
+                    const progEl = document.getElementById('swal-progress');
+                    const procEl = document.getElementById('swal-processed');
+                    const totalEl = document.getElementById('swal-total');
+
+                    const percent = status.percent || 0;
+                    
+                    if (progEl) {
+                        progEl.style.width = percent + '%';
+                        progEl.textContent = percent + '%';
+                        console.log('Progresso atualizado:', percent + '%');
+                    }
+                    
+                    if (procEl) procEl.textContent = status.processados || 0;
+                    if (totalEl) totalEl.textContent = status.total || 0;
+                    if (msgEl) msgEl.textContent = status.mensagem || `Processando ${status.processados} de ${status.total}...`;
+
+                    if (status.concluida || status.status === 'erro') {
+                        clearInterval(timerInterval);
+                        
+                        if (status.status === 'erro') {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Erro na Importação',
+                                html: `
+                                    <p>${status.mensagem || 'Ocorreu um erro durante a importação'}</p>
+                                    <a href="/importacoes/logs/${logId}/" 
+                                       class="btn btn-outline-primary mt-3">
+                                        <i class="fas fa-file-alt me-2"></i>Ver Detalhes do Log
+                                    </a>
+                                `,
+                                background: 'rgba(15, 23, 42, 0.95)',
+                                color: '#e2e8f0',
+                                confirmButtonColor: '#22d3ee'
+                            });
+                        } else {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Importação Concluída!',
+                                html: `
+                                    <div class="text-start">
+                                        <p class="mb-3">Importação finalizada com sucesso!</p>
+                                        <ul class="list-unstyled">
+                                            <li><i class="fas fa-plus-circle text-success me-2"></i> <strong>${status.criados}</strong> registros criados</li>
+                                            <li><i class="fas fa-sync text-info me-2"></i> <strong>${status.atualizados}</strong> registros atualizados</li>
+                                            <li><i class="fas fa-exclamation-triangle text-warning me-2"></i> <strong>${status.erros}</strong> erros</li>
+                                        </ul>
+                                        <a href="/importacoes/logs/${logId}/" 
+                                           class="btn btn-outline-primary mt-3 w-100">
+                                            <i class="fas fa-file-alt me-2"></i>Ver Detalhes Completos
+                                        </a>
+                                    </div>
+                                `,
+                                background: 'rgba(15, 23, 42, 0.95)',
+                                color: '#e2e8f0',
+                                confirmButtonColor: '#22d3ee',
+                                confirmButtonText: 'OK'
+                            }).then(() => {
+                                window.location.href = '{% url "importacoes:logs" %}';
+                            });
+                        }
+                    }
+                } catch (err) {
+                    console.error('Erro ao verificar status:', err);
+                }
+            }, 1500);
+
+        } catch (err) {
+            clearInterval(timerInterval);
+            Swal.fire({
+                icon: 'error',
+                title: 'Erro',
+                text: err.message || 'Erro ao iniciar importação',
+                background: 'rgba(15, 23, 42, 0.95)',
+                color: '#e2e8f0',
+                confirmButtonColor: '#22d3ee'
+            });
+        }
+    });
+</script>
+{% endblock %}

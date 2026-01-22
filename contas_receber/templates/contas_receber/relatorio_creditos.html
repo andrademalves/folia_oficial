@@ -1,0 +1,272 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Relatório de Créditos{% endblock %}
+
+{% block extra_css %}
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<link href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" rel="stylesheet" />
+<style>
+    body { background: radial-gradient(circle at 10% 20%, #0ea5e9 0%, #0f172a 35%, #0b1224 65%, #0a0f1e 100%); }
+    .sidebar { background: rgba(15, 23, 42, 0.85); border-right: 1px solid rgba(255,255,255,0.08); backdrop-filter: blur(12px); height: calc(100vh - 56px); position: sticky; top: 56px; padding: 20px 0; }
+    .sidebar .nav-link { color: #cbd5e1; padding: 12px 20px; margin: 4px 8px; border-radius: 10px; transition: all 0.2s ease; display: flex; align-items: center; gap: 12px; }
+    .sidebar .nav-link:hover { background: rgba(34,211,238,0.1); color: #7dd3fc; }
+    .sidebar .nav-link.active { background: linear-gradient(135deg, rgba(34,211,238,0.2), rgba(99,102,241,0.2)); color: #e0e7ff; font-weight: 600; box-shadow: 0 4px 12px rgba(99,102,241,0.25); }
+    .sidebar .sidebar-header { color: #7dd3fc; font-weight: 700; letter-spacing: 1px; padding: 0 20px 16px; border-bottom: 1px solid rgba(255,255,255,0.06); margin-bottom: 16px; font-size: 14px; text-transform: uppercase; }
+    .content-card { background: rgba(15, 23, 42, 0.78); border: 1px solid rgba(255,255,255,0.08); box-shadow: 0 18px 48px rgba(0,0,0,0.45); border-radius: 16px; backdrop-filter: blur(12px); padding: 24px; margin-bottom: 20px; }
+    .credito-card { background: rgba(15, 23, 42, 0.9); border: 1px solid rgba(125,211,252,0.2); border-radius: 12px; padding: 20px; margin-bottom: 20px; }
+    .credito-header { border-bottom: 2px solid rgba(125,211,252,0.3); padding-bottom: 12px; margin-bottom: 16px; }
+    .info-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 16px; }
+    .info-item { background: rgba(34,211,238,0.05); border-radius: 8px; padding: 12px; }
+    .info-label { color: #94a3b8; font-size: 12px; font-weight: 500; margin-bottom: 4px; }
+    .info-value { color: #e0e7ff; font-size: 16px; font-weight: 600; }
+    .table { color: #cbd5e1; }
+    .table thead th { color: #7dd3fc; border-bottom: 2px solid rgba(125,211,252,0.3); font-size: 13px; }
+    .table tbody td { font-size: 14px; }
+    .form-control, .form-select { background: rgba(15, 23, 42, 0.5); border: 1px solid rgba(125,211,252,0.2); color: #e0e7ff; }
+    .form-control:focus, .form-select:focus { background: rgba(15, 23, 42, 0.7); border-color: #7dd3fc; color: #fff; box-shadow: 0 0 0 0.25rem rgba(125,211,252,0.25); }
+    .badge { font-size: 12px; padding: 6px 12px; }
+    
+    /* Select2 customização */
+    .select2-container--bootstrap-5 .select2-selection { background: rgba(15, 23, 42, 0.5) !important; border: 1px solid rgba(125,211,252,0.2) !important; color: #e0e7ff !important; }
+    .select2-container--bootstrap-5 .select2-selection--single { height: 38px !important; }
+    .select2-container--bootstrap-5 .select2-selection__rendered { color: #e0e7ff !important; line-height: 36px !important; }
+    .select2-container--bootstrap-5 .select2-dropdown { background: rgba(15, 23, 42, 0.95) !important; border: 1px solid rgba(125,211,252,0.3) !important; }
+    .select2-container--bootstrap-5 .select2-results__option { color: #cbd5e1 !important; }
+    .select2-container--bootstrap-5 .select2-results__option--highlighted { background: rgba(34,211,238,0.2) !important; color: #7dd3fc !important; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-0">
+  <div class="row g-0">
+    <div class="col-md-2">
+      <div class="sidebar">
+        <nav class="nav flex-column">
+          <a class="nav-link" href="{% url 'home_modulos' %}"><i class="fas fa-arrow-left"></i> <span>Voltar aos Módulos</span></a>
+          <hr style="border-color: rgba(255,255,255,0.1); margin: 16px 8px;">
+        </nav>
+        <div class="sidebar-header"><i class="fas fa-receipt"></i> Contas a Receber</div>
+        <nav class="nav flex-column">
+          <a class="nav-link" href="{% url 'dashboard_contas_receber' %}"><i class="fas fa-home"></i> <span>Dashboard</span></a>
+          <a class="nav-link" href="{% url 'lista_notas_fiscais' %}"><i class="fas fa-file-invoice"></i> <span>Notas Fiscais</span></a>
+          <a class="nav-link" href="{% url 'parcelas_por_vencimento' %}"><i class="fas fa-clock"></i> <span>Por Vencimento</span></a>
+          <a class="nav-link" href="{% url 'lista_parcelas_baixa' %}"><i class="fas fa-check-circle"></i> <span>Dar Baixa</span></a>
+          <a class="nav-link" href="{% url 'lista_historico_negociacoes' %}"><i class="fas fa-handshake"></i> <span>Negociações</span></a>
+          <a class="nav-link" href="{% url 'lista_creditos' %}"><i class="fas fa-credit-card"></i> <span>Créditos</span></a>
+          <a class="nav-link" href="{% url 'menu_relatorios' %}"><i class="fas fa-file-pdf"></i> <span>Relatórios</span></a>
+          <a class="nav-link active" href="{% url 'relatorio_creditos' %}"><i class="fas fa-chart-line"></i> <span>Relatório Créditos</span></a>
+        </nav>
+      </div>
+    </div>
+    <div class="col-md-10">
+      <div class="p-4">
+        <div class="d-flex justify-content-between align-items-center mb-4" style="background: rgba(15, 23, 42, 0.9); padding: 20px; border-radius: 12px; border: 1px solid rgba(125,211,252,0.2);">
+            <h3 class="mb-0" style="color: #ffffff; font-weight: 600;">
+                <i class="fas fa-chart-line"></i> Relatório de Controle de Créditos
+            </h3>
+            <a href="{% url 'lista_creditos' %}" class="btn btn-outline-primary">
+                <i class="fas fa-arrow-left"></i> Voltar para Lista
+            </a>
+        </div>
+
+        <!-- Filtros -->
+        <div class="content-card">
+            <h5 class="text-info mb-3"><i class="fas fa-filter"></i> Filtros</h5>
+            <form method="get" class="row g-3">
+                <div class="col-md-2">
+                    <label class="form-label" style="color: #cbd5e1;">Status</label>
+                    <select name="status" class="form-select">
+                        <option value="">Todos</option>
+                        <option value="aprovado" {% if filtros.status == 'aprovado' %}selected{% endif %}>Aprovado</option>
+                        <option value="utilizado" {% if filtros.status == 'utilizado' %}selected{% endif %}>Utilizado</option>
+                        <option value="rejeitado" {% if filtros.status == 'rejeitado' %}selected{% endif %}>Rejeitado</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label" style="color: #cbd5e1;">Nota Fiscal</label>
+                    <select name="nota_fiscal" id="select_nota_fiscal" class="form-select">
+                        <option value="">Todas as NFs</option>
+                        {% for nf in notas_fiscais %}
+                        <option value="{{ nf.id }}" {% if filtros.nota_fiscal == nf.id|stringformat:"s" %}selected{% endif %}>
+                            NF {{ nf.numero_nota }} - {{ nf.cliente.nome }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label" style="color: #cbd5e1;">Cliente</label>
+                    <select name="cliente" class="form-select">
+                        <option value="">Todos</option>
+                        {% for cliente in clientes %}
+                        <option value="{{ cliente.id }}" {% if filtros.cliente == cliente.id|stringformat:"s" %}selected{% endif %}>
+                            {{ cliente.nome }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label" style="color: #cbd5e1;">Data Início</label>
+                    <input type="date" name="data_inicio" class="form-control" value="{{ filtros.data_inicio }}">
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label" style="color: #cbd5e1;">Data Fim</label>
+                    <input type="date" name="data_fim" class="form-control" value="{{ filtros.data_fim }}">
+                </div>
+                <div class="col-md-12 text-end">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-search"></i> Filtrar
+                    </button>
+                    <a href="{% url 'relatorio_creditos' %}" class="btn btn-secondary">
+                        <i class="fas fa-times"></i> Limpar
+                    </a>
+                </div>
+            </form>
+        </div>
+
+        <!-- Créditos Detalhados -->
+        {% if creditos_detalhados %}
+            {% for item in creditos_detalhados %}
+            <div class="credito-card">
+                <div class="credito-header">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0" style="color: #7dd3fc;">
+                            <i class="fas fa-file-invoice"></i> NF {{ item.credito.nota_fiscal.numero_nota }} 
+                            - {{ item.credito.cliente.nome }}
+                        </h5>
+                        <span class="badge 
+                            {% if item.credito.status == 'aprovado' %}bg-success
+                            {% elif item.credito.status == 'utilizado' %}bg-info
+                            {% elif item.credito.status == 'rejeitado' %}bg-danger
+                            {% endif %}">
+                            {{ item.credito.get_status_display }}
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Grid de Informações -->
+                <div class="info-grid">
+                    <div class="info-item">
+                        <div class="info-label">Solicitado por</div>
+                        <div class="info-value">{{ item.credito.usuario_solicitante }}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Aprovado por</div>
+                        <div class="info-value">{{ item.credito.usuario_aprovador|default:"—" }}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Valor Solicitado</div>
+                        <div class="info-value text-warning">R$ {{ item.credito.valor_credito|floatformat:2 }}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Valor Aprovado</div>
+                        <div class="info-value text-success">R$ {{ item.credito.valor_aprovado|floatformat:2 }}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Valor Utilizado</div>
+                        <div class="info-value text-info">R$ {{ item.credito.valor_utilizado|floatformat:2 }}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Saldo Disponível</div>
+                        <div class="info-value {% if item.credito.saldo_disponivel > 0 %}text-success{% else %}text-muted{% endif %}">
+                            R$ {{ item.credito.saldo_disponivel|floatformat:2 }}
+                        </div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Data Solicitação</div>
+                        <div class="info-value">{{ item.credito.data_solicitacao|date:"d/m/Y H:i" }}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Data Aprovação</div>
+                        <div class="info-value">{{ item.credito.data_liberacao|date:"d/m/Y"|default:"—" }}</div>
+                    </div>
+                </div>
+
+                <!-- Justificativas -->
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <div class="info-item">
+                            <div class="info-label">Justificativa Solicitação</div>
+                            <div class="info-value" style="font-size: 14px; font-weight: 400;">
+                                {{ item.credito.justificativa|default:"—" }}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="info-item">
+                            <div class="info-label">Justificativa Aprovação</div>
+                            <div class="info-value" style="font-size: 14px; font-weight: 400;">
+                                {{ item.credito.justificativa_aprovacao|default:"—" }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Parcelas onde foi aplicado -->
+                {% if item.credito.valor_utilizado > 0 %}
+                <div style="background: rgba(34,211,238,0.05); border-radius: 8px; padding: 16px;">
+                    <h6 class="text-info mb-3"><i class="fas fa-arrow-right"></i> Aplicação do Crédito</h6>
+                    <div class="table-responsive">
+                        <table class="table table-sm table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Parcela</th>
+                                    <th>NF</th>
+                                    <th>Vencimento</th>
+                                    <th>Observações</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for parcela in item.parcelas %}
+                                    {% if 'Crédito aplicado' in parcela.observacao %}
+                                    <tr>
+                                        <td>{{ parcela.codigo_identificador }}</td>
+                                        <td>{{ parcela.nota_fiscal.numero_nota }}</td>
+                                        <td>{{ parcela.data_vencimento|date:"d/m/Y" }}</td>
+                                        <td style="font-size: 12px;">{{ parcela.observacao }}</td>
+                                    </tr>
+                                    {% endif %}
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                {% else %}
+                <div class="alert alert-warning mb-0">
+                    <i class="fas fa-info-circle"></i> Este crédito ainda não foi aplicado em nenhuma parcela.
+                </div>
+                {% endif %}
+            </div>
+            {% endfor %}
+        {% else %}
+        <div class="content-card">
+            <div class="alert alert-info mb-0">
+                <i class="fas fa-info-circle"></i> Nenhum crédito encontrado com os filtros selecionados.
+            </div>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script>
+$(document).ready(function() {
+    $('#select_nota_fiscal').select2({
+        placeholder: 'Selecione uma Nota Fiscal...',
+        allowClear: true,
+        theme: 'bootstrap-5',
+        width: '100%',
+        language: {
+            noResults: function() {
+                return "Nenhuma NF encontrada";
+            },
+            searching: function() {
+                return "Buscando...";
+            }
+        }
+    });
+});
+</script>
+{% endblock %}

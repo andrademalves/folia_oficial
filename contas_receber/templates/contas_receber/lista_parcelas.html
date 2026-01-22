@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load filtros %}
+
+{% block title %}Lista de Parcelas{% endblock %}
+
+{% block extra_css %}
+<style>
+    body { background: radial-gradient(circle at 10% 20%, #0ea5e9 0%, #0f172a 35%, #0b1224 65%, #0a0f1e 100%); }
+    .sidebar { background: rgba(15, 23, 42, 0.85); border-right: 1px solid rgba(255,255,255,0.08); backdrop-filter: blur(12px); height: calc(100vh - 56px); position: sticky; top: 56px; padding: 20px 0; }
+    .sidebar .nav-link { color: #cbd5e1; padding: 12px 20px; margin: 4px 8px; border-radius: 10px; transition: all 0.2s ease; display: flex; align-items: center; gap: 12px; }
+    .sidebar .nav-link:hover { background: rgba(34,211,238,0.1); color: #7dd3fc; }
+    .sidebar .nav-link.active { background: linear-gradient(135deg, rgba(34,211,238,0.2), rgba(99,102,241,0.2)); color: #e0e7ff; font-weight: 600; box-shadow: 0 4px 12px rgba(99,102,241,0.25); }
+    .sidebar .sidebar-header { color: #7dd3fc; font-weight: 700; letter-spacing: 1px; padding: 0 20px 16px; border-bottom: 1px solid rgba(255,255,255,0.06); margin-bottom: 16px; font-size: 14px; text-transform: uppercase; }
+    .content-card { background: rgba(15, 23, 42, 0.78); border: 1px solid rgba(255,255,255,0.08); box-shadow: 0 18px 48px rgba(0,0,0,0.45); border-radius: 16px; backdrop-filter: blur(12px); padding: 24px; }
+    .table { color: #cbd5e1; }
+    .table thead th { color: #7dd3fc; border-bottom: 2px solid rgba(125,211,252,0.3); }
+    .text-danger { color: #f87171 !important; }
+    .text-success { color: #4ade80 !important; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-0">
+  <div class="row g-0">
+    <div class="col-md-2">
+      <div class="sidebar">
+        <nav class="nav flex-column">
+          <a class="nav-link" href="{% url 'home_modulos' %}"><i class="fas fa-arrow-left"></i> <span>Voltar aos Módulos</span></a>
+          <hr style="border-color: rgba(255,255,255,0.1); margin: 16px 8px;">
+        </nav>
+        <div class="sidebar-header"><i class="fas fa-receipt"></i> Contas a Receber</div>
+        <nav class="nav flex-column">
+          <a class="nav-link" href="{% url 'dashboard_contas_receber' %}"><i class="fas fa-home"></i> <span>Dashboard</span></a>
+          <a class="nav-link" href="{% url 'lista_notas_fiscais' %}"><i class="fas fa-file-invoice"></i> <span>Notas Fiscais</span></a>
+          <a class="nav-link active" href="{% url 'lista_parcelas' %}"><i class="fas fa-calendar-alt"></i> <span>Parcelas</span></a>
+          <a class="nav-link" href="{% url 'parcelas_por_vencimento' %}"><i class="fas fa-clock"></i> <span>Por Vencimento</span></a>
+          <a class="nav-link" href="{% url 'lista_parcelas_baixa' %}"><i class="fas fa-check-circle"></i> <span>Dar Baixa</span></a>
+          <a class="nav-link" href="{% url 'lista_historico_negociacoes' %}"><i class="fas fa-handshake"></i> <span>Negociações</span></a>
+          <a class="nav-link" href="{% url 'lista_creditos' %}"><i class="fas fa-credit-card"></i> <span>Créditos</span></a>
+        </nav>
+      </div>
+    </div>
+    <div class="col-md-10">
+      <div class="p-4">
+    <div class="content-card">
+        <h3 class="text-white mb-4"><i class="fas fa-calendar-alt"></i> Lista de Parcelas</h3>
+        
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>NF</th>
+                        <th>Cliente</th>
+                        <th>Parcela</th>
+                        <th>Valor</th>
+                        <th>Vencimento</th>
+                        <th>Status</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for parcela in page_obj %}
+                    <tr class="{% if parcela.esta_em_atraso %}text-danger{% elif parcela.esta_quitada %}text-success{% endif %}">
+                        <td>{{ parcela.nota_fiscal.numero_nota }}</td>
+                        <td>{{ parcela.cliente.nome }}</td>
+                        <td>{{ parcela.numero_parcela }}</td>
+                        <td>R$ {{ parcela.valor|formato_brasileiro }}</td>
+                        <td>{{ parcela.data_vencimento|date:"d/m/Y" }}</td>
+                        <td>{{ parcela.get_status_pagamento_display }}</td>
+                        <td>
+                            <a href="{% url 'dar_baixa_parcela' parcela.id %}" class="btn btn-sm btn-outline-success">Baixa</a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="7" class="text-center">Nenhuma parcela encontrada.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+{% endblock %}

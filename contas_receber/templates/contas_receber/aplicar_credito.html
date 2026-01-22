@@ -1,0 +1,227 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load filtros %}
+
+{% block title %}Aplicar Crédito{% endblock %}
+
+{% block extra_css %}
+<style>
+    body { background: radial-gradient(circle at 10% 20%, #0ea5e9 0%, #0f172a 35%, #0b1224 65%, #0a0f1e 100%); }
+    .sidebar { background: rgba(15, 23, 42, 0.85); border-right: 1px solid rgba(255,255,255,0.08); backdrop-filter: blur(12px); height: calc(100vh - 56px); position: sticky; top: 56px; padding: 20px 0; }
+    .sidebar .nav-link { color: #cbd5e1; padding: 12px 20px; margin: 4px 8px; border-radius: 10px; transition: all 0.2s ease; display: flex; align-items: center; gap: 12px; }
+    .sidebar .nav-link:hover { background: rgba(34,211,238,0.1); color: #7dd3fc; }
+    .sidebar .nav-link.active { background: linear-gradient(135deg, rgba(34,211,238,0.2), rgba(99,102,241,0.2)); color: #e0e7ff; font-weight: 600; box-shadow: 0 4px 12px rgba(99,102,241,0.25); }
+    .sidebar .sidebar-header { color: #7dd3fc; font-weight: 700; letter-spacing: 1px; padding: 0 20px 16px; border-bottom: 1px solid rgba(255,255,255,0.06); margin-bottom: 16px; font-size: 14px; text-transform: uppercase; }
+    .content-card { background: rgba(15, 23, 42, 0.78); border: 1px solid rgba(255,255,255,0.08); box-shadow: 0 18px 48px rgba(0,0,0,0.45); border-radius: 16px; backdrop-filter: blur(12px); padding: 24px; margin-bottom: 20px; }
+    label { color: #cbd5e1; font-weight: 500; margin-bottom: 8px; }
+    .form-control, .form-select { background: rgba(15, 23, 42, 0.5); border: 1px solid rgba(125,211,252,0.2); color: #e0e7ff; }
+    .form-control:focus, .form-select:focus { background: rgba(15, 23, 42, 0.7); border-color: #7dd3fc; color: #fff; box-shadow: 0 0 0 0.25rem rgba(125,211,252,0.25); }
+    .info-box { background: rgba(34,211,238,0.1); border: 1px solid rgba(34,211,238,0.3); border-radius: 8px; padding: 20px; margin-bottom: 20px; }
+    .info-box h5 { color: #7dd3fc; margin-bottom: 12px; }
+    .info-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
+    .info-row:last-child { border-bottom: none; }
+    .info-label { color: #94a3b8; font-weight: 500; }
+    .info-value { color: #e0e7ff; font-weight: 600; }
+    
+    /* Cards de Parcelas */
+    .parcelas-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; margin-bottom: 24px; }
+    .parcela-card { background: rgba(15, 23, 42, 0.6); border: 2px solid rgba(125,211,252,0.2); border-radius: 12px; padding: 16px; cursor: pointer; transition: all 0.3s ease; }
+    .parcela-card:hover { border-color: rgba(34,211,238,0.6); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(34,211,238,0.2); }
+    .parcela-card.selected { border-color: #22d3ee; background: rgba(34,211,238,0.15); box-shadow: 0 8px 24px rgba(34,211,238,0.3); }
+    .parcela-card .parcela-header { display: flex; justify-content: between; align-items: center; margin-bottom: 12px; }
+    .parcela-card .parcela-numero { color: #7dd3fc; font-size: 18px; font-weight: 700; }
+    .parcela-card .parcela-info { color: #cbd5e1; font-size: 13px; margin-bottom: 6px; }
+    .parcela-card .parcela-valor { color: #22d3ee; font-size: 20px; font-weight: 700; margin-top: 8px; }
+    .parcela-card input[type="radio"] { margin-right: 8px; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-0">
+  <div class="row g-0">
+    <div class="col-md-2">
+      <div class="sidebar">
+        <nav class="nav flex-column">
+          <a class="nav-link" href="{% url 'home_modulos' %}"><i class="fas fa-arrow-left"></i> <span>Voltar aos Módulos</span></a>
+          <hr style="border-color: rgba(255,255,255,0.1); margin: 16px 8px;">
+        </nav>
+        <div class="sidebar-header"><i class="fas fa-receipt"></i> Contas a Receber</div>
+        <nav class="nav flex-column">
+          <a class="nav-link" href="{% url 'dashboard_contas_receber' %}"><i class="fas fa-home"></i> <span>Dashboard</span></a>
+          <a class="nav-link" href="{% url 'lista_notas_fiscais' %}"><i class="fas fa-file-invoice"></i> <span>Notas Fiscais</span></a>
+          <a class="nav-link" href="{% url 'parcelas_por_vencimento' %}"><i class="fas fa-clock"></i> <span>Por Vencimento</span></a>
+          <a class="nav-link" href="{% url 'lista_parcelas_baixa' %}"><i class="fas fa-check-circle"></i> <span>Dar Baixa</span></a>
+          <a class="nav-link" href="{% url 'lista_historico_negociacoes' %}"><i class="fas fa-handshake"></i> <span>Negociações</span></a>
+          <a class="nav-link active" href="{% url 'lista_creditos' %}"><i class="fas fa-credit-card"></i> <span>Créditos</span></a>
+          <a class="nav-link" href="{% url 'menu_relatorios' %}"><i class="fas fa-file-pdf"></i> <span>Relatórios</span></a>
+          <a class="nav-link" href="{% url 'relatorio_creditos' %}"><i class="fas fa-chart-line"></i> <span>Relatório Créditos</span></a>
+        </nav>
+      </div>
+    </div>
+    <div class="col-md-10">
+      <div class="p-4">
+    <div class="content-card">
+        <h3 class="text-white mb-4"><i class="fas fa-credit-card"></i> Aplicar Crédito em Parcela</h3>
+        
+        <div class="info-box">
+            <h5><i class="fas fa-info-circle"></i> Informações do Crédito</h5>
+            <div class="info-row">
+                <span class="info-label">Cliente:</span>
+                <span class="info-value">{{ credito.cliente.nome }}</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Nota Fiscal:</span>
+                <span class="info-value">NF {{ credito.nota_fiscal.numero_nota }}</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Valor Aprovado:</span>
+                <span class="info-value text-warning">R$ {{ credito.valor_aprovado|floatformat:2 }}</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Saldo Disponível:</span>
+                <span class="info-value text-success" style="font-size: 18px;">R$ {{ credito.saldo_disponivel|floatformat:2 }}</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Justificativa:</span>
+                <span class="info-value" style="font-weight: 400;">{{ credito.justificativa }}</span>
+            </div>
+        </div>
+
+        <form method="post" id="formAplicarCredito">
+            {% csrf_token %}
+            
+            <h5 class="text-info mb-3"><i class="fas fa-hand-pointer"></i> Selecione a Parcela</h5>
+            
+            {% if parcelas %}
+            <div class="parcelas-grid">
+                {% for parcela in parcelas %}
+                <div class="parcela-card" onclick="selecionarParcela({{ parcela.id }}, {{ parcela.valor }})">
+                    <div class="parcela-header">
+                        <input type="radio" 
+                               name="parcela_id" 
+                               id="parcela_{{ parcela.id }}" 
+                               value="{{ parcela.id }}" 
+                               data-valor="{{ parcela.valor }}"
+                               required>
+                        <label for="parcela_{{ parcela.id }}" style="cursor: pointer; margin: 0; flex: 1;">
+                            <div class="parcela-numero">
+                                <i class="fas fa-file-invoice"></i> NF {{ parcela.nota_fiscal.numero_nota }} - Parcela {{ parcela.numero_parcela }}
+                            </div>
+                        </label>
+                    </div>
+                    <div class="parcela-info">
+                        <i class="fas fa-calendar"></i> Vencimento: {{ parcela.data_vencimento|date:"d/m/Y" }}
+                    </div>
+                    <div class="parcela-info">
+                        <i class="fas fa-barcode"></i> {{ parcela.codigo_identificador }}
+                    </div>
+                    <div class="parcela-valor">
+                        R$ {{ parcela.valor|floatformat:2 }}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="alert alert-warning">
+                <i class="fas fa-exclamation-triangle"></i> 
+                Não há parcelas pendentes para este cliente.
+            </div>
+            {% endif %}
+
+            <div class="content-card" style="background: rgba(34,211,238,0.05); border-color: rgba(34,211,238,0.3);">
+                <h5 class="text-info mb-3"><i class="fas fa-dollar-sign"></i> Valor a Aplicar</h5>
+                <div class="row align-items-end">
+                    <div class="col-md-6">
+                        <label for="valor_aplicar" class="form-label">Digite o valor que deseja aplicar</label>
+                        <input type="number" 
+                               name="valor_aplicar" 
+                               id="valor_aplicar" 
+                               class="form-control" 
+                               style="font-size: 20px; font-weight: 600;"
+                               step="0.01" 
+                               max="{{ credito.saldo_disponivel }}"
+                               placeholder="0,00"
+                               required>
+                        <small class="text-muted">Máximo disponível: R$ {{ credito.saldo_disponivel|floatformat:2 }}</small>
+                    </div>
+                    <div class="col-md-6">
+                        <div id="infoAplicacao" style="background: rgba(15, 23, 42, 0.5); border-radius: 8px; padding: 16px; display: none;">
+                            <div style="color: #94a3b8; font-size: 13px;">Após aplicar o crédito:</div>
+                            <div id="novoValorParcela" style="color: #22d3ee; font-size: 18px; font-weight: 700; margin-top: 4px;"></div>
+                            <div id="novoSaldoCredito" style="color: #7dd3fc; font-size: 14px; margin-top: 4px;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="d-flex gap-2 mt-4">
+                <button type="submit" class="btn btn-success btn-lg">
+                    <i class="fas fa-check"></i> Confirmar Aplicação
+                </button>
+                <a href="{% url 'lista_creditos' %}" class="btn btn-secondary btn-lg">
+                    <i class="fas fa-times"></i> Cancelar
+                </a>
+            </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<script>
+let valorParcelaSelecionada = 0;
+const saldoCredito = {{ credito.saldo_disponivel }};
+
+function selecionarParcela(parcelaId, valorParcela) {
+    // Remover seleção anterior
+    document.querySelectorAll('.parcela-card').forEach(card => {
+        card.classList.remove('selected');
+    });
+    
+    // Selecionar novo card
+    const radio = document.getElementById('parcela_' + parcelaId);
+    radio.checked = true;
+    radio.closest('.parcela-card').classList.add('selected');
+    
+    // Atualizar valor
+    valorParcelaSelecionada = valorParcela;
+    atualizarValorSugerido();
+}
+
+function atualizarValorSugerido() {
+    const input = document.getElementById('valor_aplicar');
+    
+    // Sugerir o menor valor entre saldo do crédito e valor da parcela
+    const valorSugerido = Math.min(saldoCredito, valorParcelaSelecionada);
+    input.value = valorSugerido.toFixed(2);
+    input.max = Math.min(saldoCredito, valorParcelaSelecionada);
+    
+    atualizarPrevia();
+}
+
+function atualizarPrevia() {
+    const valorAplicar = parseFloat(document.getElementById('valor_aplicar').value) || 0;
+    const infoBox = document.getElementById('infoAplicacao');
+    
+    if (valorAplicar > 0 && valorParcelaSelecionada > 0) {
+        const novoValorParcela = valorParcelaSelecionada - valorAplicar;
+        const novoSaldoCredito = saldoCredito - valorAplicar;
+        
+        document.getElementById('novoValorParcela').textContent = 
+            `Parcela ficará: R$ ${novoValorParcela.toFixed(2)}`;
+        document.getElementById('novoSaldoCredito').textContent = 
+            `Saldo restante do crédito: R$ ${novoSaldoCredito.toFixed(2)}`;
+        
+        infoBox.style.display = 'block';
+    } else {
+        infoBox.style.display = 'none';
+    }
+}
+
+// Atualizar prévia quando digitar valor
+document.addEventListener('DOMContentLoaded', function() {
+    document.getElementById('valor_aplicar').addEventListener('input', atualizarPrevia);
+});
+</script>
+{% endblock %}

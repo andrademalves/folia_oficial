@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+{% load permissoes_tags %}
+
+{% block title %}Dashboard - Sistema de Gestão{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h2><i class="fas fa-tachometer-alt"></i> Dashboard</h2>
+            <p class="text-muted">Bem-vindo, {{ request.user.get_full_name|default:request.user.username }}!</p>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body text-center">
+                    <i class="fas fa-users fa-3x text-primary mb-3"></i>
+                    <h3>{{ total_usuarios }}</h3>
+                    <p class="text-muted">Usuários Ativos</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body text-center">
+                    <i class="fas fa-th-large fa-3x text-success mb-3"></i>
+                    <h3>{{ total_modulos }}</h3>
+                    <p class="text-muted">Módulos do Sistema</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body text-center">
+                    <i class="fas fa-bars fa-3x text-warning mb-3"></i>
+                    <h3>{{ total_menus }}</h3>
+                    <p class="text-muted">Menus Disponíveis</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <i class="fas fa-info-circle"></i> Acesso Rápido
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        {% tem_permissao_menu '/usuarios/' 'visualizar' as pode_ver_usuarios %}
+                        {% if pode_ver_usuarios %}
+                        <div class="col-md-3">
+                            <a href="{% url 'listar_usuarios' %}" class="btn btn-outline-primary w-100 mb-2">
+                                <i class="fas fa-users"></i><br>Gerenciar Usuários
+                            </a>
+                        </div>
+                        {% endif %}
+                        
+                        {% if request.user.is_superuser %}
+                        <div class="col-md-3">
+                            <a href="/admin/" class="btn btn-outline-danger w-100 mb-2">
+                                <i class="fas fa-cog"></i><br>Painel Admin
+                            </a>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

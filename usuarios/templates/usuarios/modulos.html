@@ -1,0 +1,144 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Módulos - Sistema de Gestão{% endblock %}
+
+{% block extra_css %}
+<style>
+    .hero {
+        background: radial-gradient(circle at 10% 20%, #111927 0%, #0f172a 35%, #0b1224 70%, #0a0f1e 100%);
+        color: #e5e7eb;
+        padding: 48px;
+        border-radius: 16px;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+    }
+    .hero::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(circle at 80% 20%, rgba(56,189,248,0.15), transparent 35%),
+                    radial-gradient(circle at 20% 80%, rgba(129,140,248,0.12), transparent 30%);
+        pointer-events: none;
+    }
+    .module-card {
+        background: #0f172a;
+        color: #e5e7eb;
+        border: 1px solid rgba(255,255,255,0.06);
+        border-radius: 14px;
+        padding: 18px;
+        height: 100%;
+        box-shadow: 0 12px 30px rgba(0,0,0,0.20);
+        transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+    }
+    .module-card:hover {
+        transform: translateY(-4px);
+        border-color: rgba(94,234,212,0.35);
+        box-shadow: 0 16px 40px rgba(45,212,191,0.15);
+    }
+    .module-badge {
+        background: rgba(56,189,248,0.16);
+        color: #7dd3fc;
+        border: 1px solid rgba(56,189,248,0.25);
+        padding: 6px 10px;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+    }
+    .module-btn {
+        background: linear-gradient(135deg, #22d3ee, #6366f1);
+        border: none;
+        color: white;
+        font-weight: 600;
+        padding: 10px 14px;
+        border-radius: 10px;
+        width: 100%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        box-shadow: 0 10px 30px rgba(99,102,241,0.35);
+        transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+    .module-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 14px 34px rgba(34,211,238,0.35);
+    }
+    .empty-state {
+        background: #0b1220;
+        border: 1px dashed rgba(255,255,255,0.15);
+        color: #cbd5e1;
+        border-radius: 14px;
+        padding: 32px;
+        text-align: center;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="hero mb-4">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <p class="mb-2 text-uppercase" style="letter-spacing: 1px; color: #a5b4fc; font-weight: 700;">Portal de módulos</p>
+                <h2 class="mb-3" style="font-weight: 800; color: #e0e7ff;">Bem-vindo, {{ request.user.first_name|default:request.user.username }}!</h2>
+                <p class="mb-0" style="max-width: 640px; color: #cbd5e1;">
+                    Acesse rapidamente os módulos disponíveis para você. Apenas os módulos com permissão de visualização são exibidos aqui.
+                </p>
+            </div>
+            <div class="col-md-4 text-md-end mt-3 mt-md-0">
+                <div class="module-badge">
+                    <i class="fas fa-shield-check"></i> Acesso seguro
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% if modulos %}
+    <div class="row g-3">
+        {% for bloco in modulos %}
+        <div class="col-lg-4 col-md-6">
+            <div class="module-card">
+                <div class="d-flex align-items-center mb-3" style="gap: 12px;">
+                    {% if bloco.modulo.icone %}
+                        <span class="d-inline-flex align-items-center justify-content-center" style="width: 44px; height: 44px; border-radius: 12px; background: rgba(99,102,241,0.15); color: #a5b4fc;">
+                            <i class="{{ bloco.modulo.icone }} fa-lg"></i>
+                        </span>
+                    {% else %}
+                        <span class="d-inline-flex align-items-center justify-content-center" style="width: 44px; height: 44px; border-radius: 12px; background: rgba(34,211,238,0.12); color: #7dd3fc;">
+                            <i class="fas fa-cube fa-lg"></i>
+                        </span>
+                    {% endif %}
+                    <div>
+                        <h5 class="mb-1" style="color: #e5e7eb; font-weight: 700;">{{ bloco.modulo.nome }}</h5>
+                        <small style="color: #94a3b8;">{{ bloco.modulo.descricao|default:"" }}</small>
+                    </div>
+                </div>
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <div class="module-badge" style="background: rgba(34,197,94,0.14); border-color: rgba(34,197,94,0.3); color: #86efac;">
+                        <i class="fas fa-check-circle"></i> {{ bloco.menus|length }} acessos
+                    </div>
+                    <small style="color: #94a3b8;">Ordem {{ bloco.modulo.ordem }}</small>
+                </div>
+                <div class="d-grid gap-2">
+                    <a class="module-btn" href="{{ bloco.primary_url }}">
+                        <i class="fas fa-arrow-right"></i> {{ bloco.primary_label }}
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <i class="fas fa-lock mb-3" style="font-size: 28px; color: #a5b4fc;"></i>
+        <h5 class="mb-2">Nenhum módulo disponível</h5>
+        <p class="mb-0">Solicite ao administrador permissões para visualizar módulos.</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

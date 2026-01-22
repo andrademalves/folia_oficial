@@ -1,0 +1,243 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Relatórios - Cadastros{% endblock %}
+
+{% block extra_css %}
+<style>
+    body { 
+        background: radial-gradient(circle at 10% 20%, #0ea5e9 0%, #0f172a 35%, #0b1224 65%, #0a0f1e 100%); 
+    }
+    .sidebar {
+        background: rgba(15, 23, 42, 0.85);
+        border-right: 1px solid rgba(255,255,255,0.08);
+        backdrop-filter: blur(12px);
+        height: calc(100vh - 56px);
+        position: sticky;
+        top: 56px;
+        padding: 20px 0;
+    }
+    .sidebar .nav-link {
+        color: #cbd5e1;
+        padding: 12px 20px;
+        margin: 4px 8px;
+        border-radius: 10px;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+    .sidebar .nav-link:hover {
+        background: rgba(34,211,238,0.1);
+        color: #7dd3fc;
+    }
+    .sidebar .nav-link.active {
+        background: linear-gradient(135deg, rgba(34,211,238,0.2), rgba(99,102,241,0.2));
+        color: #e0e7ff;
+        font-weight: 600;
+        box-shadow: 0 4px 12px rgba(99,102,241,0.25);
+    }
+    .sidebar .sidebar-header {
+        color: #7dd3fc;
+        font-weight: 700;
+        letter-spacing: 1px;
+        padding: 0 20px 16px;
+        border-bottom: 1px solid rgba(255,255,255,0.06);
+        margin-bottom: 16px;
+        font-size: 14px;
+        text-transform: uppercase;
+    }
+    .content-card {
+        background: rgba(15, 23, 42, 0.78);
+        border: 1px solid rgba(255,255,255,0.08);
+        box-shadow: 0 18px 48px rgba(0,0,0,0.45);
+        border-radius: 16px;
+        backdrop-filter: blur(12px);
+        padding: 24px;
+    }
+    .report-card {
+        background: linear-gradient(135deg, rgba(34,211,238,0.1), rgba(99,102,241,0.1));
+        border: 1px solid rgba(255,255,255,0.08);
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 16px;
+        color: #e5e7eb;
+        transition: all 0.2s ease;
+        cursor: pointer;
+    }
+    .report-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 24px rgba(99,102,241,0.25);
+    }
+    .report-icon {
+        width: 56px;
+        height: 56px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 28px;
+        background: rgba(99,102,241,0.15);
+        color: #a5b4fc;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-0">
+  <div class="row g-0">
+    <div class="col-md-2">
+      <div class="sidebar">
+        <div class="sidebar-header"><i class="fas fa-list"></i> Cadastros</div>
+        <nav class="nav flex-column">
+          <a class="nav-link" href="{% url 'cadastros:dashboard' %}"><i class="fas fa-home"></i> <span>Dashboard</span></a>
+          <a class="nav-link" href="{% url 'cadastros:plano_contas' %}"><i class="fas fa-sitemap"></i> <span>Plano de Contas</span></a>
+          <a class="nav-link" href="{% url 'cadastros:contas_financeiras' %}"><i class="fas fa-university"></i> <span>Contas Bancárias/Factory</span></a>
+          <a class="nav-link" href="{% url 'cadastros:metodos_pagamento' %}"><i class="fas fa-credit-card"></i> <span>Métodos de Pagamento</span></a>
+          <a class="nav-link active" href="{% url 'cadastros:relatorios' %}"><i class="fas fa-file-alt"></i> <span>Relatórios</span></a>
+          <hr style="border-color: rgba(255,255,255,0.1); margin: 16px 8px;">
+          <a class="nav-link" href="{% url 'home_modulos' %}"><i class="fas fa-arrow-left"></i> <span>Voltar aos Módulos</span></a>
+        </nav>
+      </div>
+    </div>
+    <div class="col-md-10">
+      <div class="p-4">
+        <div class="content-card">
+          <div class="mb-4">
+            <p class="mb-1 text-uppercase" style="letter-spacing: 1px; color: #7dd3fc; font-weight: 700;">Cadastros</p>
+            <h3 class="mb-0" style="color: #e2e8f0; font-weight: 800;">Relatórios</h3>
+            <small style="color: #cbd5e1;">Relatórios gerenciais e análises</small>
+          </div>
+
+          <div class="row">
+            <div class="col-md-6">
+              <div class="report-card" onclick="gerarRelatorioPlanoContas()">
+                <div class="d-flex align-items-center gap-3">
+                  <div class="report-icon">
+                    <i class="fas fa-sitemap"></i>
+                  </div>
+                  <div>
+                    <h5 class="mb-1" style="color: #e5e7eb;">Plano de Contas</h5>
+                    <small style="color: #94a3b8;">Relatório completo do plano de contas com hierarquia</small>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="report-card" onclick="gerarRelatorioContasAtivas()">
+                <div class="d-flex align-items-center gap-3">
+                  <div class="report-icon">
+                    <i class="fas fa-check-circle"></i>
+                  </div>
+                  <div>
+                    <h5 class="mb-1" style="color: #e5e7eb;">Contas Ativas</h5>
+                    <small style="color: #94a3b8;">Listagem de todas as contas ativas no sistema</small>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="report-card" onclick="gerarRelatorioContasInativas()">
+                <div class="d-flex align-items-center gap-3">
+                  <div class="report-icon">
+                    <i class="fas fa-ban"></i>
+                  </div>
+                  <div>
+                    <h5 class="mb-1" style="color: #e5e7eb;">Contas Inativas</h5>
+                    <small style="color: #94a3b8;">Listagem de contas inativas para auditoria</small>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="report-card" onclick="gerarRelatorioContasBancarias()">
+                <div class="d-flex align-items-center gap-3">
+                  <div class="report-icon">
+                    <i class="fas fa-university"></i>
+                  </div>
+                  <div>
+                    <h5 class="mb-1" style="color: #e5e7eb;">Contas Bancárias</h5>
+                    <small style="color: #94a3b8;">Relatório de contas bancárias e factory cadastradas</small>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="report-card" onclick="gerarRelatorioHierarquia()">
+                <div class="d-flex align-items-center gap-3">
+                  <div class="report-icon">
+                    <i class="fas fa-project-diagram"></i>
+                  </div>
+                  <div>
+                    <h5 class="mb-1" style="color: #e5e7eb;">Hierarquia Completa</h5>
+                    <small style="color: #94a3b8;">Estrutura hierárquica com contas pai e filhas</small>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="report-card" onclick="gerarRelatorioConsolidado()">
+                <div class="d-flex align-items-center gap-3">
+                  <div class="report-icon">
+                    <i class="fas fa-chart-bar"></i>
+                  </div>
+                  <div>
+                    <h5 class="mb-1" style="color: #e5e7eb;">Relatório Consolidado</h5>
+                    <small style="color: #94a3b8;">Visão geral de todos os cadastros do sistema</small>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="report-card" onclick="gerarRelatorioMetodosPagamento()">
+                <div class="d-flex align-items-center gap-3">
+                  <div class="report-icon">
+                    <i class="fas fa-credit-card"></i>
+                  </div>
+                  <div>
+                    <h5 class="mb-1" style="color: #e5e7eb;">Métodos de Pagamento</h5>
+                    <small style="color: #94a3b8;">Listagem de todos os métodos de pagamento cadastrados</small>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+function gerarRelatorioPlanoContas() {
+  window.location.href = "{% url 'cadastros:relatorio_plano_contas_pdf' %}";
+}
+
+function gerarRelatorioContasAtivas() {
+  window.location.href = "{% url 'cadastros:relatorio_contas_ativas_pdf' %}";
+}
+
+function gerarRelatorioContasInativas() {
+  window.location.href = "{% url 'cadastros:relatorio_contas_inativas_pdf' %}";
+}
+
+function gerarRelatorioContasBancarias() {
+  window.location.href = "{% url 'cadastros:relatorio_contas_bancarias_pdf' %}";
+}
+
+function gerarRelatorioHierarquia() {
+  window.location.href = "{% url 'cadastros:relatorio_hierarquia_completa_pdf' %}";
+}
+
+function gerarRelatorioConsolidado() {
+  window.location.href = "{% url 'cadastros:relatorio_consolidado_pdf' %}";
+}
+
+function gerarRelatorioMetodosPagamento() {
+  window.location.href = "{% url 'cadastros:relatorio_metodos_pagamento_pdf' %}";
+}
+</script>
+{% endblock %}

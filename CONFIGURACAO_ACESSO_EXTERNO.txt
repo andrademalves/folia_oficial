@@ -1,0 +1,261 @@
+================================================================================
+CONFIGURAÇÃO DE ACESSO EXTERNO E INTERNO - DJANGO
+================================================================================
+
+Data: 11/01/2026
+Sistema: Gestão TI - Folia
+
+================================================================================
+1. RESUMO DA CONFIGURAÇÃO
+================================================================================
+
+✅ Django configurado para aceitar requisições de:
+   - folia.dvrdns.org (domínio externo DDNS)
+   - 192.168.10.8 (IP interno fixo)
+   - 192.168.10.* (qualquer IP da rede local)
+   - localhost / 127.0.0.1 (acesso local)
+
+✅ Servidor iniciando em 0.0.0.0:8000 (todas as interfaces)
+
+📍 IP Externo atual: 177.33.86.135 (via folia.dvrdns.org)
+📍 IP Interno: 192.168.10.8
+
+================================================================================
+2. ALTERAÇÕES REALIZADAS
+================================================================================
+
+ARQUIVO: gestaoTi/settings.py
+────────────────────────────────────────────────────────────────────────────
+ALLOWED_HOSTS = [
+    'localhost',
+    '127.0.0.1',
+    'folia.dvrdns.org',           # Domínio externo
+    '192.168.10.8',               # IP interno da máquina
+    '192.168.10.*',               # Qualquer IP da rede interna
+    '*',                          # Aceita qualquer host
+]
+
+ARQUIVO: INICIAR_SERVIDOR_COM_FIREBIRD.bat
+────────────────────────────────────────────────────────────────────────────
+- Verifica e libera porta 8000
+- Configura PATH do Firebird
+- Inicia servidor em 0.0.0.0:8000 (escuta em todas as interfaces)
+
+================================================================================
+3. URLs DE ACESSO
+================================================================================
+
+ACESSO EXTERNO (via Internet):
+────────────────────────────────────────────────────────────────────────────
+http://folia.dvrdns.org:8000/
+http://folia.dvrdns.org:8000/login/
+http://folia.dvrdns.org:8000/admin/
+
+ACESSO INTERNO (rede local 192.168.10.x):
+────────────────────────────────────────────────────────────────────────────
+http://192.168.10.8:8000/
+http://192.168.10.8:8000/login/
+http://192.168.10.8:8000/admin/
+
+ACESSO LOCAL (própria máquina):
+────────────────────────────────────────────────────────────────────────────
+http://localhost:8000/
+http://127.0.0.1:8000/
+
+================================================================================
+4. CONFIGURAÇÕES NECESSÁRIAS NO ROTEADOR
+================================================================================
+
+⚠️ IMPORTANTE: Configure Port Forwarding no roteador
+
+CONFIGURAÇÃO DO REDIRECIONAMENTO DE PORTA:
+────────────────────────────────────────────────────────────────────────────
+Tipo:              Port Forwarding / NAT / Virtual Server
+Porta Externa:     8000
+Protocolo:         TCP
+IP Interno:        192.168.10.8
+Porta Interna:     8000
+Descrição:         Django Server
+
+PASSOS (podem variar conforme modelo do roteador):
+────────────────────────────────────────────────────────────────────────────
+1. Acesse o roteador via navegador (geralmente 192.168.0.1 ou 192.168.1.1)
+2. Login (usuário/senha do roteador)
+3. Procure por: "Port Forwarding", "NAT", "Virtual Server" ou "DMZ"
+4. Adicione nova regra:
+   - Porta Externa: 8000
+   - IP Destino: 192.168.10.8
+   - Porta Interna: 8000
+   - Protocolo: TCP
+5. Salve e reinicie o roteador se necessário
+
+ALTERNATIVA - USAR PORTA 80 (HTTP padrão):
+────────────────────────────────────────────────────────────────────────────
+Se preferir acessar sem :8000 na URL:
+   - Porta Externa: 80
+   - IP Interno: 192.168.10.8
+   - Porta Interna: 8000
+   - Protocolo: TCP
+
+Acesso ficará: http://folia.dvrdns.org (sem :8000)
+
+================================================================================
+5. CONFIGURAÇÃO DO FIREWALL WINDOWS
+================================================================================
+
+OPÇÃO 1 - Automática (Recomendada):
+────────────────────────────────────────────────────────────────────────────
+1. Clique com botão direito em: CONFIGURAR_FIREWALL.bat
+2. Selecione "Executar como Administrador"
+3. Aguarde confirmação
+
+OPÇÃO 2 - Manual:
+────────────────────────────────────────────────────────────────────────────
+Execute no PowerShell como Administrador:
+
+netsh advfirewall firewall add rule name="Django Server Port 8000" dir=in action=allow protocol=TCP localport=8000
+
+VERIFICAR SE PORTA ESTÁ LIBERADA:
+────────────────────────────────────────────────────────────────────────────
+netsh advfirewall firewall show rule name="Django Server Port 8000"
+
+================================================================================
+6. INICIAR O SERVIDOR
+================================================================================
+
+MÉTODO 1 - Script Automático (Recomendado):
+────────────────────────────────────────────────────────────────────────────
+Duplo clique em: INICIAR_SERVIDOR_COM_FIREBIRD.bat
+
+MÉTODO 2 - Manual:
+────────────────────────────────────────────────────────────────────────────
+cd "C:\1.3 Gestao"
+set PATH=C:\Firebird\bin;%PATH%
+venv\Scripts\activate
+python manage.py runserver 0.0.0.0:8000
+
+IMPORTANTE: Use 0.0.0.0:8000 (não localhost:8000)
+────────────────────────────────────────────────────────────────────────────
+✓ 0.0.0.0:8000  → Escuta em TODAS as interfaces (correto)
+✗ localhost:8000 → Escuta APENAS localmente (errado para acesso externo)
+
+================================================================================
+7. VERIFICAÇÕES E TESTES
+================================================================================
+
+VERIFICAR SE SERVIDOR ESTÁ RODANDO:
+────────────────────────────────────────────────────────────────────────────
+netstat -an | findstr :8000
+
+Deve aparecer:
+TCP    0.0.0.0:8000    0.0.0.0:0    LISTENING
+
+TESTAR ACESSO LOCAL:
+────────────────────────────────────────────────────────────────────────────
+1. Abra navegador
+2. Acesse: http://localhost:8000
+3. Deve aparecer a tela de login
+
+TESTAR ACESSO INTERNO (de outra máquina na rede):
+────────────────────────────────────────────────────────────────────────────
+1. De outro computador/celular na mesma rede WiFi
+2. Acesse: http://192.168.10.8:8000
+3. Deve aparecer a tela de login
+
+TESTAR ACESSO EXTERNO (de fora da rede):
+────────────────────────────────────────────────────────────────────────────
+1. De um celular usando dados móveis (4G/5G)
+   OU de outra rede (casa de amigo, trabalho, etc)
+2. Acesse: http://folia.dvrdns.org:8000
+3. Deve aparecer a tela de login
+
+SE NÃO FUNCIONAR EXTERNAMENTE:
+────────────────────────────────────────────────────────────────────────────
+✓ Verifique port forwarding no roteador
+✓ Confirme que porta 8000 está aberta no firewall Windows
+✓ Confirme que servidor está rodando em 0.0.0.0:8000
+✓ Verifique se IP externo está atualizado no DDNS
+
+Comando para verificar IP externo:
+curl ifconfig.me
+OU acesse: https://www.meuip.com.br/
+
+================================================================================
+8. SOLUÇÃO DE PROBLEMAS
+================================================================================
+
+PROBLEMA: "Porta 8000 já está em uso"
+────────────────────────────────────────────────────────────────────────────
+SOLUÇÃO:
+for /f "tokens=5" %a in ('netstat -ano ^| findstr :8000') do taskkill /F /PID %a
+
+PROBLEMA: Acesso externo não funciona, mas interno sim
+────────────────────────────────────────────────────────────────────────────
+CAUSAS POSSÍVEIS:
+1. Port forwarding não configurado no roteador
+2. DDNS não atualizado (IP externo mudou)
+3. ISP bloqueando porta 8000 (tente porta 80 ou 8080)
+
+PROBLEMA: "CSRF verification failed"
+────────────────────────────────────────────────────────────────────────────
+SOLUÇÃO: Adicione no settings.py:
+CSRF_TRUSTED_ORIGINS = [
+    'http://folia.dvrdns.org',
+    'http://192.168.10.8',
+]
+
+PROBLEMA: Imagens/CSS não carregam
+────────────────────────────────────────────────────────────────────────────
+SOLUÇÃO:
+python manage.py collectstatic --noinput
+
+================================================================================
+9. SEGURANÇA - RECOMENDAÇÕES
+================================================================================
+
+⚠️ PARA PRODUÇÃO, CONSIDERE:
+────────────────────────────────────────────────────────────────────────────
+1. Usar HTTPS (SSL/TLS)
+   - Obtenha certificado SSL (Let's Encrypt gratuito)
+   - Configure proxy reverso (Nginx/Apache)
+
+2. Alterar DEBUG para False em produção:
+   DEBUG = False
+
+3. Usar senha forte no SECRET_KEY
+
+4. Configurar ALLOWED_HOSTS específicos (remover '*'):
+   ALLOWED_HOSTS = ['folia.dvrdns.org', '192.168.10.8']
+
+5. Usar servidor WSGI/ASGI em produção:
+   - Gunicorn
+   - uWSGI
+   - Daphne
+
+6. Backup regular do banco de dados
+
+7. Manter sistema atualizado
+
+================================================================================
+10. ARQUIVOS CRIADOS/MODIFICADOS
+================================================================================
+
+✓ gestaoTi/settings.py              (ALLOWED_HOSTS atualizado)
+✓ INICIAR_SERVIDOR_COM_FIREBIRD.bat (script de inicialização)
+✓ CONFIGURAR_FIREWALL.bat           (script firewall)
+✓ verificar_acesso_externo.py       (script de verificação)
+✓ CONFIGURACAO_ACESSO_EXTERNO.txt   (este arquivo)
+
+================================================================================
+11. CONTATOS E SUPORTE
+================================================================================
+
+Documentação Django: https://docs.djangoproject.com/
+DDNS DVR: https://www.dvrdns.org/
+
+Em caso de dúvidas, verifique logs do servidor Django
+para mensagens de erro detalhadas.
+
+================================================================================
+FIM DA DOCUMENTAÇÃO
+================================================================================

@@ -1,0 +1,429 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Extrato - {{ conta.nome }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar -->
+        <nav id="sidebar" class="col-md-3 col-lg-2 d-md-block sidebar">
+            <div class="position-sticky pt-3">
+                <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-white">
+                    <span>Financeiro</span>
+                </h6>
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">
+                            <i class="fas fa-home"></i> <span>Voltar aos Módulos</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'financeiro:dashboard' %}">
+                            <i class="fas fa-tachometer-alt"></i> <span>Dashboard</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'financeiro:contaspagar_list' %}">
+                            <i class="fas fa-file-invoice-dollar"></i> <span>Contas a Pagar</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'financeiro:dar_baixa' %}">
+                            <i class="fas fa-money-check-alt"></i> <span>Dar Baixa</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="{% url 'financeiro:conta_corrente_list' %}">
+                            <i class="fas fa-university"></i> <span>Conta Corrente</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'financeiro:relatorios' %}">
+                            <i class="fas fa-chart-bar"></i> <span>Relatórios</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+
+        <!-- Main content -->
+        <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 main-content">
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2" style="color: #7dd3fc;">
+        <i class="fas fa-university"></i> {{ conta.nome }}
+    </h1>
+    <div>
+        <a href="{% url 'financeiro:movimentacao_create' %}" class="btn btn-primary me-2">
+            <i class="fas fa-plus"></i> Nova Movimentação
+        </a>
+        <a href="{% url 'financeiro:conta_corrente_list' %}" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left"></i> Voltar
+        </a>
+    </div>
+</div>
+
+            <!-- Resumo da Conta -->
+            <div class="row mb-4">
+                <div class="col-md-3">
+                    <div class="info-card">
+                        <div class="info-label">Saldo Inicial</div>
+                        <div class="info-value">R$ {{ saldo_inicial|floatformat:2 }}</div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="info-card success">
+                        <div class="info-label">Total Entradas</div>
+                        <div class="info-value">+ R$ {{ entradas_total|floatformat:2 }}</div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="info-card danger">
+                        <div class="info-label">Total Saídas</div>
+                        <div class="info-value">- R$ {{ saidas_total|floatformat:2 }}</div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="info-card {% if saldo_atual < 0 %}danger{% else %}primary{% endif %}">
+                        <div class="info-label">Saldo Atual</div>
+                        <div class="info-value">R$ {{ saldo_atual|floatformat:2 }}</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Filtros -->
+            <div class="content-card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0" style="color: #7dd3fc;">
+                        <i class="fas fa-filter"></i> Filtros
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form method="get" class="row g-3">
+                        <div class="col-md-3">
+                            <label class="form-label">{{ filtro_form.tipo.label }}</label>
+                            {{ filtro_form.tipo }}
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">{{ filtro_form.origem.label }}</label>
+                            {{ filtro_form.origem }}
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">{{ filtro_form.data_inicio.label }}</label>
+                            {{ filtro_form.data_inicio }}
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">{{ filtro_form.data_fim.label }}</label>
+                            {{ filtro_form.data_fim }}
+                        </div>
+                        <div class="col-12">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-search"></i> Filtrar
+                            </button>
+                            <a href="{% url 'financeiro:extrato_conta' conta.pk %}" class="btn btn-secondary">
+                                <i class="fas fa-times"></i> Limpar
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Extrato -->
+            <div class="content-card">
+                <div class="card-header">
+                    <h5 class="mb-0" style="color: #7dd3fc;">
+                        <i class="fas fa-list"></i> Movimentações
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% if movimentacoes %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Data</th>
+                                        <th>Tipo</th>
+                                        <th>Descrição</th>
+                                        <th>Categoria</th>
+                                        <th>Origem</th>
+                                        <th class="text-end">Valor</th>
+                                        <th>Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for mov in movimentacoes %}
+                                    <tr>
+                                        <td>{{ mov.data|date:"d/m/Y" }}</td>
+                                        <td>
+                                            {% if mov.tipo == 'ENTRADA' %}
+                                                <span class="badge bg-success">
+                                                    <i class="fas fa-arrow-down"></i> Entrada
+                                                </span>
+                                            {% else %}
+                                                <span class="badge bg-danger">
+                                                    <i class="fas fa-arrow-up"></i> Saída
+                                                </span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {{ mov.descricao }}
+                                            {% if mov.conta_destino %}
+                                                <br><small class="text-muted">→ {{ mov.conta_destino.nome }}</small>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if mov.categoria %}
+                                                <small>{{ mov.categoria.codigo }} - {{ mov.categoria.nome }}</small>
+                                            {% else %}
+                                                <span class="text-muted">-</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-secondary">{{ mov.get_origem_display }}</span>
+                                        </td>
+                                        <td class="text-end">
+                                            {% if mov.tipo == 'ENTRADA' %}
+                                                <span class="text-success fw-bold">+ R$ {{ mov.valor|floatformat:2 }}</span>
+                                            {% else %}
+                                                <span class="text-danger fw-bold">- R$ {{ mov.valor|floatformat:2 }}</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if mov.origem == 'MANUAL' %}
+                                                <a href="{% url 'financeiro:movimentacao_edit' mov.pk %}" class="btn btn-sm btn-warning" title="Editar">
+                                                    <i class="fas fa-edit"></i>
+                                                </a>
+                                                <a href="{% url 'financeiro:movimentacao_delete' mov.pk %}" 
+                                                   class="btn btn-sm btn-danger" 
+                                                   onclick="return confirm('Confirma a exclusão desta movimentação?')"
+                                                   title="Deletar">
+                                                    <i class="fas fa-trash"></i>
+                                                </a>
+                                            {% else %}
+                                                <span class="text-muted"><i class="fas fa-lock"></i></span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle"></i> Nenhuma movimentação encontrada.
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+
+<style>
+    /* Sidebar */
+    #sidebar {
+        background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+        min-height: 100vh;
+        box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    #sidebar .nav-link {
+        color: rgba(255, 255, 255, 0.8);
+        padding: 12px 20px;
+        border-radius: 8px;
+        margin: 4px 8px;
+        transition: all 0.3s ease;
+    }
+
+    #sidebar .nav-link:hover {
+        background: rgba(125, 211, 252, 0.1);
+        color: #7dd3fc;
+        transform: translateX(5px);
+    }
+
+    #sidebar .nav-link.active {
+        background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+        color: white;
+    }
+
+    #sidebar .nav-link i {
+        width: 20px;
+        margin-right: 10px;
+    }
+
+    /* Main content */
+    .main-content {
+        background: #0f172a;
+        min-height: 100vh;
+        color: #e2e8f0;
+    }
+
+    /* Info cards */
+    .info-card {
+        background: rgba(30, 41, 59, 0.6);
+        border-radius: 12px;
+        padding: 1.5rem;
+        border: 1px solid rgba(125, 211, 252, 0.2);
+        text-align: center;
+    }
+
+    .info-card.success {
+        border-color: rgba(16, 185, 129, 0.4);
+    }
+
+    .info-card.danger {
+        border-color: rgba(239, 68, 68, 0.4);
+    }
+
+    .info-card.primary {
+        border-color: rgba(14, 165, 233, 0.4);
+    }
+
+    .info-label {
+        color: #94a3b8;
+        font-size: 0.875rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .info-value {
+        color: #e2e8f0;
+        font-size: 1.5rem;
+        font-weight: 700;
+    }
+
+    .info-card.success .info-value {
+        color: #10b981;
+    }
+
+    .info-card.danger .info-value {
+        color: #ef4444;
+    }
+
+    .info-card.primary .info-value {
+        color: #0ea5e9;
+    }
+
+    /* Content card */
+    .content-card {
+        background: rgba(30, 41, 59, 0.6);
+        border-radius: 12px;
+        padding: 0;
+        margin-bottom: 24px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        border: 1px solid rgba(125, 211, 252, 0.1);
+    }
+
+    .content-card .card-header {
+        background: linear-gradient(135deg, rgba(14, 165, 233, 0.1) 0%, rgba(2, 132, 199, 0.1) 100%);
+        border-bottom: 1px solid rgba(125, 211, 252, 0.2);
+        padding: 1rem 1.5rem;
+        border-radius: 12px 12px 0 0;
+    }
+
+    .content-card .card-body {
+        padding: 1.5rem;
+    }
+
+    /* Form elements */
+    .form-label {
+        color: #94a3b8;
+        font-weight: 500;
+        margin-bottom: 0.5rem;
+    }
+
+    .form-control, .form-select {
+        background: rgba(15, 23, 42, 0.6);
+        border: 1px solid rgba(125, 211, 252, 0.3);
+        color: #e2e8f0;
+        padding: 0.75rem;
+        border-radius: 8px;
+    }
+
+    .form-control:focus, .form-select:focus {
+        background: rgba(15, 23, 42, 0.8);
+        border-color: #7dd3fc;
+        color: #e2e8f0;
+        box-shadow: 0 0 0 0.2rem rgba(125, 211, 252, 0.25);
+    }
+
+    /* Table */
+    .table {
+        color: #e2e8f0;
+        margin-bottom: 0;
+    }
+
+    .table thead th {
+        background: rgba(15, 23, 42, 0.6);
+        color: #7dd3fc;
+        border-color: rgba(125, 211, 252, 0.2);
+        font-weight: 600;
+        padding: 12px;
+    }
+
+    .table tbody tr {
+        border-color: rgba(125, 211, 252, 0.1);
+        transition: all 0.3s ease;
+    }
+
+    .table tbody tr:hover {
+        background: rgba(125, 211, 252, 0.05);
+    }
+
+    .table tbody td {
+        border-color: rgba(125, 211, 252, 0.1);
+        padding: 12px;
+        vertical-align: middle;
+    }
+
+    /* Buttons */
+    .btn-primary {
+        background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+        border: none;
+        padding: 10px 20px;
+        border-radius: 8px;
+        font-weight: 500;
+    }
+
+    .btn-secondary {
+        background: rgba(71, 85, 105, 0.6);
+        border: 1px solid rgba(125, 211, 252, 0.3);
+        color: #e2e8f0;
+        padding: 10px 20px;
+        border-radius: 8px;
+    }
+
+    .btn-outline-secondary {
+        color: #94a3b8;
+        border-color: rgba(125, 211, 252, 0.3);
+        padding: 10px 20px;
+        border-radius: 8px;
+    }
+
+    .btn-warning {
+        background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+        border: none;
+        color: white;
+    }
+
+    .btn-danger {
+        background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+        border: none;
+        color: white;
+    }
+
+    /* Alert */
+    .alert-info {
+        background: rgba(14, 165, 233, 0.1);
+        border: 1px solid rgba(125, 211, 252, 0.3);
+        color: #7dd3fc;
+        border-radius: 8px;
+    }
+
+    /* Badge */
+    .badge {
+        padding: 6px 12px;
+        border-radius: 6px;
+        font-weight: 500;
+    }
+</style>
+{% endblock %}

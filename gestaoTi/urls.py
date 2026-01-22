@@ -1,0 +1,32 @@
+"""
+URL configuration for gestaoTi project.
+
+The `urlpatterns` list routes URLs to views. For more information please see:
+    https://docs.djangoproject.com/en/6.0/topics/http/urls/
+Examples:
+Function views
+    1. Add an import:  from my_app import views
+    2. Add a URL to urlpatterns:  path('', views.home, name='home')
+Class-based views
+    1. Add an import:  from other_app.views import Home
+    2. Add a URL to urlpatterns:  path('', Home.as_view(), name='home')
+Including another URLconf
+    1. Import the include() function: from django.urls import include, path
+    2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
+"""
+from django.contrib import admin
+from django.urls import path, include
+from usuarios import views as usuarios_views
+
+urlpatterns = [
+    path('admin/', admin.site.urls),
+    # Logout custom para permitir GET
+    path('accounts/logout/', usuarios_views.logout_custom, name='logout'),
+    path('accounts/', include('django.contrib.auth.urls')),
+    path('', include('usuarios.urls')),
+    path('financeiro/', include('financeiro.urls')),
+    path('contas-receber/', include('contas_receber.urls')),
+    path('importacoes/', include('importacoes.urls')),
+    path('cadastros/', include('cadastros.urls')),
+    path('boletos/', include('boletos.urls')),
+]

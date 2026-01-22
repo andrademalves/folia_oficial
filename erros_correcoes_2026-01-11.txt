@@ -1,0 +1,521 @@
+2026-01-11 17:00:31 [INFO] Iniciando processo de configuração...
+2026-01-11 17:00:31 [INFO] Sistema Operacional: Windows 10
+2026-01-11 17:00:31 [INFO] Python Global: 3.14.2 (tags/v3.14.2:df79316, Dec  5 2025, 17:18:21) [MSC v.1944 64 bit (AMD64)]
+2026-01-11 17:00:31 [INFO] ================================================================================
+2026-01-11 17:00:31 [INFO] ETAPA 1: Verificação do Diretório do Projeto
+2026-01-11 17:00:31 [INFO] ================================================================================
+2026-01-11 17:00:31 [INFO] Diretório de trabalho alterado para: C:\1.3 Gestao
+2026-01-11 17:00:31 [INFO] ================================================================================
+2026-01-11 17:00:31 [INFO] ETAPA 2: Verificação de Arquivos Críticos
+2026-01-11 17:00:31 [INFO] ================================================================================
+2026-01-11 17:00:31 [INFO] ✓ Arquivo encontrado: manage.py
+2026-01-11 17:00:31 [INFO] ✓ Arquivo encontrado: requirements.txt
+2026-01-11 17:00:31 [INFO] ✓ settings.py encontrado em: C:\1.3 Gestao\gestaoTi\settings.py
+2026-01-11 17:00:31 [INFO] ================================================================================
+2026-01-11 17:00:31 [INFO] ETAPA 3: Configuração do Ambiente Virtual
+2026-01-11 17:00:31 [INFO] ================================================================================
+2026-01-11 17:00:31 [INFO] Ambiente virtual já existe.
+2026-01-11 17:00:31 [INFO] Python da venv: C:\1.3 Gestao\venv\Scripts\python.exe
+2026-01-11 17:00:31 [INFO] Pip da venv: C:\1.3 Gestao\venv\Scripts\pip.exe
+2026-01-11 17:00:31 [INFO] ================================================================================
+2026-01-11 17:00:31 [INFO] ETAPA 4: Instalação de Dependências
+2026-01-11 17:00:31 [INFO] ================================================================================
+2026-01-11 17:00:31 [INFO] Executando: Atualizar pip
+2026-01-11 17:00:31 [INFO] Comando: C:\1.3 Gestao\venv\Scripts\pip.exe install --upgrade pip
+2026-01-11 17:00:31 [ERRO] Falha: Atualizar pip
+Erro: 
+2026-01-11 17:00:31 [INFO] Executando: Instalar Django
+2026-01-11 17:00:31 [INFO] Comando: C:\1.3 Gestao\venv\Scripts\pip.exe install django
+2026-01-11 17:00:31 [ERRO] Falha: Instalar Django
+Erro: 
+2026-01-11 17:00:31 [INFO] Instalando mysqlclient (necessário para MySQL)...
+2026-01-11 17:00:31 [INFO] Executando: Instalar mysqlclient
+2026-01-11 17:00:31 [INFO] Comando: C:\1.3 Gestao\venv\Scripts\pip.exe install mysqlclient
+2026-01-11 17:00:31 [ERRO] Falha: Instalar mysqlclient
+Erro: 
+2026-01-11 17:00:31 [ERRO] mysqlclient falhou. Tentando PyMySQL como alternativa...
+2026-01-11 17:00:31 [INFO] Executando: Instalar PyMySQL (alternativa)
+2026-01-11 17:00:31 [INFO] Comando: C:\1.3 Gestao\venv\Scripts\pip.exe install pymysql
+2026-01-11 17:00:31 [ERRO] Falha: Instalar PyMySQL (alternativa)
+Erro: 
+2026-01-11 17:00:31 [INFO] Executando: Instalar requirements.txt
+2026-01-11 17:00:31 [INFO] Comando: C:\1.3 Gestao\venv\Scripts\pip.exe install -r C:\1.3 Gestao\requirements.txt
+2026-01-11 17:00:31 [ERRO] Falha: Instalar requirements.txt
+Erro: 
+2026-01-11 17:00:31 [ERRO] Exceção ao executar Instalar requirements.txt: Falha: Instalar requirements.txt
+Erro: 
+2026-01-11 17:00:31 [ERRO] ================================================================================
+2026-01-11 17:00:31 [ERRO] ✗✗✗ ERRO FATAL - CONFIGURAÇÃO INTERROMPIDA ✗✗✗
+2026-01-11 17:00:31 [ERRO] ================================================================================
+2026-01-11 17:00:31 [ERRO] Erro: Falha: Instalar requirements.txt
+Erro: 
+2026-01-11 17:00:31 [ERRO] Verifique o log completo em: C:\1.3 Gestao\erros_correcoes_2026-01-11.txt
+2026-01-11 17:01:35 [INFO] Iniciando processo de configuração...
+2026-01-11 17:01:35 [INFO] Sistema Operacional: Windows 10
+2026-01-11 17:01:35 [INFO] Python Global: 3.14.2 (tags/v3.14.2:df79316, Dec  5 2025, 17:18:21) [MSC v.1944 64 bit (AMD64)]
+2026-01-11 17:01:35 [INFO] ================================================================================
+2026-01-11 17:01:35 [INFO] ETAPA 1: Verificação do Diretório do Projeto
+2026-01-11 17:01:35 [INFO] ================================================================================
+2026-01-11 17:01:35 [INFO] Diretório de trabalho alterado para: C:\1.3 Gestao
+2026-01-11 17:01:35 [INFO] ================================================================================
+2026-01-11 17:01:35 [INFO] ETAPA 2: Verificação de Arquivos Críticos
+2026-01-11 17:01:35 [INFO] ================================================================================
+2026-01-11 17:01:35 [INFO] ✓ Arquivo encontrado: manage.py
+2026-01-11 17:01:35 [INFO] ✓ Arquivo encontrado: requirements.txt
+2026-01-11 17:01:35 [INFO] ✓ settings.py encontrado em: C:\1.3 Gestao\gestaoTi\settings.py
+2026-01-11 17:01:35 [INFO] ================================================================================
+2026-01-11 17:01:35 [INFO] ETAPA 3: Configuração do Ambiente Virtual
+2026-01-11 17:01:35 [INFO] ================================================================================
+2026-01-11 17:01:35 [INFO] Ambiente virtual encontrado. Verificando integridade...
+2026-01-11 17:01:35 [ERRO] ✗ Ambiente virtual está corrompido.
+2026-01-11 17:01:35 [INFO] Removendo ambiente virtual corrompido...
+2026-01-11 17:01:35 [ERRO] Erro ao remover venv: [WinError 5] Acesso negado: 'C:\\1.3 Gestao\\venv\\Lib\\site-packages\\asgiref\\__pycache__'
+2026-01-11 17:01:35 [INFO] Criando novo ambiente virtual...
+2026-01-11 17:01:35 [INFO] Executando: Criar ambiente virtual
+2026-01-11 17:01:35 [INFO] Comando: C:\Users\adm\AppData\Local\Programs\Python\Python314\python.exe -m venv venv
+2026-01-11 17:01:39 [INFO] ✓ Sucesso: Criar ambiente virtual
+2026-01-11 17:01:39 [INFO] Python da venv: C:\1.3 Gestao\venv\Scripts\python.exe
+2026-01-11 17:01:39 [INFO] Pip da venv: C:\1.3 Gestao\venv\Scripts\pip.exe
+2026-01-11 17:01:39 [INFO] ================================================================================
+2026-01-11 17:01:39 [INFO] ETAPA 4: Instalação de Dependências
+2026-01-11 17:01:39 [INFO] ================================================================================
+2026-01-11 17:01:39 [INFO] Executando: Atualizar pip
+2026-01-11 17:01:39 [INFO] Comando: C:\1.3 Gestao\venv\Scripts\pip.exe install --upgrade pip
+2026-01-11 17:01:39 [ERRO] Falha: Atualizar pip
+Erro: 
+2026-01-11 17:01:39 [INFO] Executando: Instalar Django
+2026-01-11 17:01:39 [INFO] Comando: C:\1.3 Gestao\venv\Scripts\pip.exe install django
+2026-01-11 17:01:39 [ERRO] Falha: Instalar Django
+Erro: 
+2026-01-11 17:01:39 [INFO] Instalando mysqlclient (necessário para MySQL)...
+2026-01-11 17:01:39 [INFO] Executando: Instalar mysqlclient
+2026-01-11 17:01:39 [INFO] Comando: C:\1.3 Gestao\venv\Scripts\pip.exe install mysqlclient
+2026-01-11 17:01:39 [ERRO] Falha: Instalar mysqlclient
+Erro: 
+2026-01-11 17:01:39 [ERRO] mysqlclient falhou. Tentando PyMySQL como alternativa...
+2026-01-11 17:01:39 [INFO] Executando: Instalar PyMySQL (alternativa)
+2026-01-11 17:01:39 [INFO] Comando: C:\1.3 Gestao\venv\Scripts\pip.exe install pymysql
+2026-01-11 17:01:39 [ERRO] Falha: Instalar PyMySQL (alternativa)
+Erro: 
+2026-01-11 17:01:39 [INFO] Executando: Instalar requirements.txt
+2026-01-11 17:01:39 [INFO] Comando: C:\1.3 Gestao\venv\Scripts\pip.exe install -r C:\1.3 Gestao\requirements.txt
+2026-01-11 17:01:39 [ERRO] Falha: Instalar requirements.txt
+Erro: 
+2026-01-11 17:01:39 [ERRO] Exceção ao executar Instalar requirements.txt: Falha: Instalar requirements.txt
+Erro: 
+2026-01-11 17:01:39 [ERRO] ================================================================================
+2026-01-11 17:01:39 [ERRO] ✗✗✗ ERRO FATAL - CONFIGURAÇÃO INTERROMPIDA ✗✗✗
+2026-01-11 17:01:39 [ERRO] ================================================================================
+2026-01-11 17:01:39 [ERRO] Erro: Falha: Instalar requirements.txt
+Erro: 
+2026-01-11 17:01:39 [ERRO] Verifique o log completo em: C:\1.3 Gestao\erros_correcoes_2026-01-11.txt
+2026-01-11 17:02:09 [INFO] Iniciando processo de configuração...
+2026-01-11 17:02:09 [INFO] Sistema Operacional: Windows 10
+2026-01-11 17:02:09 [INFO] Python Global: 3.14.2 (tags/v3.14.2:df79316, Dec  5 2025, 17:18:21) [MSC v.1944 64 bit (AMD64)]
+2026-01-11 17:02:09 [INFO] ================================================================================
+2026-01-11 17:02:09 [INFO] ETAPA 1: Verificação do Diretório do Projeto
+2026-01-11 17:02:09 [INFO] ================================================================================
+2026-01-11 17:02:09 [INFO] Diretório de trabalho alterado para: C:\1.3 Gestao
+2026-01-11 17:02:09 [INFO] ================================================================================
+2026-01-11 17:02:09 [INFO] ETAPA 2: Verificação de Arquivos Críticos
+2026-01-11 17:02:09 [INFO] ================================================================================
+2026-01-11 17:02:09 [INFO] ✓ Arquivo encontrado: manage.py
+2026-01-11 17:02:09 [INFO] ✓ Arquivo encontrado: requirements.txt
+2026-01-11 17:02:09 [INFO] ✓ settings.py encontrado em: C:\1.3 Gestao\gestaoTi\settings.py
+2026-01-11 17:02:09 [INFO] ================================================================================
+2026-01-11 17:02:09 [INFO] ETAPA 3: Configuração do Ambiente Virtual
+2026-01-11 17:02:09 [INFO] ================================================================================
+2026-01-11 17:02:09 [INFO] Ambiente virtual encontrado. Verificando integridade...
+2026-01-11 17:02:09 [INFO] ✓ Ambiente virtual está funcional: Python 3.14.2
+2026-01-11 17:02:09 [INFO] Python da venv: C:\1.3 Gestao\venv\Scripts\python.exe
+2026-01-11 17:02:09 [INFO] Pip da venv: C:\1.3 Gestao\venv\Scripts\pip.exe
+2026-01-11 17:02:09 [INFO] ================================================================================
+2026-01-11 17:02:09 [INFO] ETAPA 4: Instalação de Dependências
+2026-01-11 17:02:09 [INFO] ================================================================================
+2026-01-11 17:02:09 [INFO] Executando: Atualizar pip
+2026-01-11 17:02:09 [INFO] Comando: C:\1.3 Gestao\venv\Scripts\python.exe -m pip install --upgrade pip
+2026-01-11 17:02:32 [INFO] ✓ Sucesso: Atualizar pip
+2026-01-11 17:02:32 [INFO] Output: Requirement already satisfied: pip in c:\1.3 gestao\venv\lib\site-packages (25.3)
+
+2026-01-11 17:02:32 [INFO] Executando: Instalar Django
+2026-01-11 17:02:32 [INFO] Comando: C:\1.3 Gestao\venv\Scripts\python.exe -m pip install django
+2026-01-11 17:02:51 [INFO] Iniciando processo de configuração...
+2026-01-11 17:02:51 [INFO] Sistema Operacional: Windows 10
+2026-01-11 17:02:51 [INFO] Python Global: 3.14.2 (tags/v3.14.2:df79316, Dec  5 2025, 17:18:21) [MSC v.1944 64 bit (AMD64)]
+2026-01-11 17:02:51 [INFO] ================================================================================
+2026-01-11 17:02:51 [INFO] ETAPA 1: Verificação do Diretório do Projeto
+2026-01-11 17:02:51 [INFO] ================================================================================
+2026-01-11 17:02:51 [INFO] Diretório de trabalho alterado para: C:\1.3 Gestao
+2026-01-11 17:02:51 [INFO] ================================================================================
+2026-01-11 17:02:51 [INFO] ETAPA 2: Verificação de Arquivos Críticos
+2026-01-11 17:02:51 [INFO] ================================================================================
+2026-01-11 17:02:51 [ERRO] ================================================================================
+2026-01-11 17:03:19 [INFO] Iniciando processo de configuraÃ§Ã£o...
+2026-01-11 17:03:19 [INFO] Sistema Operacional: Windows 10
+2026-01-11 17:03:19 [INFO] Python Global: 3.14.2 (tags/v3.14.2:df79316, Dec  5 2025, 17:18:21) [MSC v.1944 64 bit (AMD64)]
+2026-01-11 17:03:19 [INFO] ================================================================================
+2026-01-11 17:03:19 [INFO] ETAPA 1: VerificaÃ§Ã£o do DiretÃ³rio do Projeto
+2026-01-11 17:03:19 [INFO] ================================================================================
+2026-01-11 17:03:19 [INFO] DiretÃ³rio de trabalho alterado para: C:\1.3 Gestao
+2026-01-11 17:03:19 [INFO] ================================================================================
+2026-01-11 17:03:19 [INFO] ETAPA 2: VerificaÃ§Ã£o de Arquivos CrÃ­ticos
+2026-01-11 17:03:19 [INFO] ================================================================================
+2026-01-11 17:03:19 [INFO] âœ“ Arquivo encontrado: manage.py
+2026-01-11 17:03:19 [INFO] âœ“ Arquivo encontrado: requirements.txt
+2026-01-11 17:03:19 [INFO] âœ“ settings.py encontrado em: C:\1.3 Gestao\gestaoTi\settings.py
+2026-01-11 17:03:19 [INFO] ================================================================================
+2026-01-11 17:03:19 [INFO] ETAPA 3: ConfiguraÃ§Ã£o do Ambiente Virtual
+2026-01-11 17:03:19 [INFO] ================================================================================
+2026-01-11 17:03:19 [INFO] Ambiente virtual encontrado. Verificando integridade...
+2026-01-11 17:03:19 [INFO] âœ“ Ambiente virtual estÃ¡ funcional: Python 3.14.2
+2026-01-11 17:03:19 [INFO] Python da venv: C:\1.3 Gestao\venv\Scripts\python.exe
+2026-01-11 17:03:19 [INFO] Pip da venv: C:\1.3 Gestao\venv\Scripts\pip.exe
+2026-01-11 17:03:19 [INFO] ================================================================================
+2026-01-11 17:03:19 [INFO] ETAPA 4: InstalaÃ§Ã£o de DependÃªncias
+2026-01-11 17:03:19 [INFO] ================================================================================
+2026-01-11 17:03:19 [INFO] Executando: Atualizar pip
+2026-01-11 17:03:19 [INFO] Comando: C:\1.3 Gestao\venv\Scripts\python.exe -m pip install --upgrade pip
+2026-01-11 17:03:21 [INFO] âœ“ Sucesso: Atualizar pip
+2026-01-11 17:03:21 [INFO] Output: Requirement already satisfied: pip in c:\1.3 gestao\venv\lib\site-packages (25.3)
+
+2026-01-11 17:03:21 [INFO] Executando: Instalar Django
+2026-01-11 17:03:21 [INFO] Comando: C:\1.3 Gestao\venv\Scripts\python.exe -m pip install django
+2026-01-11 17:03:22 [INFO] âœ“ Sucesso: Instalar Django
+2026-01-11 17:03:22 [INFO] Output: Requirement already satisfied: django in c:\1.3 gestao\venv\lib\site-packages (6.0)
+Requirement already satisfied: asgiref>=3.9.1 in c:\1.3 gestao\venv\lib\site-packages (from django) (3.11.0)
+Requirement already satisfied: sqlparse>=0.5.0 in c:\1.3 gestao\venv\lib\site-packages (from django) (0.5.5)
+Requirement already satisfied: tzdata in c:\1.3 gestao\venv\lib\site-packages (from django) (2025.3)
+
+2026-01-11 17:03:22 [INFO] Instalando mysqlclient (necessÃ¡rio para MySQL)...
+2026-01-11 17:03:22 [INFO] Executando: Instalar mysqlclient
+2026-01-11 17:03:22 [INFO] Comando: C:\1.3 Gestao\venv\Scripts\python.exe -m pip install mysqlclient
+2026-01-11 17:03:24 [INFO] âœ“ Sucesso: Instalar mysqlclient
+2026-01-11 17:03:24 [INFO] Output: Requirement already satisfied: mysqlclient in c:\1.3 gestao\venv\lib\site-packages (2.2.7)
+
+2026-01-11 17:03:24 [INFO] Executando: Instalar requirements.txt
+2026-01-11 17:03:24 [INFO] Comando: C:\1.3 Gestao\venv\Scripts\python.exe -m pip install -r C:\1.3 Gestao\requirements.txt
+2026-01-11 17:03:31 [INFO] âœ“ Sucesso: Instalar requirements.txt
+2026-01-11 17:03:31 [INFO] Output: Requirement already satisfied: asgiref==3.11.0 in c:\1.3 gestao\venv\lib\site-packages (from -r C:\1.3 Gestao\requirements.txt (line 1)) (3.11.0)
+Requirement already satisfied: charset-normalizer==3.4.4 in c:\1.3 gestao\venv\lib\site-packages (from -r C:\1.3 Gestao\requirements.txt (line 2)) (3.4.4)
+Requirement already satisfied: Django==6.0 in c:\1.3 gestao\venv\lib\site-packages (from -r C:\1.3 Gestao\requirements.txt (line 3)) (6.0)
+Collecting django-firebird==2.2.2 (from -r C:\1.3 Gestao\req
+2026-01-11 17:03:31 [INFO] ================================================================================
+2026-01-11 17:03:31 [INFO] ETAPA 5: ConfiguraÃ§Ã£o do Banco de Dados
+2026-01-11 17:03:31 [INFO] ================================================================================
+2026-01-11 17:03:31 [INFO] Nome do banco de dados identificado: gestao_ti
+2026-01-11 17:03:31 [INFO] Atualizando senha do banco de dados no settings.py...
+2026-01-11 17:03:31 [INFO] Backup do settings.py criado em: C:\1.3 Gestao\gestaoTi\settings.py.backup
+2026-01-11 17:03:31 [INFO] âœ“ Senha do banco atualizada no settings.py
+2026-01-11 17:03:31 [INFO] Criando banco de dados: gestao_ti
+2026-01-11 17:03:31 [INFO] âœ“ Banco de dados gestao_ti criado/verificado com sucesso (UTF-8 Brasil)
+2026-01-11 17:03:31 [INFO] ================================================================================
+2026-01-11 17:03:31 [INFO] ETAPA 6: Setup do Django
+2026-01-11 17:03:31 [INFO] ================================================================================
+2026-01-11 17:03:31 [INFO] Executando: Django makemigrations
+2026-01-11 17:03:31 [INFO] Comando: C:\1.3 Gestao\venv\Scripts\python.exe C:\1.3 Gestao\manage.py makemigrations
+2026-01-11 17:03:34 [ERRO] Falha: Django makemigrations
+Erro: Traceback (most recent call last):
+  File "C:\1.3 Gestao\venv\Lib\site-packages\django\db\backends\mysql\base.py", line 16, in <module>
+    import MySQLdb as Database
+  File "C:\1.3 Gestao\venv\Lib\site-packages\MySQLdb\__init__.py", line 17, in <module>
+    from . import _mysql
+ImportError: cannot import name '_mysql' from partially initialized module 'MySQLdb' (most likely due to a circular import) (C:\1.3 Gestao\venv\Lib\site-packages\MySQLdb\__init__.py)
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\1.3 Gestao\manage.py", line 22, in <module>
+    main()
+    ~~~~^^
+  File "C:\1.3 Gestao\manage.py", line 18, in main
+    execute_from_command_line(sys.argv)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^
+  File "C:\1.3 Gestao\venv\Lib\site-packages\django\core\management\__init__.py", line 443, in execute_from_command_line
+    utility.execute()
+    ~~~~~~~~~~~~~~~^^
+  File "C:\1.3 Gestao\venv\Lib\site-packages\django\core\management\__init__.py", line 417, in execute
+    django.setup()
+    ~~~~~~~~~~~~^^
+  File "C:\1.3 Gestao\venv\Lib\site-packages\django\__init__.py", line 24, in setup
+    apps.populate(settings.INSTALLED_APPS)
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\1.3 Gestao\venv\Lib\site-packages\django\apps\registry.py", line 116, in populate
+    app_config.import_models()
+    ~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\1.3 Gestao\venv\Lib\site-packages\django\apps\config.py", line 269, in import_models
+    self.models_module = import_module(models_module_name)
+                         ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\adm\AppData\Local\Programs\Python\Python314\Lib\importlib\__init__.py", line 88, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen importlib._bootstrap>", line 1398, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1371, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1342, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 938, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 759, in exec_module
+  File "<frozen importlib._bootstrap>", line 491, in _call_with_frames_removed
+  File "C:\1.3 Gestao\venv\Lib\site-packages\django\contrib\auth\models.py", line 5, in <module>
+    from django.contrib.auth.base_user import AbstractBaseUser, BaseUserManager
+  File "C:\1.3 Gestao\venv\Lib\site-packages\django\contrib\auth\base_user.py", line 43, in <module>
+    class AbstractBaseUser(models.Model):
+    ...<120 lines>...
+            )
+  File "C:\1.3 Gestao\venv\Lib\site-packages\django\db\models\base.py", line 145, in __new__
+    new_class.add_to_class("_meta", Options(meta, app_label))
+    ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\1.3 Gestao\venv\Lib\site-packages\django\db\models\base.py", line 393, in add_to_class
+    value.contribute_to_class(cls, name)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^
+  File "C:\1.3 Gestao\venv\Lib\site-packages\django\db\models\options.py", line 238, in contribute_to_class
+    self.db_table, connection.ops.max_name_length()
+                   ^^^^^^^^^^^^^^
+  File "C:\1.3 Gestao\venv\Lib\site-packages\django\utils\connection.py", line 15, in __getattr__
+    return getattr(self._connections[self._alias], item)
+                   ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "C:\1.3 Gestao\venv\Lib\site-packages\django\utils\connection.py", line 62, in __getitem__
+    conn = self.create_connection(alias)
+  File "C:\1.3 Gestao\venv\Lib\site-packages\django\db\utils.py", line 196, in create_connection
+    backend = load_backend(db["ENGINE"])
+  File "C:\1.3 Gestao\venv\Lib\site-packages\django\db\utils.py", line 116, in load_backend
+    return import_module("%s.base" % backend_name)
+  File "C:\Users\adm\AppData\Local\Programs\Python\Python314\Lib\importlib\__init__.py", line 88, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\1.3 Gestao\venv\Lib\site-packages\django\db\backends\mysql\base.py", line 18, in <module>
+    raise ImproperlyConfigured(
+        "Error loading MySQLdb module.\nDid you install mysqlclient?"
+    ) from err
+django.core.exceptions.ImproperlyConfigured: Error loading MySQLdb module.
+Did you install mysqlclient?
+
+2026-01-11 17:03:34 [INFO] Executando: Django migrate
+2026-01-11 17:03:34 [INFO] Comando: C:\1.3 Gestao\venv\Scripts\python.exe C:\1.3 Gestao\manage.py migrate
+2026-01-11 17:03:35 [ERRO] Falha: Django migrate
+Erro: Traceback (most recent call last):
+  File "C:\1.3 Gestao\venv\Lib\site-packages\django\db\backends\mysql\base.py", line 16, in <module>
+    import MySQLdb as Database
+  File "C:\1.3 Gestao\venv\Lib\site-packages\MySQLdb\__init__.py", line 17, in <module>
+    from . import _mysql
+ImportError: cannot import name '_mysql' from partially initialized module 'MySQLdb' (most likely due to a circular import) (C:\1.3 Gestao\venv\Lib\site-packages\MySQLdb\__init__.py)
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\1.3 Gestao\manage.py", line 22, in <module>
+    main()
+    ~~~~^^
+  File "C:\1.3 Gestao\manage.py", line 18, in main
+    execute_from_command_line(sys.argv)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^
+  File "C:\1.3 Gestao\venv\Lib\site-packages\django\core\management\__init__.py", line 443, in execute_from_command_line
+    utility.execute()
+    ~~~~~~~~~~~~~~~^^
+  File "C:\1.3 Gestao\venv\Lib\site-packages\django\core\management\__init__.py", line 417, in execute
+    django.setup()
+    ~~~~~~~~~~~~^^
+  File "C:\1.3 Gestao\venv\Lib\site-packages\django\__init__.py", line 24, in setup
+    apps.populate(settings.INSTALLED_APPS)
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\1.3 Gestao\venv\Lib\site-packages\django\apps\registry.py", line 116, in populate
+    app_config.import_models()
+    ~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\1.3 Gestao\venv\Lib\site-packages\django\apps\config.py", line 269, in import_models
+    self.models_module = import_module(models_module_name)
+                         ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\adm\AppData\Local\Programs\Python\Python314\Lib\importlib\__init__.py", line 88, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen importlib._bootstrap>", line 1398, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1371, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1342, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 938, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 759, in exec_module
+  File "<frozen importlib._bootstrap>", line 491, in _call_with_frames_removed
+  File "C:\1.3 Gestao\venv\Lib\site-packages\django\contrib\auth\models.py", line 5, in <module>
+    from django.contrib.auth.base_user import AbstractBaseUser, BaseUserManager
+  File "C:\1.3 Gestao\venv\Lib\site-packages\django\contrib\auth\base_user.py", line 43, in <module>
+    class AbstractBaseUser(models.Model):
+    ...<120 lines>...
+            )
+  File "C:\1.3 Gestao\venv\Lib\site-packages\django\db\models\base.py", line 145, in __new__
+    new_class.add_to_class("_meta", Options(meta, app_label))
+    ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\1.3 Gestao\venv\Lib\site-packages\django\db\models\base.py", line 393, in add_to_class
+    value.contribute_to_class(cls, name)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^
+  File "C:\1.3 Gestao\venv\Lib\site-packages\django\db\models\options.py", line 238, in contribute_to_class
+    self.db_table, connection.ops.max_name_length()
+                   ^^^^^^^^^^^^^^
+  File "C:\1.3 Gestao\venv\Lib\site-packages\django\utils\connection.py", line 15, in __getattr__
+    return getattr(self._connections[self._alias], item)
+                   ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "C:\1.3 Gestao\venv\Lib\site-packages\django\utils\connection.py", line 62, in __getitem__
+    conn = self.create_connection(alias)
+  File "C:\1.3 Gestao\venv\Lib\site-packages\django\db\utils.py", line 196, in create_connection
+    backend = load_backend(db["ENGINE"])
+  File "C:\1.3 Gestao\venv\Lib\site-packages\django\db\utils.py", line 116, in load_backend
+    return import_module("%s.base" % backend_name)
+  File "C:\Users\adm\AppData\Local\Programs\Python\Python314\Lib\importlib\__init__.py", line 88, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\1.3 Gestao\venv\Lib\site-packages\django\db\backends\mysql\base.py", line 18, in <module>
+    raise ImproperlyConfigured(
+        "Error loading MySQLdb module.\nDid you install mysqlclient?"
+    ) from err
+django.core.exceptions.ImproperlyConfigured: Error loading MySQLdb module.
+Did you install mysqlclient?
+
+2026-01-11 17:03:35 [ERRO] ExceÃ§Ã£o ao executar Django migrate: Falha: Django migrate
+Erro: Traceback (most recent call last):
+  File "C:\1.3 Gestao\venv\Lib\site-packages\django\db\backends\mysql\base.py", line 16, in <module>
+    import MySQLdb as Database
+  File "C:\1.3 Gestao\venv\Lib\site-packages\MySQLdb\__init__.py", line 17, in <module>
+    from . import _mysql
+ImportError: cannot import name '_mysql' from partially initialized module 'MySQLdb' (most likely due to a circular import) (C:\1.3 Gestao\venv\Lib\site-packages\MySQLdb\__init__.py)
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\1.3 Gestao\manage.py", line 22, in <module>
+    main()
+    ~~~~^^
+  File "C:\1.3 Gestao\manage.py", line 18, in main
+    execute_from_command_line(sys.argv)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^
+  File "C:\1.3 Gestao\venv\Lib\site-packages\django\core\management\__init__.py", line 443, in execute_from_command_line
+    utility.execute()
+    ~~~~~~~~~~~~~~~^^
+  File "C:\1.3 Gestao\venv\Lib\site-packages\django\core\management\__init__.py", line 417, in execute
+    django.setup()
+    ~~~~~~~~~~~~^^
+  File "C:\1.3 Gestao\venv\Lib\site-packages\django\__init__.py", line 24, in setup
+    apps.populate(settings.INSTALLED_APPS)
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\1.3 Gestao\venv\Lib\site-packages\django\apps\registry.py", line 116, in populate
+    app_config.import_models()
+    ~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\1.3 Gestao\venv\Lib\site-packages\django\apps\config.py", line 269, in import_models
+    self.models_module = import_module(models_module_name)
+                         ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\adm\AppData\Local\Programs\Python\Python314\Lib\importlib\__init__.py", line 88, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen importlib._bootstrap>", line 1398, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1371, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1342, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 938, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 759, in exec_module
+  File "<frozen importlib._bootstrap>", line 491, in _call_with_frames_removed
+  File "C:\1.3 Gestao\venv\Lib\site-packages\django\contrib\auth\models.py", line 5, in <module>
+    from django.contrib.auth.base_user import AbstractBaseUser, BaseUserManager
+  File "C:\1.3 Gestao\venv\Lib\site-packages\django\contrib\auth\base_user.py", line 43, in <module>
+    class AbstractBaseUser(models.Model):
+    ...<120 lines>...
+            )
+  File "C:\1.3 Gestao\venv\Lib\site-packages\django\db\models\base.py", line 145, in __new__
+    new_class.add_to_class("_meta", Options(meta, app_label))
+    ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\1.3 Gestao\venv\Lib\site-packages\django\db\models\base.py", line 393, in add_to_class
+    value.contribute_to_class(cls, name)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^
+  File "C:\1.3 Gestao\venv\Lib\site-packages\django\db\models\options.py", line 238, in contribute_to_class
+    self.db_table, connection.ops.max_name_length()
+                   ^^^^^^^^^^^^^^
+  File "C:\1.3 Gestao\venv\Lib\site-packages\django\utils\connection.py", line 15, in __getattr__
+    return getattr(self._connections[self._alias], item)
+                   ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "C:\1.3 Gestao\venv\Lib\site-packages\django\utils\connection.py", line 62, in __getitem__
+    conn = self.create_connection(alias)
+  File "C:\1.3 Gestao\venv\Lib\site-packages\django\db\utils.py", line 196, in create_connection
+    backend = load_backend(db["ENGINE"])
+  File "C:\1.3 Gestao\venv\Lib\site-packages\django\db\utils.py", line 116, in load_backend
+    return import_module("%s.base" % backend_name)
+  File "C:\Users\adm\AppData\Local\Programs\Python\Python314\Lib\importlib\__init__.py", line 88, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\1.3 Gestao\venv\Lib\site-packages\django\db\backends\mysql\base.py", line 18, in <module>
+    raise ImproperlyConfigured(
+        "Error loading MySQLdb module.\nDid you install mysqlclient?"
+    ) from err
+django.core.exceptions.ImproperlyConfigured: Error loading MySQLdb module.
+Did you install mysqlclient?
+
+2026-01-11 17:03:35 [ERRO] ================================================================================
+2026-01-11 17:03:35 [ERRO] âœ—âœ—âœ— ERRO FATAL - CONFIGURAÃ‡ÃƒO INTERROMPIDA âœ—âœ—âœ—
+2026-01-11 17:03:35 [ERRO] ================================================================================
+2026-01-11 17:03:35 [ERRO] Erro: Falha: Django migrate
+Erro: Traceback (most recent call last):
+  File "C:\1.3 Gestao\venv\Lib\site-packages\django\db\backends\mysql\base.py", line 16, in <module>
+    import MySQLdb as Database
+  File "C:\1.3 Gestao\venv\Lib\site-packages\MySQLdb\__init__.py", line 17, in <module>
+    from . import _mysql
+ImportError: cannot import name '_mysql' from partially initialized module 'MySQLdb' (most likely due to a circular import) (C:\1.3 Gestao\venv\Lib\site-packages\MySQLdb\__init__.py)
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\1.3 Gestao\manage.py", line 22, in <module>
+    main()
+    ~~~~^^
+  File "C:\1.3 Gestao\manage.py", line 18, in main
+    execute_from_command_line(sys.argv)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^
+  File "C:\1.3 Gestao\venv\Lib\site-packages\django\core\management\__init__.py", line 443, in execute_from_command_line
+    utility.execute()
+    ~~~~~~~~~~~~~~~^^
+  File "C:\1.3 Gestao\venv\Lib\site-packages\django\core\management\__init__.py", line 417, in execute
+    django.setup()
+    ~~~~~~~~~~~~^^
+  File "C:\1.3 Gestao\venv\Lib\site-packages\django\__init__.py", line 24, in setup
+    apps.populate(settings.INSTALLED_APPS)
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\1.3 Gestao\venv\Lib\site-packages\django\apps\registry.py", line 116, in populate
+    app_config.import_models()
+    ~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\1.3 Gestao\venv\Lib\site-packages\django\apps\config.py", line 269, in import_models
+    self.models_module = import_module(models_module_name)
+                         ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\adm\AppData\Local\Programs\Python\Python314\Lib\importlib\__init__.py", line 88, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen importlib._bootstrap>", line 1398, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1371, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1342, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 938, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 759, in exec_module
+  File "<frozen importlib._bootstrap>", line 491, in _call_with_frames_removed
+  File "C:\1.3 Gestao\venv\Lib\site-packages\django\contrib\auth\models.py", line 5, in <module>
+    from django.contrib.auth.base_user import AbstractBaseUser, BaseUserManager
+  File "C:\1.3 Gestao\venv\Lib\site-packages\django\contrib\auth\base_user.py", line 43, in <module>
+    class AbstractBaseUser(models.Model):
+    ...<120 lines>...
+            )
+  File "C:\1.3 Gestao\venv\Lib\site-packages\django\db\models\base.py", line 145, in __new__
+    new_class.add_to_class("_meta", Options(meta, app_label))
+    ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\1.3 Gestao\venv\Lib\site-packages\django\db\models\base.py", line 393, in add_to_class
+    value.contribute_to_class(cls, name)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^
+  File "C:\1.3 Gestao\venv\Lib\site-packages\django\db\models\options.py", line 238, in contribute_to_class
+    self.db_table, connection.ops.max_name_length()
+                   ^^^^^^^^^^^^^^
+  File "C:\1.3 Gestao\venv\Lib\site-packages\django\utils\connection.py", line 15, in __getattr__
+    return getattr(self._connections[self._alias], item)
+                   ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "C:\1.3 Gestao\venv\Lib\site-packages\django\utils\connection.py", line 62, in __getitem__
+    conn = self.create_connection(alias)
+  File "C:\1.3 Gestao\venv\Lib\site-packages\django\db\utils.py", line 196, in create_connection
+    backend = load_backend(db["ENGINE"])
+  File "C:\1.3 Gestao\venv\Lib\site-packages\django\db\utils.py", line 116, in load_backend
+    return import_module("%s.base" % backend_name)
+  File "C:\Users\adm\AppData\Local\Programs\Python\Python314\Lib\importlib\__init__.py", line 88, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\1.3 Gestao\venv\Lib\site-packages\django\db\backends\mysql\base.py", line 18, in <module>
+    raise ImproperlyConfigured(
+        "Error loading MySQLdb module.\nDid you install mysqlclient?"
+    ) from err
+django.core.exceptions.ImproperlyConfigured: Error loading MySQLdb module.
+Did you install mysqlclient?
+
+2026-01-11 17:03:35 [ERRO] Verifique o log completo em: C:\1.3 Gestao\erros_correcoes_2026-01-11.txt

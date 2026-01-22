@@ -1,0 +1,93 @@
+# ====================================================================================================
+# COMANDOS PARA INSTALAÇÃO DO MÓDULO DE BOLETOS - CAIXA ECONÔMICA FEDERAL
+# ====================================================================================================
+# Execute estes comandos na ordem para instalar o módulo completo de boletos
+# ====================================================================================================
+
+# 1. Criar migrations do módulo boletos
+python manage.py makemigrations boletos
+
+# 2. Aplicar migrations no banco de dados
+python manage.py migrate boletos
+
+# 3. Instalar dependências Python necessárias
+pip install reportlab python-barcode pillow
+
+# 4. Criar módulo, menus e permissões no sistema
+python criar_modulo_boletos.py
+
+# 5. (Opcional) Atualizar requirements.txt com as novas dependências
+pip freeze > requirements.txt
+
+# ====================================================================================================
+# APÓS EXECUTAR OS COMANDOS ACIMA:
+# ====================================================================================================
+# 
+# 1. Acesse o Admin Django: http://127.0.0.1:8000/admin/
+# 2. Vá em "Boletos" → "Configurações Bancárias"  
+# 3. Clique em "Adicionar Configuração Bancária"
+# 4. Preencha com os dados fornecidos pela Caixa Econômica Federal
+# 5. Marque como "Ativo"
+# 6. Salve
+# 
+# 7. Acesse o módulo: http://127.0.0.1:8000/boletos/
+# 8. Teste gerando um boleto para uma parcela
+# 
+# ====================================================================================================
+# ESTRUTURA CRIADA:
+# ====================================================================================================
+#
+# boletos/
+# ├── models.py           # 4 models (ConfiguracaoBancaria, Boleto, RemessaCNAB, RetornoCNAB)
+# ├── views.py            # 12 views (dashboard, lista, gerar, imprimir, remessa, etc.)
+# ├── urls.py             # 10 URLs
+# ├── admin.py            # Interface administrativa completa
+# ├── utils/
+# │   ├── codigo_barras.py  # Cálculo de código de barras (44 pos) e linha digitável (47 pos)
+# │   ├── cnab240.py        # Geração de arquivo CNAB 240 (240 posições por linha)
+# │   └── gerar_pdf.py      # Geração de PDF do boleto (ReportLab)
+# └── templates/boletos/
+#     └── dashboard.html    # Interface web
+#
+# ====================================================================================================
+# FUNCIONALIDADES IMPLEMENTADAS:
+# ====================================================================================================
+#
+# ✅ Geração de boletos com nosso número sequencial (17 dígitos)
+# ✅ Cálculo de código de barras (44 posições) conforme Caixa
+# ✅ Cálculo de linha digitável (47 posições)
+# ✅ Dígitos verificadores Módulo 10 e Módulo 11
+# ✅ Geração de arquivo CNAB 240 (remessa)
+# ✅ Validação de arquivo CNAB (240 posições/linha)
+# ✅ Geração de PDF do boleto para impressão
+# ✅ Controle de status (PENDENTE, EMITIDO, REGISTRADO, PAGO, CANCELADO)
+# ✅ Dashboard com estatísticas
+# ✅ Listagem e filtros de boletos
+# ✅ Download de arquivo de remessa
+# ✅ Integração com módulo contas_receber
+# ✅ Interface administrativa completa
+# ✅ Sistema de permissões
+#
+# ====================================================================================================
+# BASEADO EM DOCUMENTAÇÃO OFICIAL:
+# ====================================================================================================
+#
+# - Manual CNAB 240 - Caixa Econômica Federal
+# - Especificações de Código de Barras SIGCB - Caixa
+# - Layout Padrão CNAB 240 - FEBRABAN
+# - ESP_COD_BARRAS_SIGCB_COBRANCA_CAIXA.pdf
+# - Manual_de_Leiaute_de_Arquivo_Eletronico_CNAB_240.pdf
+#
+# ====================================================================================================
+# PARTICULARIDADES DA CAIXA IMPLEMENTADAS:
+# ====================================================================================================
+#
+# - Código do Banco: 104
+# - Nosso Número: 17 dígitos
+# - Carteira padrão: 1
+# - Modalidade comum: 14
+# - Campo livre: 25 posições
+# - DV calculado por Módulo 11
+# - Fator de vencimento desde 07/10/1997
+#
+# ====================================================================================================

@@ -1,0 +1,123 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Logs de Importação - Gestão TI{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4 py-5">
+    <div class="mb-4">
+        <a href="{% url 'importacoes:dashboard' %}" class="btn btn-sm btn-outline-secondary mb-3">
+            <i class="fas fa-arrow-left me-2"></i>Voltar
+        </a>
+        <h1 class="h2 text-dark fw-bold">📋 Histórico de Importações</h1>
+        <p class="text-muted">Acompanhe todos os processos de importação realizados</p>
+    </div>
+
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-header bg-light border-0 py-3">
+            <h5 class="mb-0 fw-bold">Filtrar</h5>
+        </div>
+        <div class="card-body">
+            <form method="post" class="row g-3">
+                {% csrf_token %}
+                <div class="col-md-3">
+                    {{ form.tipo }}
+                </div>
+                <div class="col-md-3">
+                    {{ form.status }}
+                </div>
+                <div class="col-md-3">
+                    {{ form.data_inicio }}
+                </div>
+                <div class="col-md-3">
+                    {{ form.data_fim }}
+                </div>
+                <div class="col-12">
+                    <button type="submit" class="btn btn-primary btn-sm">
+                        <i class="fas fa-filter me-2"></i>Filtrar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="card border-0 shadow-sm">
+        <div class="card-body">
+            {% if logs %}
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead>
+                            <tr class="table-light">
+                                <th>ID</th>
+                                <th>Tipo</th>
+                                <th>Data/Hora</th>
+                                <th>Usuário</th>
+                                <th>Status</th>
+                                <th>Criados</th>
+                                <th>Atualizados</th>
+                                <th>Erros</th>
+                                <th>Tempo</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for log in logs %}
+                            <tr>
+                                <td><strong>#{{ log.id }}</strong></td>
+                                <td>
+                                    {% if log.tipo == 'cadastro' %}
+                                        <span class="badge bg-info">👥 Cadastros</span>
+                                    {% elif log.tipo == 'nota_fiscal' %}
+                                        <span class="badge bg-primary">📄 Notas Fiscais</span>
+                                    {% else %}
+                                        <span class="badge bg-warning">💰 Parcelas</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ log.data_inicio|date:"d/m/Y H:i" }}</td>
+                                <td>{{ log.usuario.get_full_name|default:log.usuario.username }}</td>
+                                <td>
+                                    {% if log.status == 'concluida' %}
+                                        <span class="badge bg-success">✓ Concluída</span>
+                                    {% elif log.status == 'em_progresso' %}
+                                        <span class="badge bg-warning">⟳ Em Progresso</span>
+                                    {% elif log.status == 'erro' %}
+                                        <span class="badge bg-danger">✗ Erro</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">Pendente</span>
+                                    {% endif %}
+                                </td>
+                                <td><span class="badge bg-success">{{ log.registros_criados }}</span></td>
+                                <td><span class="badge bg-info">{{ log.registros_atualizados }}</span></td>
+                                <td>
+                                    {% if log.registros_erro > 0 %}
+                                        <span class="badge bg-danger">{{ log.registros_erro }}</span>
+                                    {% else %}
+                                        <span class="text-muted">—</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if log.data_fim %}
+                                        {{ log.data_fim|timesince:log.data_inicio }}
+                                    {% else %}
+                                        —
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <a href="{% url 'importacoes:detalhe_log' log.pk %}" class="btn btn-sm btn-outline-primary" title="Detalhes">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="alert alert-info mb-0">
+                    <i class="fas fa-info-circle me-2"></i>Nenhuma importação encontrada com os filtros aplicados
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

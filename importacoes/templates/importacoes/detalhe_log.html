@@ -1,0 +1,262 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Detalhes da Importação - Gestão TI{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4 py-5">
+    <div class="mb-4">
+        <a href="{% url 'importacoes:logs' %}" class="btn btn-sm btn-outline-secondary mb-3">
+            <i class="fas fa-arrow-left me-2"></i>Voltar ao Histórico
+        </a>
+        <h1 class="h2 text-dark fw-bold">📊 Detalhes da Importação #{{ log.id }}</h1>
+    </div>
+
+    <!-- Informações Gerais -->
+    <div class="row mb-4">
+        <div class="col-lg-3">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <p class="text-muted small mb-1">Tipo</p>
+                    <h6 class="mb-0">{{ log.get_tipo_display }}</h6>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-3">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <p class="text-muted small mb-1">Status</p>
+                    <h6 class="mb-0">
+                        {% if log.status == 'concluida' %}
+                            <span class="badge bg-success">✓ Concluída</span>
+                        {% elif log.status == 'em_progresso' %}
+                            <span class="badge bg-warning">⟳ Em Progresso</span>
+                        {% elif log.status == 'erro' %}
+                            <span class="badge bg-danger">✗ Erro</span>
+                        {% endif %}
+                    </h6>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-3">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <p class="text-muted small mb-1">Data/Hora</p>
+                    <h6 class="mb-0">{{ log.data_inicio|date:"d/m/Y H:i" }}</h6>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-3">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <p class="text-muted small mb-1">Usuário</p>
+                    <h6 class="mb-0">{{ log.usuario.get_full_name|default:log.usuario.username }}</h6>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Estatísticas -->
+    <div class="row mb-4">
+        <div class="col-lg-3">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body text-center">
+                    <h3 class="h4 mb-0 text-success">{{ log.registros_criados }}</h3>
+                    <small class="text-muted">Registros Criados</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-3">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body text-center">
+                    <h3 class="h4 mb-0 text-info">{{ log.registros_atualizados }}</h3>
+                    <small class="text-muted">Registros Atualizados</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-3">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body text-center">
+                    <h3 class="h4 mb-0 text-danger">{{ log.registros_erro }}</h3>
+                    <small class="text-muted">Erros</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-3">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body text-center">
+                    <h3 class="h4 mb-0">{{ log.total_registros }}</h3>
+                    <small class="text-muted">Total Processado</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filtros e Dados -->
+    {% if cadastros or notas or parcelas %}
+    <div class="card border-0 shadow-sm">
+        <div class="card-header bg-light border-0 py-3">
+            <h5 class="mb-0 fw-bold">Registros Importados</h5>
+        </div>
+        <div class="card-body">
+            {% if cadastros %}
+                <h6 class="fw-bold mb-3">Cadastros ({{ cadastros.count }})</h6>
+                <div class="table-responsive mb-4">
+                    <table class="table table-sm table-hover">
+                        <thead class="table-light">
+                            <tr>
+                                <th>ID</th>
+                                <th>Razão Social</th>
+                                <th>CNPJ/CPF</th>
+                                <th>Tipo</th>
+                                <th>Sincronizado</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for cad in cadastros|slice:":10" %}
+                            <tr>
+                                <td><small>{{ cad.id }}</small></td>
+                                <td><small>{{ cad.razao_social }}</small></td>
+                                <td><small>{{ cad.cnpj_cpf }}</small></td>
+                                <td>
+                                    {% if cad.chk_cliente == 'S' %}<span class="badge bg-info">Cliente</span>{% endif %}
+                                    {% if cad.chk_fornecedor == 'S' %}<span class="badge bg-warning">Fornecedor</span>{% endif %}
+                                </td>
+                                <td><small>{{ cad.sincronizado_em|date:"d/m/Y H:i" }}</small></td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    {% if cadastros.count > 10 %}
+                        <small class="text-muted">Mostrando 10 de {{ cadastros.count }} registros</small>
+                    {% endif %}
+                </div>
+            {% endif %}
+
+            {% if notas %}
+                <h6 class="fw-bold mb-3">Notas Fiscais ({{ notas.count }})</h6>
+                <div class="table-responsive mb-4">
+                    <table class="table table-sm table-hover">
+                        <thead class="table-light">
+                            <tr>
+                                <th>ID</th>
+                                <th>NF</th>
+                                <th>Série</th>
+                                <th>Data</th>
+                                <th>Valor</th>
+                                <th>Sincronizado</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for nf in notas|slice:":10" %}
+                            <tr>
+                                <td><small>{{ nf.id }}</small></td>
+                                <td><small><strong>{{ nf.nro_nota }}</strong></small></td>
+                                <td><small>{{ nf.serie }}</small></td>
+                                <td><small>{{ nf.data_emissao|date:"d/m/Y" }}</small></td>
+                                <td><small>R$ {{ nf.total_nota|floatformat:2 }}</small></td>
+                                <td><small>{{ nf.sincronizado_em|date:"d/m/Y H:i" }}</small></td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    {% if notas.count > 10 %}
+                        <small class="text-muted">Mostrando 10 de {{ notas.count }} registros</small>
+                    {% endif %}
+                </div>
+            {% endif %}
+
+            {% if parcelas %}
+                <h6 class="fw-bold mb-3">Parcelas ({{ parcelas.count }})</h6>
+                <div class="table-responsive">
+                    <table class="table table-sm table-hover">
+                        <thead class="table-light">
+                            <tr>
+                                <th>ID</th>
+                                <th>Documento</th>
+                                <th>Vencimento</th>
+                                <th>Valor</th>
+                                <th>Status</th>
+                                <th>Sincronizado</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for parc in parcelas|slice:":10" %}
+                            <tr>
+                                <td><small>{{ parc.id }}</small></td>
+                                <td><small>{{ parc.documento }}</small></td>
+                                <td><small>{{ parc.data_vencimento|date:"d/m/Y" }}</small></td>
+                                <td><small>R$ {{ parc.valor_parcela|floatformat:2 }}</small></td>
+                                <td><small>{{ parc.get_status_display|default:parc.status }}</small></td>
+                                <td><small>{{ parc.sincronizado_em|date:"d/m/Y H:i" }}</small></td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    {% if parcelas.count > 10 %}
+                        <small class="text-muted">Mostrando 10 de {{ parcelas.count }} registros</small>
+                    {% endif %}
+                </div>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Erros -->
+    {% if log.erros_detalhe %}
+    <div class="card border-0 shadow-sm mt-4">
+        <div class="card-header bg-light border-0 py-3">
+            <h5 class="mb-0 fw-bold text-danger">⚠️ Erros Encontrados ({{ log.erros_detalhe|length }})</h5>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-sm table-striped">
+                    <thead class="table-light">
+                        <tr>
+                            <th>ID</th>
+                            <th>Descrição</th>
+                            <th>Erro</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for erro in log.erros_detalhe %}
+                        <tr>
+                            <td><small>{{ erro.id }}</small></td>
+                            <td>
+                                <small>
+                                    {% if erro.razao_social %}
+                                        {{ erro.razao_social }}
+                                    {% elif erro.nro_nota %}
+                                        Nota: {{ erro.nro_nota }}
+                                    {% elif erro.documento %}
+                                        Doc: {{ erro.documento }}
+                                    {% else %}
+                                        -
+                                    {% endif %}
+                                </small>
+                            </td>
+                            <td><small class="text-danger">{{ erro.erro }}</small></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Mensagens -->
+    {% if log.mensagem %}
+    <div class="alert alert-danger mt-4">
+        <h6 class="alert-heading">Mensagem de Erro Geral</h6>
+        {{ log.mensagem }}
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

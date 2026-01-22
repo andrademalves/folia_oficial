@@ -1,0 +1,5 @@
+python3.13.exe manage.py shell -c "from django.contrib.auth.models import User; User.objects.create_superuser('marcos@mbrtecnologia.com.br', 'marcos@mbrtecnologia.com.br', 'folia1234@'); print('Superusuário criado com sucesso!')"
+
+python3.13.exe -c "import os, django; os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'gestaoTi.settings'); django.setup(); from django.contrib.auth.models import User; User.objects.create_superuser('marcos@mbrtecnologia.com.br', 'marcos@mbrtecnologia.com.br', 'folia1234@'); print('Superusuário criado: marcos@mbrtecnologia.com.br / folia1234@')"
+
+O módulo está completo e pronto para uso. Basta seguir os passos de instalação e configurar os dados bancários da sua empresa na Caixa. Qualquer dúvida, consulte os arquivos de documentação criados!

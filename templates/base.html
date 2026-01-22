@@ -1,0 +1,177 @@
+{% load static %}
+{% load permissoes_tags %}
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Sistema de Gestão{% endblock %}</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .sidebar {
+            min-height: 100vh;
+            background: linear-gradient(180deg, #2c3e50 0%, #34495e 100%);
+            box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+        }
+        .sidebar .nav-link {
+            color: #ecf0f1;
+            padding: 12px 20px;
+            margin: 5px 10px;
+            border-radius: 5px;
+            transition: all 0.3s;
+        }
+        .sidebar .nav-link:hover {
+            background-color: rgba(255,255,255,0.1);
+            color: #fff;
+        }
+        .sidebar .nav-link.active {
+            background-color: #3498db;
+            color: #fff;
+        }
+        .sidebar .nav-link i {
+            margin-right: 10px;
+            width: 20px;
+        }
+        .modulo-header {
+            color: #95a5a6;
+            font-size: 0.85rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            padding: 15px 20px 5px;
+            margin-top: 10px;
+        }
+        .main-content {
+            padding: 20px;
+            background-color: #f8f9fa;
+            min-height: 100vh;
+        }
+        .navbar {
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            background-color: #fff !important;
+        }
+        .card {
+            border: none;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+            margin-bottom: 20px;
+        }
+        .card-header {
+            background-color: #fff;
+            border-bottom: 2px solid #3498db;
+            font-weight: bold;
+        }
+        .btn-primary {
+            background-color: #3498db;
+            border-color: #3498db;
+        }
+        .btn-primary:hover {
+            background-color: #2980b9;
+            border-color: #2980b9;
+        }
+    </style>
+    
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="{% url 'home_modulos' %}">
+                <i class="fas fa-cog"></i> Sistema de Gestão
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
+                            <i class="fas fa-user"></i> {{ request.user.username }}
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="#"><i class="fas fa-user-circle"></i> Meu Perfil</a></li>
+                            <li><a class="dropdown-item" href="#"><i class="fas fa-cog"></i> Configurações</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="{% url 'logout' %}?next=/accounts/login/"><i class="fas fa-sign-out-alt"></i> Sair</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid">
+        <div class="row">
+            {% if not hide_sidebar %}
+            <!-- Sidebar -->
+            <div class="col-md-2 p-0 sidebar">
+                <div class="pt-3">
+                    {% get_menus_usuario as modulos %}
+                    {% for modulo in modulos %}
+                        <div class="modulo-header">
+                            {% if modulo.icone %}
+                                <i class="{{ modulo.icone }}"></i>
+                            {% endif %}
+                            {{ modulo.nome }}
+                        </div>
+                        <ul class="nav flex-column">
+                            {% for menu in modulo.menus_permitidos %}
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{{ menu.url }}">
+                                        {% if menu.icone %}
+                                            <i class="{{ menu.icone }}"></i>
+                                        {% else %}
+                                            <i class="fas fa-circle" style="font-size: 0.5rem;"></i>
+                                        {% endif %}
+                                        {{ menu.nome }}
+                                    </a>
+                                    {% get_submenus menu as submenus %}
+                                    {% if submenus %}
+                                        <ul class="nav flex-column ms-3">
+                                            {% for submenu in submenus %}
+                                                <li class="nav-item">
+                                                    <a class="nav-link" href="{{ submenu.url }}" style="font-size: 0.9rem;">
+                                                        <i class="fas fa-angle-right"></i> {{ submenu.nome }}
+                                                    </a>
+                                                </li>
+                                            {% endfor %}
+                                        </ul>
+                                    {% endif %}
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Main Content -->
+            <div class="{% if hide_sidebar %}col-12{% else %}col-md-10{% endif %} main-content">
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+
+                {% block content %}{% endblock %}
+            </div>
+        </div>
+    </div>
+
+    <!-- jQuery (necessário para Select2 e outros plugins) -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

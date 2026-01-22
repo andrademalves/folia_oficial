@@ -1,0 +1,470 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Dashboard - Cadastros{% endblock %}
+
+{% block extra_css %}
+<style>
+    body { 
+        background: radial-gradient(circle at 10% 20%, #111927 0%, #0f172a 35%, #0b1224 70%, #0a0f1e 100%);
+    }
+    
+    .sidebar { 
+        background: rgba(15, 23, 42, 0.85); 
+        border-right: 1px solid rgba(255,255,255,0.08); 
+        backdrop-filter: blur(12px); 
+        height: calc(100vh - 56px); 
+        position: sticky; 
+        top: 56px; 
+        padding: 20px 0; 
+    }
+    
+    .sidebar .nav-link { 
+        color: #cbd5e1; 
+        padding: 12px 20px; 
+        margin: 4px 8px; 
+        border-radius: 10px; 
+        transition: all 0.2s ease; 
+        display: flex; 
+        align-items: center; 
+        gap: 12px; 
+    }
+    
+    .sidebar .nav-link:hover { 
+        background: rgba(34,211,238,0.1); 
+        color: #7dd3fc; 
+    }
+    
+    .sidebar .nav-link.active { 
+        background: linear-gradient(135deg, rgba(34,211,238,0.2), rgba(99,102,241,0.2)); 
+        color: #e0e7ff; 
+        font-weight: 600; 
+        box-shadow: 0 4px 12px rgba(99,102,241,0.25); 
+    }
+    
+    .sidebar .sidebar-header { 
+        color: #7dd3fc; 
+        font-weight: 700; 
+        letter-spacing: 1px; 
+        padding: 0 20px 16px; 
+        border-bottom: 1px solid rgba(255,255,255,0.06); 
+        margin-bottom: 16px; 
+        font-size: 14px; 
+        text-transform: uppercase; 
+    }
+    
+    .content-card { 
+        background: rgba(15, 23, 42, 0.85); 
+        border: 1px solid rgba(255,255,255,0.08); 
+        box-shadow: 0 20px 60px rgba(0,0,0,0.25); 
+        border-radius: 16px; 
+        backdrop-filter: blur(12px); 
+        padding: 24px; 
+        margin-bottom: 20px; 
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .content-card::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(circle at 80% 20%, rgba(56,189,248,0.08), transparent 50%),
+                    radial-gradient(circle at 20% 80%, rgba(129,140,248,0.06), transparent 40%);
+        pointer-events: none;
+    }
+    
+    .stat-card {
+        background: #0f172a;
+        border: 1px solid rgba(255,255,255,0.06);
+        border-radius: 14px;
+        padding: 20px;
+        height: 100%;
+        box-shadow: 0 12px 30px rgba(0,0,0,0.20);
+        transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .stat-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: linear-gradient(90deg, #22d3ee, #6366f1);
+        opacity: 0;
+        transition: opacity 0.3s;
+    }
+    
+    .stat-card:hover {
+        transform: translateY(-5px);
+        border-color: rgba(34,211,238,0.35);
+        box-shadow: 0 16px 40px rgba(34,211,238,0.15);
+    }
+    
+    .stat-card:hover::before {
+        opacity: 1;
+    }
+    
+    .stat-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 28px;
+        margin-bottom: 15px;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+    }
+    
+    .stat-title {
+        color: #94a3b8;
+        font-size: 0.875rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 8px;
+    }
+    
+    .stat-value {
+        color: #f8fafc;
+        font-size: 2rem;
+        font-weight: 800;
+        margin-bottom: 8px;
+        text-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    }
+    
+    .stat-subtitle {
+        color: #64748b;
+        font-size: 0.8rem;
+    }
+    
+    .table-recent {
+        background: transparent;
+        border-radius: 8px;
+        overflow: hidden;
+    }
+    
+    .table-recent th {
+        background: linear-gradient(135deg, rgba(34, 211, 238, 0.15), rgba(99, 102, 241, 0.15));
+        color: #e0e7ff;
+        font-weight: 600;
+        border: none;
+        padding: 12px;
+        font-size: 0.875rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    .table-recent td {
+        color: #e5e7eb;
+        border-color: rgba(255, 255, 255, 0.05);
+        padding: 12px;
+        background: transparent;
+        font-weight: 500;
+    }
+    
+    .table-recent tbody tr {
+        transition: all 0.2s;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+    }
+    
+    .table-recent tbody tr:hover {
+        background: rgba(34, 211, 238, 0.08);
+        transform: translateX(4px);
+    }
+    
+    .table-recent tbody tr:last-child {
+        border-bottom: none;
+    }
+    
+    .table-recent small {
+        color: #e5e7eb !important;
+        font-size: 0.75rem;
+        font-weight: 400;
+    }
+    
+    .table-recent .text-muted {
+        color: #e5e7eb !important;
+    }
+    
+    .badge-status {
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+    }
+    
+    .badge-ativo {
+        background: rgba(16, 185, 129, 0.15);
+        color: #6ee7b7;
+        border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+    
+    .badge-inativo {
+        background: rgba(239, 68, 68, 0.15);
+        color: #fca5a5;
+        border: 1px solid rgba(239, 68, 68, 0.3);
+    }
+    
+    .hero-header {
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .hero-header::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(circle at 80% 20%, rgba(56,189,248,0.12), transparent 50%),
+                    radial-gradient(circle at 20% 80%, rgba(129,140,248,0.08), transparent 40%);
+        pointer-events: none;
+    }
+    
+    .hero-header h3 {
+        font-weight: 800;
+        text-shadow: 0 2px 12px rgba(0,0,0,0.3);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-0">
+  <div class="row g-0">
+    <div class="col-md-2">
+      <div class="sidebar">
+        <div class="sidebar-header"><i class="fas fa-list"></i> Cadastros</div>
+        <nav class="nav flex-column">
+          <a class="nav-link active" href="{% url 'cadastros:dashboard' %}"><i class="fas fa-home"></i> <span>Dashboard</span></a>
+          <a class="nav-link" href="{% url 'cadastros:plano_contas' %}"><i class="fas fa-sitemap"></i> <span>Plano de Contas</span></a>
+          <a class="nav-link" href="{% url 'cadastros:contas_financeiras' %}"><i class="fas fa-university"></i> <span>Contas Bancárias/Factory</span></a>
+          <a class="nav-link" href="{% url 'cadastros:relatorios' %}"><i class="fas fa-file-alt"></i> <span>Relatórios</span></a>
+          <hr style="border-color: rgba(255,255,255,0.1); margin: 16px 8px;">
+          <a class="nav-link" href="{% url 'home_modulos' %}"><i class="fas fa-arrow-left"></i> <span>Voltar aos Módulos</span></a>
+        </nav>
+      </div>
+    </div>
+    <div class="col-md-10">
+      <div class="p-4">
+        <!-- Header -->
+        <div class="content-card hero-header">
+          <h3 class="text-white mb-2"><i class="fas fa-chart-line"></i> Dashboard de Cadastros</h3>
+          <p class="text-muted mb-0">Visão geral completa de todos os cadastros do sistema</p>
+        </div>
+
+        <!-- Cards de Estatísticas -->
+        <div class="row g-3 mb-4">
+          <!-- Clientes -->
+          <div class="col-md-3">
+            <div class="stat-card">
+              <div class="stat-icon" style="background: linear-gradient(135deg, #22d3ee, #6366f1);">
+                <i class="fas fa-users" style="color: white;"></i>
+              </div>
+              <div class="stat-title">Clientes</div>
+              <div class="stat-value">{{ total_clientes }}</div>
+              <div class="stat-subtitle">
+                <i class="fas fa-check-circle" style="color: #6ee7b7;"></i> {{ clientes_ativos }} ativos
+                <i class="fas fa-times-circle ms-2" style="color: #fca5a5;"></i> {{ clientes_inativos }} inativos
+              </div>
+            </div>
+          </div>
+
+          <!-- Fornecedores -->
+          <div class="col-md-3">
+            <div class="stat-card">
+              <div class="stat-icon" style="background: linear-gradient(135deg, #10b981, #059669);">
+                <i class="fas fa-truck" style="color: white;"></i>
+              </div>
+              <div class="stat-title">Fornecedores</div>
+              <div class="stat-value">{{ total_fornecedores }}</div>
+              <div class="stat-subtitle">
+                <i class="fas fa-check-circle" style="color: #6ee7b7;"></i> {{ fornecedores_ativos }} ativos
+                <i class="fas fa-times-circle ms-2" style="color: #fca5a5;"></i> {{ fornecedores_inativos }} inativos
+              </div>
+            </div>
+          </div>
+
+          <!-- Contas Financeiras -->
+          <div class="col-md-3">
+            <div class="stat-card">
+              <div class="stat-icon" style="background: linear-gradient(135deg, #f59e0b, #d97706);">
+                <i class="fas fa-university" style="color: white;"></i>
+              </div>
+              <div class="stat-title">Contas Financeiras</div>
+              <div class="stat-value">{{ total_contas }}</div>
+              <div class="stat-subtitle">
+                <i class="fas fa-building" style="color: #7dd3fc;"></i> {{ contas_banco }} bancos
+                <i class="fas fa-industry ms-2" style="color: #fbbf24;"></i> {{ contas_factory }} factory
+              </div>
+            </div>
+          </div>
+
+          <!-- Plano de Contas -->
+          <div class="col-md-3">
+            <div class="stat-card">
+              <div class="stat-icon" style="background: linear-gradient(135deg, #8b5cf6, #6d28d9);">
+                <i class="fas fa-sitemap" style="color: white;"></i>
+              </div>
+              <div class="stat-title">Plano de Contas</div>
+              <div class="stat-value">{{ total_plano_contas }}</div>
+              <div class="stat-subtitle">
+                <i class="fas fa-folder" style="color: #c4b5fd;"></i> {{ plano_contas_pai }} principais
+                <i class="fas fa-folder-open ms-2" style="color: #ddd6fe;"></i> {{ plano_contas_filhos }} sub-contas
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Segunda linha de cards -->
+        <div class="row g-3 mb-4">
+          <!-- Métodos de Pagamento -->
+          <div class="col-md-12">
+            <div class="stat-card">
+              <div class="d-flex align-items-center justify-content-between">
+                <div class="d-flex align-items-center" style="gap: 16px;">
+                  <div class="stat-icon" style="background: linear-gradient(135deg, #22d3ee, #6366f1); width: 80px; height: 80px;">
+                    <i class="fas fa-coins" style="color: white; font-size: 36px;"></i>
+                  </div>
+                  <div>
+                    <h5 class="text-white mb-2" style="font-weight: 700;"><i class="fas fa-credit-card"></i> Métodos de Pagamento</h5>
+                    <div style="font-size: 2.5rem; font-weight: 800; color: #7dd3fc; text-shadow: 0 2px 8px rgba(0,0,0,0.3);">
+                      {{ total_metodos_pagamento }}
+                    </div>
+                    <p class="text-muted mb-0" style="font-size: 0.9rem;">
+                      <i class="fas fa-check-circle" style="color: #6ee7b7;"></i> {{ metodos_ativos }} métodos ativos cadastrados
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Últimos Registros -->
+        <div class="row g-3">
+          <!-- Últimos Clientes -->
+          <div class="col-md-4">
+            <div class="stat-card">
+              <div class="d-flex align-items-center mb-3" style="gap: 12px;">
+                <div class="stat-icon" style="background: linear-gradient(135deg, #22d3ee, #6366f1); width: 48px; height: 48px; font-size: 20px;">
+                  <i class="fas fa-user-plus" style="color: white;"></i>
+                </div>
+                <h5 class="text-white mb-0" style="font-weight: 700;">Últimos Clientes</h5>
+              </div>
+              {% if ultimos_clientes %}
+                <div class="table-responsive">
+                  <table class="table table-recent table-sm mb-0">
+                    <tbody>
+                      {% for cliente in ultimos_clientes %}
+                      <tr>
+                        <td>{{ cliente.nome }}</td>
+                        <td class="text-end">
+                          {% if cliente.ativo %}
+                            <span class="badge-status badge-ativo"><i class="fas fa-check-circle"></i> Ativo</span>
+                          {% else %}
+                            <span class="badge-status badge-inativo"><i class="fas fa-times-circle"></i> Inativo</span>
+                          {% endif %}
+                        </td>
+                      </tr>
+                      {% endfor %}
+                    </tbody>
+                  </table>
+                </div>
+              {% else %}
+                <div class="text-center py-4">
+                  <i class="fas fa-inbox" style="font-size: 32px; color: #475569; opacity: 0.5;"></i>
+                  <p class="text-muted mb-0 mt-2">Nenhum cliente cadastrado</p>
+                </div>
+              {% endif %}
+            </div>
+          </div>
+
+          <!-- Últimos Fornecedores -->
+          <div class="col-md-4">
+            <div class="stat-card">
+              <div class="d-flex align-items-center mb-3" style="gap: 12px;">
+                <div class="stat-icon" style="background: linear-gradient(135deg, #10b981, #059669); width: 48px; height: 48px; font-size: 20px;">
+                  <i class="fas fa-truck-loading" style="color: white;"></i>
+                </div>
+                <h5 class="text-white mb-0" style="font-weight: 700;">Últimos Fornecedores</h5>
+              </div>
+              {% if ultimos_fornecedores %}
+                <div class="table-responsive">
+                  <table class="table table-recent table-sm mb-0">
+                    <tbody>
+                      {% for fornecedor in ultimos_fornecedores %}
+                      <tr>
+                        <td>{{ fornecedor.nome }}</td>
+                        <td class="text-end">
+                          {% if fornecedor.ativo %}
+                            <span class="badge-status badge-ativo"><i class="fas fa-check-circle"></i> Ativo</span>
+                          {% else %}
+                            <span class="badge-status badge-inativo"><i class="fas fa-times-circle"></i> Inativo</span>
+                          {% endif %}
+                        </td>
+                      </tr>
+                      {% endfor %}
+                    </tbody>
+                  </table>
+                </div>
+              {% else %}
+                <div class="text-center py-4">
+                  <i class="fas fa-inbox" style="font-size: 32px; color: #475569; opacity: 0.5;"></i>
+                  <p class="text-muted mb-0 mt-2">Nenhum fornecedor cadastrado</p>
+                </div>
+              {% endif %}
+            </div>
+          </div>
+
+          <!-- Últimas Contas -->
+          <div class="col-md-4">
+            <div class="stat-card">
+              <div class="d-flex align-items-center mb-3" style="gap: 12px;">
+                <div class="stat-icon" style="background: linear-gradient(135deg, #f59e0b, #d97706); width: 48px; height: 48px; font-size: 20px;">
+                  <i class="fas fa-university" style="color: white;"></i>
+                </div>
+                <h5 class="text-white mb-0" style="font-weight: 700;">Últimas Contas</h5>
+              </div>
+              {% if ultimas_contas %}
+                <div class="table-responsive">
+                  <table class="table table-recent table-sm mb-0">
+                    <tbody>
+                      {% for conta in ultimas_contas %}
+                      <tr>
+                        <td>
+                          {{ conta.nome }}
+                          <br>
+                          <small class="text-muted"><i class="fas fa-tag" style="font-size: 10px;"></i> {{ conta.get_tipo_display }}</small>
+                        </td>
+                        <td class="text-end">
+                          {% if conta.ativo %}
+                            <span class="badge-status badge-ativo"><i class="fas fa-check-circle"></i> Ativo</span>
+                          {% else %}
+                            <span class="badge-status badge-inativo"><i class="fas fa-times-circle"></i> Inativo</span>
+                          {% endif %}
+                        </td>
+                      </tr>
+                      {% endfor %}
+                    </tbody>
+                  </table>
+                </div>
+              {% else %}
+                <div class="text-center py-4">
+                  <i class="fas fa-inbox" style="font-size: 32px; color: #475569; opacity: 0.5;"></i>
+                  <p class="text-muted mb-0 mt-2">Nenhuma conta cadastrada</p>
+                </div>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

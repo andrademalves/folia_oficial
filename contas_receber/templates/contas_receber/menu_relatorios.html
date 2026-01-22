@@ -1,0 +1,289 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Relatórios - Contas a Receber{% endblock %}
+
+{% block extra_css %}
+<style>
+    body { background: radial-gradient(circle at 10% 20%, #0ea5e9 0%, #0f172a 35%, #0b1224 65%, #0a0f1e 100%); }
+    .sidebar { background: rgba(15, 23, 42, 0.85); border-right: 1px solid rgba(255,255,255,0.08); backdrop-filter: blur(12px); height: calc(100vh - 56px); position: sticky; top: 56px; padding: 20px 0; }
+    .sidebar .nav-link { color: #cbd5e1; padding: 12px 20px; margin: 4px 8px; border-radius: 10px; transition: all 0.2s ease; display: flex; align-items: center; gap: 12px; }
+    .sidebar .nav-link:hover { background: rgba(34,211,238,0.1); color: #7dd3fc; }
+    .sidebar .nav-link.active { background: linear-gradient(135deg, rgba(34,211,238,0.2), rgba(99,102,241,0.2)); color: #e0e7ff; font-weight: 600; box-shadow: 0 4px 12px rgba(99,102,241,0.25); }
+    .sidebar .sidebar-header { color: #7dd3fc; font-weight: 700; letter-spacing: 1px; padding: 0 20px 16px; border-bottom: 1px solid rgba(255,255,255,0.06); margin-bottom: 16px; font-size: 14px; text-transform: uppercase; }
+    .content-card { background: rgba(15, 23, 42, 0.78); border: 1px solid rgba(255,255,255,0.08); box-shadow: 0 18px 48px rgba(0,0,0,0.45); border-radius: 16px; backdrop-filter: blur(12px); padding: 24px; margin-bottom: 20px; }
+    
+    .relatorio-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-bottom: 30px; }
+    .relatorio-card { background: rgba(15, 23, 42, 0.9); border: 2px solid rgba(125,211,252,0.2); border-radius: 12px; padding: 24px; transition: all 0.3s ease; cursor: pointer; }
+    .relatorio-card:hover { border-color: #22d3ee; transform: translateY(-4px); box-shadow: 0 12px 32px rgba(34,211,238,0.3); }
+    .relatorio-card .icon { font-size: 48px; margin-bottom: 16px; }
+    .relatorio-card .icon.danger { color: #ef4444; }
+    .relatorio-card .icon.warning { color: #f59e0b; }
+    .relatorio-card .icon.success { color: #10b981; }
+    .relatorio-card .icon.info { color: #3b82f6; }
+    .relatorio-card .icon.primary { color: #22d3ee; }
+    .relatorio-card h5 { color: #e0e7ff; font-weight: 600; margin-bottom: 12px; }
+    .relatorio-card p { color: #94a3b8; font-size: 14px; margin-bottom: 16px; }
+    .relatorio-card .btn { width: 100%; }
+    
+    .form-control { background: rgba(15, 23, 42, 0.5); border: 1px solid rgba(125,211,252,0.2); color: #e0e7ff; }
+    .form-control:focus { background: rgba(15, 23, 42, 0.7); border-color: #7dd3fc; color: #fff; box-shadow: 0 0 0 0.25rem rgba(125,211,252,0.25); }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-0">
+  <div class="row g-0">
+    <div class="col-md-2">
+      <div class="sidebar">
+        <nav class="nav flex-column">
+          <a class="nav-link" href="{% url 'home_modulos' %}"><i class="fas fa-arrow-left"></i> <span>Voltar aos Módulos</span></a>
+          <hr style="border-color: rgba(255,255,255,0.1); margin: 16px 8px;">
+        </nav>
+        <div class="sidebar-header"><i class="fas fa-receipt"></i> Contas a Receber</div>
+        <nav class="nav flex-column">
+          <a class="nav-link" href="{% url 'dashboard_contas_receber' %}"><i class="fas fa-home"></i> <span>Dashboard</span></a>
+          <a class="nav-link" href="{% url 'lista_notas_fiscais' %}"><i class="fas fa-file-invoice"></i> <span>Notas Fiscais</span></a>
+          <a class="nav-link" href="{% url 'parcelas_por_vencimento' %}"><i class="fas fa-clock"></i> <span>Por Vencimento</span></a>
+          <a class="nav-link" href="{% url 'lista_parcelas_baixa' %}"><i class="fas fa-check-circle"></i> <span>Dar Baixa</span></a>
+          <a class="nav-link" href="{% url 'lista_historico_negociacoes' %}"><i class="fas fa-handshake"></i> <span>Negociações</span></a>
+          <a class="nav-link" href="{% url 'lista_creditos' %}"><i class="fas fa-credit-card"></i> <span>Créditos</span></a>
+          <a class="nav-link active" href="{% url 'menu_relatorios' %}"><i class="fas fa-file-pdf"></i> <span>Relatórios</span></a>
+          <a class="nav-link" href="{% url 'relatorio_creditos' %}"><i class="fas fa-chart-line"></i> <span>Relatório Créditos</span></a>
+        </nav>
+      </div>
+    </div>
+    <div class="col-md-10">
+      <div class="p-4">
+        <div class="d-flex justify-content-between align-items-center mb-4" style="background: rgba(15, 23, 42, 0.9); padding: 20px; border-radius: 12px; border: 1px solid rgba(125,211,252,0.2);">
+            <h3 class="mb-0" style="color: #ffffff; font-weight: 600;">
+                <i class="fas fa-file-pdf"></i> Relatórios Gerenciais
+            </h3>
+        </div>
+
+        <!-- Relatórios de Gestão -->
+        <div class="content-card">
+            <h5 class="text-info mb-4"><i class="fas fa-chart-bar"></i> Relatórios de Gestão Financeira</h5>
+            
+            <div class="relatorio-grid">
+                <!-- Títulos a Vencer -->
+                <div class="relatorio-card" onclick="gerarRelatorio('vencer')">
+                    <div class="icon warning text-center">
+                        <i class="fas fa-calendar-alt"></i>
+                    </div>
+                    <h5>Títulos a Vencer</h5>
+                    <p>Lista de parcelas com vencimento nos próximos dias. Útil para planejamento de recebimentos.</p>
+                    <form id="form_vencer" method="get" action="{% url 'relatorio_titulos_vencer_pdf' %}" target="_blank">
+                        <div class="mb-2">
+                            <label style="color: #cbd5e1; font-size: 12px;">Período (dias)</label>
+                            <input type="number" name="dias" class="form-control" value="30" min="1" max="365">
+                        </div>
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-warning">
+                                <i class="fas fa-file-pdf"></i> Gerar PDF
+                            </button>
+                            <button type="button" class="btn btn-success" onclick="exportarExcel('vencer', event)">
+                                <i class="fas fa-file-excel"></i> Exportar Excel
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Inadimplência -->
+                <div class="relatorio-card" onclick="gerarRelatorio('vencidos')">
+                    <div class="icon danger text-center">
+                        <i class="fas fa-exclamation-triangle"></i>
+                    </div>
+                    <h5>Relatório de Inadimplência</h5>
+                    <p>Parcelas vencidas e não pagas. Essencial para controle de inadimplência e ações de cobrança.</p>
+                    <form id="form_vencidos" method="get" action="{% url 'relatorio_titulos_vencidos_pdf' %}" target="_blank">
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-danger">
+                                <i class="fas fa-file-pdf"></i> Gerar PDF
+                            </button>
+                            <button type="button" class="btn btn-success" onclick="exportarExcel('vencidos', event)">
+                                <i class="fas fa-file-excel"></i> Exportar Excel
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Recebimentos -->
+                <div class="relatorio-card" onclick="gerarRelatorio('recebimentos')">
+                    <div class="icon success text-center">
+                        <i class="fas fa-money-bill-wave"></i>
+                    </div>
+                    <h5>Recebimentos Realizados</h5>
+                    <p>Histórico de pagamentos recebidos em um período. Ideal para análise de desempenho de vendas.</p>
+                    <form id="form_recebimentos" method="get" action="{% url 'relatorio_recebimentos_pdf' %}" target="_blank">
+                        <div class="mb-2">
+                            <label style="color: #cbd5e1; font-size: 12px;">Data Início</label>
+                            <input type="date" name="data_inicio" class="form-control" value="{{ hoje|date:'Y-m-01' }}">
+                        </div>
+                        <div class="mb-2">
+                            <label style="color: #cbd5e1; font-size: 12px;">Data Fim</label>
+                            <input type="date" name="data_fim" class="form-control" value="{{ hoje|date:'Y-m-d' }}">
+                        </div>
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-success">
+                                <i class="fas fa-file-pdf"></i> Gerar PDF
+                            </button>
+                            <button type="button" class="btn btn-success" onclick="exportarExcel('recebimentos', event)" style="background: #059669;">
+                                <i class="fas fa-file-excel"></i> Exportar Excel
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Fluxo de Caixa -->
+                <div class="relatorio-card" onclick="gerarRelatorio('fluxo')">
+                    <div class="icon info text-center">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <h5>Fluxo de Caixa Projetado</h5>
+                    <p>Projeção de recebimentos futuros agrupados por semana. Fundamental para planejamento financeiro.</p>
+                    <form id="form_fluxo" method="get" action="{% url 'relatorio_fluxo_caixa_pdf' %}" target="_blank">
+                        <div class="mb-2">
+                            <label style="color: #cbd5e1; font-size: 12px;">Período (dias)</label>
+                            <input type="number" name="dias" class="form-control" value="60" min="1" max="365">
+                        </div>
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-info">
+                                <i class="fas fa-file-pdf"></i> Gerar PDF
+                            </button>
+                            <button type="button" class="btn btn-success" onclick="exportarExcel('fluxo', event)">
+                                <i class="fas fa-file-excel"></i> Exportar Excel
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Extrato por Período -->
+                <div class="relatorio-card" onclick="gerarRelatorio('extrato')">
+                    <div class="icon primary text-center">
+                        <i class="fas fa-file-invoice-dollar"></i>
+                    </div>
+                    <h5>Extrato por Período</h5>
+                    <p>Visão completa do período com parcelas pagas, vencidas e a vencer em um único relatório.</p>
+                    <form id="form_extrato" method="get" action="{% url 'relatorio_extrato_periodo_pdf' %}" target="_blank">
+                        <div class="mb-2">
+                            <label style="color: #cbd5e1; font-size: 12px;">Data Início</label>
+                            <input type="date" name="data_inicio" class="form-control" value="{{ hoje|date:'Y-m-01' }}">
+                        </div>
+                        <div class="mb-2">
+                            <label style="color: #cbd5e1; font-size: 12px;">Data Fim</label>
+                            <input type="date" name="data_fim" class="form-control" value="{{ hoje|date:'Y-m-d' }}">
+                        </div>
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-file-pdf"></i> Gerar PDF
+                            </button>
+                            <button type="button" class="btn btn-success" onclick="exportarExcel('extrato', event)">
+                                <i class="fas fa-file-excel"></i> Exportar Excel
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Relatório por Cliente -->
+        <div class="content-card">
+            <h5 class="text-primary mb-4"><i class="fas fa-users"></i> Relatório Detalhado por Cliente</h5>
+            
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="relatorio-card">
+                        <div class="icon primary text-center">
+                            <i class="fas fa-user-check"></i>
+                        </div>
+                        <h5>Análise Completa de Cliente</h5>
+                        <p>Relatório detalhado com estatísticas e parcelas pendentes de um cliente específico.</p>
+                        <form method="get" id="form_cliente" action="" target="_blank">
+                            <div class="mb-2">
+                                <label style="color: #cbd5e1; font-size: 12px;">Selecione o Cliente</label>
+                                <select name="cliente_id" id="select_cliente" class="form-control" required>
+                                    <option value="">Escolha um cliente...</option>
+                                    {% for cliente in clientes %}
+                                    <option value="{{ cliente.id }}">{{ cliente.nome }} - {{ cliente.cpf_cnpj }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="d-grid gap-2">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-file-pdf"></i> Gerar PDF
+                                </button>
+                                <button type="button" class="btn btn-success" onclick="exportarExcelCliente(event)">
+                                    <i class="fas fa-file-excel"></i> Exportar Excel
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Informações -->
+        <div class="content-card" style="background: rgba(34,211,238,0.05); border-color: rgba(34,211,238,0.3);">
+            <h6 class="text-info"><i class="fas fa-info-circle"></i> Sobre os Relatórios</h6>
+            <ul style="color: #cbd5e1; margin-bottom: 0;">
+                <li>Todos os relatórios estão disponíveis em <strong>PDF</strong> e <strong>Excel</strong></li>
+                <li>Os dados são extraídos em tempo real do banco de dados</li>
+                <li>Você pode ajustar os filtros antes de gerar cada relatório</li>
+                <li>Planilhas Excel incluem formatação profissional, data de emissão e usuário responsável</li>
+                <li>PDFs podem ser impressos ou salvos para compartilhamento</li>
+            </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function gerarRelatorio(tipo) {
+    // Não fazer nada, o formulário interno cuida do submit
+}
+
+// Exportar para Excel
+function exportarExcel(tipo, event) {
+    event.preventDefault();
+    event.stopPropagation();
+    
+    const urlMap = {
+        'vencer': "{% url 'relatorio_titulos_vencer_excel' %}",
+        'vencidos': "{% url 'relatorio_titulos_vencidos_excel' %}",
+        'recebimentos': "{% url 'relatorio_recebimentos_excel' %}",
+        'fluxo': "{% url 'relatorio_fluxo_caixa_excel' %}",
+        'extrato': "{% url 'relatorio_extrato_periodo_excel' %}"
+    };
+    
+    const form = document.getElementById('form_' + tipo);
+    const formData = new FormData(form);
+    const params = new URLSearchParams(formData).toString();
+    
+    window.open(urlMap[tipo] + '?' + params, '_blank');
+}
+
+function exportarExcelCliente(event) {
+    event.preventDefault();
+    event.stopPropagation();
+    
+    const clienteId = document.getElementById('select_cliente').value;
+    if (!clienteId) {
+        alert('Por favor, selecione um cliente');
+        return;
+    }
+    
+    const url = "{% url 'relatorio_por_cliente_excel' 999999 %}".replace('999999', clienteId);
+    window.open(url, '_blank');
+}
+
+// Atualizar action do formulário de cliente quando selecionar
+document.getElementById('select_cliente').addEventListener('change', function() {
+    if (this.value) {
+        const url = "{% url 'relatorio_por_cliente_pdf' 999999 %}".replace('999999', this.value);
+        document.getElementById('form_cliente').action = url;
+    }
+});
+</script>
+{% endblock %}

@@ -1,0 +1,185 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Relatórios Financeiros{% endblock %}
+
+{% block extra_css %}
+<style>
+    body { 
+        background: radial-gradient(circle at 10% 20%, #0ea5e9 0%, #0f172a 35%, #0b1224 65%, #0a0f1e 100%); 
+    }
+    .financial-sidebar {
+        background: rgba(15, 23, 42, 0.85);
+        border-right: 1px solid rgba(255,255,255,0.08);
+        backdrop-filter: blur(12px);
+        height: calc(100vh - 56px);
+        position: sticky;
+        top: 56px;
+        padding: 20px 0;
+    }
+    .financial-sidebar .nav-link {
+        color: #cbd5e1;
+        padding: 12px 20px;
+        margin: 4px 8px;
+        border-radius: 10px;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+    .financial-sidebar .nav-link:hover {
+        background: rgba(34,211,238,0.1);
+        color: #7dd3fc;
+    }
+    .financial-sidebar .nav-link.active {
+        background: linear-gradient(135deg, rgba(34,211,238,0.2), rgba(99,102,241,0.2));
+        color: #e0e7ff;
+        font-weight: 600;
+        box-shadow: 0 4px 12px rgba(99,102,241,0.25);
+    }
+    .financial-sidebar .sidebar-header {
+        color: #7dd3fc;
+        font-weight: 700;
+        letter-spacing: 1px;
+        padding: 0 20px 16px;
+        border-bottom: 1px solid rgba(255,255,255,0.06);
+        margin-bottom: 16px;
+        font-size: 14px;
+        text-transform: uppercase;
+    }
+    .content-card {
+        background: rgba(15, 23, 42, 0.78);
+        border: 1px solid rgba(255,255,255,0.08);
+        box-shadow: 0 18px 48px rgba(0,0,0,0.45);
+        border-radius: 16px;
+        backdrop-filter: blur(12px);
+        padding: 24px;
+    }
+    .report-card {
+        background: linear-gradient(135deg, rgba(34,211,238,0.1), rgba(99,102,241,0.1));
+        border: 1px solid rgba(255,255,255,0.08);
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 16px;
+        color: #e5e7eb;
+        transition: all 0.2s ease;
+        cursor: pointer;
+    }
+    .report-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 24px rgba(99,102,241,0.25);
+    }
+    .report-icon {
+        width: 56px;
+        height: 56px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 28px;
+        background: rgba(99,102,241,0.15);
+        color: #a5b4fc;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-0">
+    <div class="row g-0">
+        <!-- Sidebar -->
+        <div class="col-md-2">
+            <div class="financial-sidebar">
+                <div class="sidebar-header">
+                    <i class="fas fa-wallet"></i> Financeiro
+                </div>
+                <nav class="nav flex-column">
+                    <a class="nav-link" href="/">
+                        <i class="fas fa-home"></i>
+                        <span>Voltar aos Módulos</span>
+                    </a>
+                    <a class="nav-link" href="{% url 'financeiro:dashboard' %}">
+                        <i class="fas fa-chart-line"></i>
+                        <span>Dashboard</span>
+                    </a>
+                    <a class="nav-link" href="{% url 'financeiro:contas_pagar' %}">
+                        <i class="fas fa-file-invoice-dollar"></i>
+                        <span>Contas a Pagar</span>
+                    </a>
+                    <a class="nav-link active" href="{% url 'financeiro:relatorios' %}">
+                        <i class="fas fa-chart-bar"></i>
+                        <span>Relatórios</span>
+                    </a>
+                </nav>
+            </div>
+        </div>
+
+        <!-- Conteúdo Principal -->
+        <div class="col-md-10">
+            <div class="p-4">
+                <div class="content-card">
+                    <div class="mb-4">
+                        <p class="mb-1 text-uppercase" style="letter-spacing: 1px; color: #7dd3fc; font-weight: 700;">Análise Financeira</p>
+                        <h3 class="mb-0" style="color: #e2e8f0; font-weight: 800;">Relatórios</h3>
+                        <small style="color: #cbd5e1;">Relatórios gerenciais e análises</small>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="report-card">
+                                <div class="d-flex align-items-center gap-3">
+                                    <div class="report-icon">
+                                        <i class="fas fa-chart-line"></i>
+                                    </div>
+                                    <div>
+                                        <h5 class="mb-1" style="color: #e5e7eb;">Fluxo de Caixa</h5>
+                                        <small style="color: #94a3b8;">Análise de entradas e saídas</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="report-card">
+                                <div class="d-flex align-items-center gap-3">
+                                    <div class="report-icon">
+                                        <i class="fas fa-chart-pie"></i>
+                                    </div>
+                                    <div>
+                                        <h5 class="mb-1" style="color: #e5e7eb;">Despesas por Categoria</h5>
+                                        <small style="color: #94a3b8;">Distribuição de gastos</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="report-card">
+                                <div class="d-flex align-items-center gap-3">
+                                    <div class="report-icon">
+                                        <i class="fas fa-calendar-alt"></i>
+                                    </div>
+                                    <div>
+                                        <h5 class="mb-1" style="color: #e5e7eb;">Contas a Vencer</h5>
+                                        <small style="color: #94a3b8;">Previsão de pagamentos</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="report-card">
+                                <div class="d-flex align-items-center gap-3">
+                                    <div class="report-icon">
+                                        <i class="fas fa-file-invoice"></i>
+                                    </div>
+                                    <div>
+                                        <h5 class="mb-1" style="color: #e5e7eb;">Resumo Mensal</h5>
+                                        <small style="color: #94a3b8;">Consolidado do mês</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

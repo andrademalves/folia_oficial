@@ -1,0 +1,466 @@
+
+# Implementação de Geração de Boletos Caixa Econômica Federal no Módulo Contas a Receber
+
+## Contexto
+Preciso implementar funcionalidade completa de geração de boletos da Caixa Econômica Federal integrada ao módulo de contas a receber existente no projeto Django.
+
+## Documentação Técnica de Referência
+- Manual CNAB 240 Caixa:  https://www.caixa.gov.br/Downloads/cobranca-caixa/Manual_de_Leiaute_de_Arquivo_Eletronico_CNAB_240.pdf
+- Especificações Código de Barras: https://www.caixa.gov.br/Downloads/cobranca-caixa/ESP_COD_BARRAS_SIGCB_COBRANCA_CAIXA.pdf
+- Padrão FEBRABAN CNAB 240: https://cmsarquivos.febraban.org.br/Arquivos/documentos/PDF/Layout%20padrao%20CNAB240%20V%2010%2011%20-%2021_08_2023.pdf
+
+## Requisitos Funcionais
+
+### 1. Models (Django ORM)
+Criar ou adaptar models no módulo contas a receber para suportar: 
+
+**Model:  BeneficiarioCaixa**
+- codigo_beneficiario (CharField, código do cedente na Caixa)
+- agencia (CharField, 4 dígitos)
+- agencia_dv (CharField, 1 dígito)
+- conta (CharField)
+- conta_dv (CharField, 1 dígito)
+- convenio (CharField, número do convênio)
+- carteira (CharField, código da carteira, padrão "1")
+- modalidade (CharField, código da modalidade, ex: "14")
+- cnpj (CharField, 14 dígitos)
+- razao_social (CharField)
+- endereco, cidade, estado, cep (endereço completo)
+- ativo (BooleanField)
+- timestamps (created_at, updated_at)
+
+**Model:  Boleto** (ou adaptar ContaReceber existente)
+- beneficiario (ForeignKey para BeneficiarioCaixa)
+- conta_receber (ForeignKey para ContaReceber existente - se aplicável)
+- pagador_nome (CharField)
+- pagador_cpf_cnpj (CharField)
+- pagador_endereco, cidade, estado, cep
+- nosso_numero (CharField, 17 dígitos, único)
+- seu_numero (CharField, número do documento/pedido)
+- valor_titulo (DecimalField, max_digits=15, decimal_places=2)
+- data_vencimento (DateField)
+- data_emissao (DateField)
+- data_limite_pagamento (DateField, opcional)
+- especie_titulo (CharField, default="02" - Duplicata Mercantil)
+- aceite (CharField, default="N")
+- codigo_barras (CharField, 44 dígitos)
+- linha_digitavel (CharField, 47 dígitos)
+- status (CharField, choices:  ABERTO, REGISTRADO, PAGO, CANCELADO, VENCIDO)
+- juros_mora_taxa (DecimalField, opcional)
+- multa_atraso_taxa (DecimalField, opcional)
+- desconto_1_valor (DecimalField, opcional)
+- desconto_1_data (DateField, opcional)
+- mensagem_beneficiario (TextField, opcional)
+- instrucoes_caixa (TextField, opcional, ex: códigos de protesto)
+- arquivo_remessa (ForeignKey para ArquivoRemessaCNAB240, null=True)
+- data_registro (DateTimeField, null=True)
+- data_pagamento (DateField, null=True)
+- valor_pago (DecimalField, null=True)
+- timestamps
+
+**Model: ArquivoRemessaCNAB240**
+- beneficiario (ForeignKey)
+- numero_sequencial (IntegerField, auto incremento por beneficiário)
+- data_geracao (DateTimeField)
+- arquivo (FileField, upload_to='cnab/remessa/')
+- quantidade_boletos (IntegerField)
+- valor_total (DecimalField)
+- processado (BooleanField, default=False)
+- timestamps
+
+**Model: ArquivoRetornoCNAB240**
+- arquivo (FileField, upload_to='cnab/retorno/')
+- data_processamento (DateTimeField)
+- quantidade_registros (IntegerField)
+- processado (BooleanField)
+- erros (TextField, JSON com erros de processamento)
+- timestamps
+
+### 2. Services/Business Logic
+
+**Criar arquivo:  services/boleto_caixa_service.py**
+
+Implementar classe `BoletoCaixaService` com métodos: 
+
+```python
+class BoletoCaixaService: 
+    def gerar_nosso_numero(self, beneficiario) -> str:
+        """
+        Gera nosso número sequencial de 17 dígitos
+        Formato: 17 posições numéricas
+        Deve ser único por beneficiário
+        """
+        pass
+    
+    def calcular_digito_verificador_nosso_numero(self, nosso_numero: str) -> str:
+        """
+        Calcula DV do nosso número segundo regras da Caixa
+        Módulo 11
+        """
+        pass
+    
+    def gerar_codigo_barras(self, boleto) -> str:
+        """
+        Gera código de barras de 44 posições
+        Formato Caixa: 
+        Posições 1-3: Código do banco (104)
+        Posição 4: Código da moeda (9)
+        Posição 5: DV do código de barras
+        Posições 6-9: Fator de vencimento
+        Posições 10-19: Valor (10 posições, sem vírgula)
+        Posições 20-44: Campo livre (25 posições)
+        """
+        pass
+    
+    def calcular_dv_codigo_barras(self, codigo_barras_sem_dv: str) -> str:
+        """
+        Calcula dígito verificador do código de barras
+        Módulo 11
+        """
+        pass
+    
+    def gerar_linha_digitavel(self, codigo_barras: str) -> str:
+        """
+        Converte código de barras em linha digitável
+        Formato:  XXXXX. XXXXX XXXXX. XXXXXX XXXXX.XXXXXX X XXXXXXXXXXXXXX
+        """
+        pass
+    
+    def criar_boleto(self, conta_receber_id, beneficiario_id, dados_pagador:  dict) -> Boleto:
+        """
+        Cria boleto completo com todos os cálculos
+        """
+        pass
+    
+    def validar_boleto(self, boleto) -> tuple[bool, list]:
+        """
+        Valida dados do boleto antes de gerar remessa
+        Retorna: (válido, lista_de_erros)
+        """
+        pass
+
+
+class CNAB240Service: 
+    def gerar_remessa(self, beneficiario, boletos: list) -> ArquivoRemessaCNAB240:
+        """
+        Gera arquivo CNAB 240 de remessa
+        
+        Estrutura:
+        - Header do Arquivo (registro tipo 0)
+        - Header do Lote (registro tipo 1)
+        - Detalhes Segmento P (registro tipo 3, segmento P)
+        - Detalhes Segmento Q (registro tipo 3, segmento Q)
+        - Detalhes Segmento R (registro tipo 3, segmento R) - opcional
+        - Trailer do Lote (registro tipo 5)
+        - Trailer do Arquivo (registro tipo 9)
+        """
+        pass
+    
+    def _gerar_header_arquivo(self, beneficiario, numero_sequencial:  int) -> str:
+        """
+        Registro tipo 0 - Header de Arquivo
+        240 posições
+        """
+        pass
+    
+    def _gerar_header_lote(self, beneficiario, numero_lote: int) -> str:
+        """
+        Registro tipo 1 - Header de Lote
+        240 posições
+        """
+        pass
+    
+    def _gerar_segmento_p(self, boleto, numero_registro: int) -> str:
+        """
+        Registro tipo 3 Segmento P - Dados do título
+        240 posições
+        """
+        pass
+    
+    def _gerar_segmento_q(self, boleto, numero_registro: int) -> str:
+        """
+        Registro tipo 3 Segmento Q - Dados do pagador
+        240 posições
+        """
+        pass
+    
+    def _gerar_segmento_r(self, boleto, numero_registro: int) -> str:
+        """
+        Registro tipo 3 Segmento R - Descontos, multas e juros (opcional)
+        240 posições
+        """
+        pass
+    
+    def _gerar_trailer_lote(self, numero_lote: int, quantidade_registros: int) -> str:
+        """
+        Registro tipo 5 - Trailer de Lote
+        240 posições
+        """
+        pass
+    
+    def _gerar_trailer_arquivo(self, quantidade_lotes: int, quantidade_registros: int) -> str:
+        """
+        Registro tipo 9 - Trailer de Arquivo
+        240 posições
+        """
+        pass
+    
+    def processar_retorno(self, arquivo) -> dict:
+        """
+        Processa arquivo CNAB 240 de retorno
+        Atualiza status dos boletos
+        Retorna dicionário com estatísticas
+        """
+        pass
+    
+    def _processar_segmento_t(self, linha:  str) -> dict:
+        """
+        Processa segmento T do retorno (dados do título)
+        """
+        pass
+    
+    def _processar_segmento_u(self, linha: str) -> dict:
+        """
+        Processa segmento U do retorno (dados complementares)
+        """
+        pass
+
+
+
+def validar_cpf(cpf: str) -> bool:
+    """Valida CPF"""
+    pass
+
+def validar_cnpj(cnpj: str) -> bool:
+    """Valida CNPJ"""
+    pass
+
+def validar_data_vencimento(data: date) -> tuple[bool, str]:
+    """Valida se data de vencimento é válida (não pode ser passado)"""
+    pass
+
+def formatar_valor_cnab(valor:  Decimal, tamanho: int = 15) -> str:
+    """
+    Formata valor decimal para CNAB
+    Exemplo: 1234.56 -> 000000000123456
+    """
+    pass
+
+def formatar_data_cnab(data: date) -> str:
+    """
+    Formata data para CNAB (DDMMAAAA)
+    """
+    pass
+
+def calcular_fator_vencimento(data_vencimento: date) -> int:
+    """
+    Calcula fator de vencimento
+    Base: 07/10/1997
+    """
+    pass
+
+def formatar_texto_cnab(texto: str, tamanho: int, preencher_com: str = ' ') -> str:
+    """
+    Formata texto para CNAB (uppercase, sem acentos, tamanho fixo)
+    """
+    pass
+
+
+
+class BeneficiarioCaixaSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = BeneficiarioCaixa
+        fields = '__all__'
+
+class BoletoSerializer(serializers.ModelSerializer):
+    linha_digitavel_formatada = serializers.SerializerMethodField()
+    status_display = serializers.CharField(source='get_status_display', read_only=True)
+    
+    class Meta:
+        model = Boleto
+        fields = '__all__'
+        read_only_fields = ['codigo_barras', 'linha_digitavel', 'nosso_numero']
+
+class GerarBoletoSerializer(serializers. Serializer):
+    conta_receber_id = serializers.IntegerField()
+    beneficiario_id = serializers. IntegerField()
+    pagador_nome = serializers.CharField(max_length=200)
+    pagador_cpf_cnpj = serializers. CharField(max_length=14, validators=[validar_cpf_cnpj])
+    # ...  outros campos
+
+class GerarRemessaSerializer(serializers.Serializer):
+    beneficiario_id = serializers. IntegerField()
+    boletos_ids = serializers.ListField(child=serializers.IntegerField())
+
+
+
+class BoletoViewSet(viewsets.ModelViewSet):
+    queryset = Boleto.objects.all()
+    serializer_class = BoletoSerializer
+    
+    @action(detail=False, methods=['post'])
+    def gerar_boleto(self, request):
+        """
+        POST /api/boletos/gerar_boleto/
+        Cria novo boleto com cálculos automáticos
+        """
+        pass
+    
+    @action(detail=True, methods=['get'])
+    def pdf(self, request, pk=None):
+        """
+        GET /api/boletos/{id}/pdf/
+        Gera PDF do boleto
+        """
+        pass
+    
+    @action(detail=False, methods=['post'])
+    def gerar_remessa(self, request):
+        """
+        POST /api/boletos/gerar_remessa/
+        Gera arquivo CNAB 240 de remessa
+        Body:  {
+            "beneficiario_id": 1,
+            "boletos_ids": [1, 2, 3]
+        }
+        """
+        pass
+    
+    @action(detail=False, methods=['post'])
+    def processar_retorno(self, request):
+        """
+        POST /api/boletos/processar_retorno/
+        Upload de arquivo de retorno CNAB 240
+        """
+        pass
+
+
+
+class ContaReceber(models.Model):
+    # ... campos existentes
+    boleto = models.OneToOneField(Boleto, null=True, blank=True, on_delete=models.SET_NULL)
+    permite_gerar_boleto = models.BooleanField(default=True)
+
+
+
+def gerar_boleto(self, beneficiario_id, dados_pagador=None):
+    """
+    Gera boleto para esta conta a receber
+    """
+    service = BoletoCaixaService()
+    return service.criar_boleto(
+        conta_receber_id=self.id,
+        beneficiario_id=beneficiario_id,
+        dados_pagador=dados_pagador or self._extrair_dados_pagador()
+    )
+
+
+
+@admin.register(BeneficiarioCaixa)
+class BeneficiarioCaixaAdmin(admin.ModelAdmin):
+    list_display = ['razao_social', 'cnpj', 'codigo_beneficiario', 'agencia', 'ativo']
+    search_fields = ['razao_social', 'cnpj', 'codigo_beneficiario']
+
+@admin.register(Boleto)
+class BoletoAdmin(admin.ModelAdmin):
+    list_display = ['nosso_numero', 'pagador_nome', 'valor_titulo', 'data_vencimento', 'status']
+    list_filter = ['status', 'data_emissao', 'data_vencimento']
+    search_fields = ['nosso_numero', 'pagador_nome', 'pagador_cpf_cnpj']
+    readonly_fields = ['codigo_barras', 'linha_digitavel', 'nosso_numero']
+    
+    actions = ['gerar_remessa_action']
+    
+    def gerar_remessa_action(self, request, queryset):
+        # Ação para gerar remessa dos boletos selecionados
+        pass
+
+
+
+# Configurações de Boleto Caixa
+BOLETO_CAIXA = {
+    'CODIGO_BANCO': '104',
+    'NOME_BANCO': 'CAIXA ECONOMICA FEDERAL',
+    'CODIGO_MOEDA': '9',  # Real
+    'ESPECIE_TITULO_PADRAO': '02',  # Duplicata Mercantil
+    'ACEITE_PADRAO': 'N',
+    'AMBIENTE': env('BOLETO_AMBIENTE', default='homologacao'),  # homologacao ou producao
+}
+
+# Diretórios para arquivos CNAB
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+CNAB_REMESSA_DIR = os.path. join(MEDIA_ROOT, 'cnab/remessa/')
+CNAB_RETORNO_DIR = os.path.join(MEDIA_ROOT, 'cnab/retorno/')
+
+
+class BoletoCaixaServiceTest(TestCase):
+    def test_gerar_nosso_numero(self):
+        pass
+    
+    def test_calcular_codigo_barras(self):
+        pass
+    
+    def test_gerar_linha_digitavel(self):
+        pass
+    
+    def test_validar_boleto(self):
+        pass
+
+class CNAB240ServiceTest(TestCase):
+    def test_gerar_remessa_formato_valido(self):
+        """Testa se arquivo gerado tem 240 caracteres por linha"""
+        pass
+    
+    def test_processar_retorno(self):
+        pass
+
+
+
+# Criar beneficiário
+beneficiario = BeneficiarioCaixa.objects.create(
+    codigo_beneficiario='123456',
+    agencia='1234',
+    agencia_dv='5',
+    convenio='654321',
+    cnpj='12345678000190',
+    razao_social='Minha Empresa Ltda'
+)
+
+# Gerar boleto a partir de conta a receber
+conta = ContaReceber.objects.get(id=1)
+boleto = conta.gerar_boleto(
+    beneficiario_id=beneficiario.id,
+    dados_pagador={
+        'nome': 'João da Silva',
+        'cpf':  '12345678901',
+        'endereco': 'Rua Exemplo, 123'
+    }
+)
+
+# Gerar arquivo de remessa
+service = CNAB240Service()
+arquivo_remessa = service.gerar_remessa(
+    beneficiario=beneficiario,
+    boletos=[boleto]
+)
+
+# Processar retorno
+service.processar_retorno(arquivo_retorno)
+
+
+contas_receber/
+├── models.py                    # Models atualizados
+├── serializers.py              # Novos serializers
+├── views. py                    # ViewSets de boleto
+├── admin.py                    # Admin configurado
+├── services/
+│   ├── __init__.py
+│   ├── boleto_caixa_service.py
+│   └── cnab240_service.py
+├── utils/
+│   ├── __init__.py
+│   ├── validadores.py
+│   └── formatadores. py
+└── tests/
+    ├── __init__.py
+    ├── test_boleto_service.py
+    └── test_cnab240_service.py

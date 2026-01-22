@@ -1,0 +1,135 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Sistema de Gestão</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            min-height: 100vh;
+            margin: 0;
+            background: radial-gradient(circle at 10% 20%, #0ea5e9 0%, #0f172a 35%, #0b1224 65%, #0a0f1e 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #e2e8f0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .glass-card {
+            width: 100%;
+            max-width: 520px;
+            background: rgba(15, 23, 42, 0.75);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 18px;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.35);
+            backdrop-filter: blur(18px);
+            padding: 28px;
+            position: relative;
+            overflow: hidden;
+        }
+        .glass-card::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at 85% 15%, rgba(14,165,233,0.18), transparent 30%),
+                        radial-gradient(circle at 15% 80%, rgba(99,102,241,0.18), transparent 32%);
+            pointer-events: none;
+        }
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 800;
+            letter-spacing: 0.3px;
+            color: #e0f2fe;
+            margin-bottom: 10px;
+        }
+        .brand i {
+            color: #38bdf8;
+        }
+        .form-control {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            color: #e2e8f0;
+        }
+        .form-control:focus {
+            background: rgba(255, 255, 255, 0.06);
+            border-color: #38bdf8;
+            box-shadow: 0 0 0 0.2rem rgba(56, 189, 248, 0.15);
+            color: #e2e8f0;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #22d3ee, #6366f1);
+            border: none;
+            font-weight: 700;
+            letter-spacing: 0.3px;
+            box-shadow: 0 12px 30px rgba(99,102,241,0.35);
+        }
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 16px 36px rgba(34,211,238,0.35);
+        }
+        .helper-text {
+            color: #cbd5e1;
+            font-size: 0.95rem;
+        }
+        .link-light {
+            color: #7dd3fc;
+        }
+        .link-light:hover {
+            color: #bae6fd;
+        }
+    </style>
+</head>
+<body>
+    <div class="glass-card">
+        <div class="brand">
+            <i class="fas fa-cube fa-lg"></i> Sistema de Gestão
+        </div>
+        <h4 class="mb-1" style="color: #e2e8f0; font-weight: 800;">Bem-vindo de volta</h4>
+        <p class="mb-4 helper-text">Acesse sua conta para visualizar seus módulos autorizados.</p>
+
+        {% if form.errors %}
+            <div class="alert alert-danger" role="alert">
+                Usuário ou senha inválidos. Tente novamente.
+            </div>
+        {% endif %}
+
+        <form method="post" action="{% url 'login' %}">
+            {% csrf_token %}
+            <div class="mb-3">
+                <label for="id_username" class="form-label">Usuário</label>
+                <div class="input-group">
+                    <span class="input-group-text" style="background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.12); color: #94a3b8;"><i class="fas fa-user"></i></span>
+                    <input type="text" name="username" autofocus required class="form-control" id="id_username" placeholder="seu.usuario">
+                </div>
+            </div>
+            <div class="mb-3">
+                <label for="id_password" class="form-label">Senha</label>
+                <div class="input-group">
+                    <span class="input-group-text" style="background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.12); color: #94a3b8;"><i class="fas fa-lock"></i></span>
+                    <input type="password" name="password" required class="form-control" id="id_password" placeholder="••••••••">
+                </div>
+            </div>
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="remember" id="remember">
+                    <label class="form-check-label" for="remember" style="color: #cbd5e1;">Manter conectado</label>
+                </div>
+                <a class="link-light" href="{% url 'password_reset' %}">Esqueci minha senha</a>
+            </div>
+            <button type="submit" class="btn btn-primary w-100">
+                <i class="fas fa-arrow-right"></i> Entrar
+            </button>
+            <input type="hidden" name="next" value="{{ next|default:'/' }}">
+        </form>
+
+        <div class="mt-4 helper-text" style="font-size: 0.9rem;">
+            Em caso de acesso negado, solicite permissões ao administrador.
+        </div>
+    </div>
+</body>
+</html>

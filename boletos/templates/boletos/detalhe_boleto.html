@@ -1,0 +1,295 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Boleto #{{ boleto.id }} - Sistema de Gestão{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <h2><i class="bi bi-upc-scan me-2"></i>Detalhes do Boleto #{{ boleto.id }}</h2>
+                <div>
+                    <a href="{% url 'boletos:imprimir_boleto' boleto.id %}" class="btn btn-primary" target="_blank">
+                        <i class="bi bi-printer me-2"></i>Imprimir PDF
+                    </a>
+                    <a href="{% url 'boletos:lista_boletos' %}" class="btn btn-secondary">
+                        <i class="bi bi-arrow-left me-2"></i>Voltar
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Informações do Boleto -->
+        <div class="col-md-6 mb-4">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="bi bi-info-circle me-2"></i>Informações do Boleto</h5>
+                </div>
+                <div class="card-body">
+                    <table class="table table-sm">
+                        <tr>
+                            <th width="40%">Número do Documento:</th>
+                            <td>{{ boleto.numero_documento }}</td>
+                        </tr>
+                        <tr>
+                            <th>Nosso Número:</th>
+                            <td>{{ boleto.nosso_numero }}</td>
+                        </tr>
+                        <tr>
+                            <th>Data de Vencimento:</th>
+                            <td>{{ boleto.data_vencimento|date:"d/m/Y" }}</td>
+                        </tr>
+                        <tr>
+                            <th>Valor:</th>
+                            <td><strong>R$ {{ boleto.valor|floatformat:2 }}</strong></td>
+                        </tr>
+                        <tr>
+                            <th>Status:</th>
+                            <td>
+                                {% if boleto.status == 'pendente' %}
+                                    <span class="badge bg-warning">Pendente</span>
+                                {% elif boleto.status == 'registrado' %}
+                                    <span class="badge bg-info">Registrado</span>
+                                {% elif boleto.status == 'pago' %}
+                                    <span class="badge bg-success">Pago</span>
+                                {% elif boleto.status == 'cancelado' %}
+                                    <span class="badge bg-danger">Cancelado</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% if boleto.data_pagamento %}
+                        <tr>
+                            <th>Data de Pagamento:</th>
+                            <td>{{ boleto.data_pagamento|date:"d/m/Y" }}</td>
+                        </tr>
+                        <tr>
+                            <th>Valor Pago:</th>
+                            <td>R$ {{ boleto.valor_pago|floatformat:2 }}</td>
+                        </tr>
+                        {% endif %}
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Informações do Cliente -->
+        <div class="col-md-6 mb-4">
+            <div class="card shadow-sm">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0"><i class="bi bi-person me-2"></i>Dados do Cliente</h5>
+                </div>
+                <div class="card-body">
+                    <table class="table table-sm">
+                        <tr>
+                            <th width="40%">Nome:</th>
+                            <td>{{ boleto.cliente.nome }}</td>
+                        </tr>
+                        <tr>
+                            <th>CPF/CNPJ:</th>
+                            <td>{{ boleto.cliente.cpf_cnpj }}</td>
+                        </tr>
+                        {% if boleto.cliente.endereco %}
+                        <tr>
+                            <th>Endereço:</th>
+                            <td>{{ boleto.cliente.endereco }}</td>
+                        </tr>
+                        {% endif %}
+                        {% if boleto.cliente.cidade %}
+                        <tr>
+                            <th>Cidade:</th>
+                            <td>{{ boleto.cliente.cidade }} - {{ boleto.cliente.estado }}</td>
+                        </tr>
+                        {% endif %}
+                        {% if boleto.cliente.cep %}
+                        <tr>
+                            <th>CEP:</th>
+                            <td>{{ boleto.cliente.cep }}</td>
+                        </tr>
+                        {% endif %}
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Configuração Bancária -->
+        <div class="col-md-6 mb-4">
+            <div class="card shadow-sm">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0"><i class="bi bi-bank me-2"></i>Configuração Bancária</h5>
+                </div>
+                <div class="card-body">
+                    <table class="table table-sm">
+                        <tr>
+                            <th width="40%">Banco:</th>
+                            <td>{{ boleto.configuracao.codigo_banco }} - {{ boleto.configuracao.nome_banco }}</td>
+                        </tr>
+                        <tr>
+                            <th>Agência:</th>
+                            <td>{{ boleto.configuracao.conta_financeira.agencia }}{% if boleto.configuracao.conta_financeira.agencia_dv %}-{{ boleto.configuracao.conta_financeira.agencia_dv }}{% endif %}</td>
+                        </tr>
+                        <tr>
+                            <th>Conta:</th>
+                            <td>{{ boleto.configuracao.conta_financeira.conta }}{% if boleto.configuracao.conta_financeira.conta_dv %}-{{ boleto.configuracao.conta_financeira.conta_dv }}{% endif %}</td>
+                        </tr>
+                        <tr>
+                            <th>Carteira:</th>
+                            <td>{{ boleto.configuracao.carteira }}</td>
+                        </tr>
+                        <tr>
+                            <th>Convênio:</th>
+                            <td>{{ boleto.configuracao.convenio|default:"-" }}</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Parcela Relacionada -->
+        {% if boleto.parcela %}
+        <div class="col-md-6 mb-4">
+            <div class="card shadow-sm">
+                <div class="card-header bg-warning text-dark">
+                    <h5 class="mb-0"><i class="bi bi-receipt me-2"></i>Parcela Relacionada</h5>
+                </div>
+                <div class="card-body">
+                    <table class="table table-sm">
+                        <tr>
+                            <th width="40%">Tipo:</th>
+                            <td>{{ boleto.parcela.get_tipo_display }}</td>
+                        </tr>
+                        <tr>
+                            <th>Número da Parcela:</th>
+                            <td>{{ boleto.parcela.numero_parcela }}</td>
+                        </tr>
+                        {% if boleto.parcela.nota_fiscal %}
+                        <tr>
+                            <th>Nota Fiscal:</th>
+                            <td>{{ boleto.parcela.nota_fiscal.numero }}</td>
+                        </tr>
+                        {% endif %}
+                        <tr>
+                            <th>Data de Emissão:</th>
+                            <td>{{ boleto.parcela.data_emissao|date:"d/m/Y" }}</td>
+                        </tr>
+                        <tr>
+                            <th>Valor Original:</th>
+                            <td>R$ {{ boleto.parcela.valor|floatformat:2 }}</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="row">
+        <!-- Código de Barras -->
+        <div class="col-12 mb-4">
+            <div class="card shadow-sm">
+                <div class="card-header bg-dark text-white">
+                    <h5 class="mb-0"><i class="bi bi-upc-scan me-2"></i>Código de Barras</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Linha Digitável:</label>
+                        <div class="input-group">
+                            <input type="text" class="form-control form-control-lg font-monospace" 
+                                   value="{{ boleto.linha_digitavel }}" readonly id="linhaDigitavel">
+                            <button class="btn btn-outline-secondary" type="button" onclick="copiarLinhaDigitavel()">
+                                <i class="bi bi-clipboard"></i> Copiar
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Código de Barras (44 dígitos):</label>
+                        <div class="input-group">
+                            <input type="text" class="form-control font-monospace" 
+                                   value="{{ boleto.codigo_barras }}" readonly id="codigoBarras">
+                            <button class="btn btn-outline-secondary" type="button" onclick="copiarCodigoBarras()">
+                                <i class="bi bi-clipboard"></i> Copiar
+                            </button>
+                        </div>
+                        <small class="text-muted">
+                            Tamanho: <span id="tamanhoCodigoBarras">{{ boleto.codigo_barras|length }}</span> caracteres
+                            {% if boleto.codigo_barras|length != 44 %}
+                                <span class="badge bg-danger ms-2">ATENÇÃO: Deveria ter 44 caracteres!</span>
+                            {% else %}
+                                <span class="badge bg-success ms-2">OK</span>
+                            {% endif %}
+                        </small>
+                    </div>
+
+                    {% if boleto.codigo_barras|length != 44 %}
+                    <div class="alert alert-danger" role="alert">
+                        <i class="bi bi-exclamation-triangle me-2"></i>
+                        <strong>Atenção!</strong> O código de barras está com {{ boleto.codigo_barras|length }} caracteres, 
+                        mas deveria ter exatamente 44 para o padrão CNAB 240 da Caixa Econômica Federal.
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% if boleto.observacoes %}
+    <div class="row">
+        <div class="col-12 mb-4">
+            <div class="card shadow-sm">
+                <div class="card-header bg-secondary text-white">
+                    <h5 class="mb-0"><i class="bi bi-chat-left-text me-2"></i>Observações</h5>
+                </div>
+                <div class="card-body">
+                    <p class="mb-0">{{ boleto.observacoes|linebreaks }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<script>
+function copiarLinhaDigitavel() {
+    const input = document.getElementById('linhaDigitavel');
+    input.select();
+    document.execCommand('copy');
+    
+    // Feedback visual
+    const btn = event.target.closest('button');
+    const originalHtml = btn.innerHTML;
+    btn.innerHTML = '<i class="bi bi-check"></i> Copiado!';
+    btn.classList.add('btn-success');
+    btn.classList.remove('btn-outline-secondary');
+    
+    setTimeout(() => {
+        btn.innerHTML = originalHtml;
+        btn.classList.remove('btn-success');
+        btn.classList.add('btn-outline-secondary');
+    }, 2000);
+}
+
+function copiarCodigoBarras() {
+    const input = document.getElementById('codigoBarras');
+    input.select();
+    document.execCommand('copy');
+    
+    // Feedback visual
+    const btn = event.target.closest('button');
+    const originalHtml = btn.innerHTML;
+    btn.innerHTML = '<i class="bi bi-check"></i> Copiado!';
+    btn.classList.add('btn-success');
+    btn.classList.remove('btn-outline-secondary');
+    
+    setTimeout(() => {
+        btn.innerHTML = originalHtml;
+        btn.classList.remove('btn-success');
+        btn.classList.add('btn-outline-secondary');
+    }, 2000);
+}
+</script>
+{% endblock %}

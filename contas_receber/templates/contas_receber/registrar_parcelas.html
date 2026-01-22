@@ -1,0 +1,333 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Configurar Parcelas - Nota {{ nota.numero_nota|default:nota.nro_nota }}{% endblock %}
+
+{% block extra_css %}
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<style>
+    body { background: radial-gradient(circle at 10% 20%, #0ea5e9 0%, #0f172a 35%, #0b1224 65%, #0a0f1e 100%); }
+    .sidebar { background: rgba(15, 23, 42, 0.85); border-right: 1px solid rgba(255,255,255,0.08); backdrop-filter: blur(12px); height: calc(100vh - 56px); position: sticky; top: 56px; padding: 20px 0; }
+    .sidebar .nav-link { color: #cbd5e1; padding: 12px 20px; margin: 4px 8px; border-radius: 10px; transition: all 0.2s ease; display: flex; align-items: center; gap: 12px; }
+    .sidebar .nav-link:hover { background: rgba(34,211,238,0.1); color: #7dd3fc; }
+    .sidebar .nav-link.active { background: linear-gradient(135deg, rgba(34,211,238,0.2), rgba(99,102,241,0.2)); color: #e0e7ff; font-weight: 600; box-shadow: 0 4px 12px rgba(99,102,241,0.25); }
+    .sidebar .sidebar-header { color: #7dd3fc; font-weight: 700; letter-spacing: 1px; padding: 0 20px 16px; border-bottom: 1px solid rgba(255,255,255,0.06); margin-bottom: 16px; font-size: 14px; text-transform: uppercase; }
+    .content-card { background: rgba(15, 23, 42, 0.78); border: 1px solid rgba(255,255,255,0.08); box-shadow: 0 18px 48px rgba(0,0,0,0.45); border-radius: 16px; backdrop-filter: blur(12px); padding: 24px; }
+    .table { color: #cbd5e1; }
+    .table thead th { color: #7dd3fc; border-bottom: 2px solid rgba(125,211,252,0.3); }
+    .btn-outline-primary { border-color: #0ea5e9; color: #0ea5e9; }
+    .btn-outline-primary:hover { background: #0ea5e9; color: white; }
+    
+    /* Remover fundo branco dos campos de formulário */
+    .form-control, .form-select {
+        background: rgba(255, 255, 255, 0.1) !important;
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.2) !important;
+        color: white !important;
+    }
+    .form-control:focus, .form-select:focus {
+        background: rgba(255, 255, 255, 0.15) !important;
+        border-color: rgba(14, 165, 233, 0.5) !important;
+        box-shadow: 0 0 0 0.2rem rgba(14, 165, 233, 0.25);
+        color: white !important;
+    }
+    .form-control::placeholder {
+        color: rgba(255, 255, 255, 0.5);
+    }
+    .form-select option {
+        background: #0f172a;
+        color: white;
+    }
+    
+    /* Select2 Styling */
+    .select2-container--default .select2-selection--single {
+        background: #1e293b !important;
+        border: 1px solid rgba(255, 255, 255, 0.15) !important;
+        height: auto !important;
+        padding: 8px 12px !important;
+        border-radius: 8px !important;
+    }
+
+    .select2-container--default.select2-container--focus .select2-selection--single {
+        background: #334155 !important;
+        border-color: rgba(34, 211, 238, 0.5) !important;
+        box-shadow: 0 0 0 0.2rem rgba(34, 211, 238, 0.25) !important;
+    }
+
+    .select2-container--default .select2-selection--single .select2-selection__rendered {
+        color: #fff !important;
+        line-height: 1.5 !important;
+        padding: 0 !important;
+    }
+
+    .select2-dropdown {
+        background: #1e293b !important;
+        border: 1px solid rgba(255, 255, 255, 0.15) !important;
+        border-radius: 8px !important;
+    }
+
+    .select2-results {
+        background: #1e293b !important;
+    }
+
+    .select2-results__options {
+        background: #1e293b !important;
+    }
+
+    .select2-search--dropdown {
+        background: #1e293b !important;
+        padding: 8px !important;
+    }
+
+    .select2-search--dropdown .select2-search__field {
+        background: #0f172a !important;
+        border: 1px solid rgba(255, 255, 255, 0.15) !important;
+        color: #fff !important;
+    }
+
+    .select2-results__option {
+        color: #e2e8f0 !important;
+        background: #1e293b !important;
+    }
+
+    .select2-results__option--highlighted {
+        background: #0ea5e9 !important;
+        color: #fff !important;
+    }
+
+    .select2-results__option--selected {
+        background: #334155 !important;
+    }
+    
+    .select2-container {
+        width: 100% !important;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar -->
+        <div class="col-md-2 bg-dark text-white p-3" style="min-height: 100vh;">
+            <h5 class="mb-4">Contas a Receber</h5>
+            <ul class="nav flex-column">
+                <li class="nav-item mb-2">
+                    <a href="{% url 'dashboard_contas_receber' %}" class="nav-link text-white">
+                        <i class="fas fa-chart-line me-2"></i>Dashboard
+                    </a>
+                </li>
+                <li class="nav-item mb-2">
+                    <a href="{% url 'lista_notas_fiscais' %}" class="nav-link text-white-50">
+                        <i class="fas fa-file-invoice me-2"></i>Notas Fiscais
+                    </a>
+                </li>
+                <li class="nav-item mb-2">
+
+                    <a href="{% url 'lista_creditos' %}" class="nav-link text-white-50">
+                        <i class="fas fa-credit-card me-2"></i>Créditos
+                    </a>
+                </li>
+                <li class="nav-item mb-2">
+                    <a href="{% url 'relatorio_creditos' %}" class="nav-link text-white-50">
+                        <i class="fas fa-chart-line me-2"></i>Relatório Créditos
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Conteúdo Principal -->
+        <div class="col-md-10 p-4">
+            <div class="content__wrap">
+                <div class="content-card mb-4">
+                    <h3 class="display-6 text-center text-white">Informações da Nota Fiscal</h3>
+                    <div class="content__wrap">
+                        <table class="table table-striped" cellpadding="5" cellspacing="0">
+                            <tbody>
+                                <tr>
+                                    <th>Razão Social</th>
+                                    <td>
+                                        {% if nota.cliente %}
+                                            {{ nota.cliente.razao_social|default:nota.cliente.nome }}
+                                        {% else %}
+                                            {% if modo_importada %}
+                                                {% for c in clientes_futura %}
+                                                    {% if c.id == nota.fk_cadastro %}{{ c.razao_social|default:c.fantasia }}{% endif %}
+                                                {% endfor %}
+                                            {% endif %}
+                                        {% endif %}
+                                    </td>
+                                    <th>CNPJ/CPF</th>
+                                    <td>
+                                        {% if nota.cliente %}
+                                            {{ nota.cliente.cpf_cnpj }}
+                                        {% else %}
+                                            {% if modo_importada %}
+                                                {% for c in clientes_futura %}
+                                                    {% if c.id == nota.fk_cadastro %}{{ c.cnpj_cpf }}{% endif %}
+                                                {% endfor %}
+                                            {% endif %}
+                                        {% endif %}
+                                    </td>
+                                    <th>Data de Emissão</th>
+                                    <td>{{ nota.data_emissao|date:"d/m/Y" }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Nro Nota</th>
+                                    <td>{{ nota.numero_nota|default:nota.nro_nota }}</td>
+                                    <th>Total Produto</th>
+                                    <td>R$ {{ nota.valor_produtos|default:nota.total_produto|floatformat:2 }}</td>
+                                    <th>Total IPI</th>
+                                    <td>R$ {{ nota.valor_ipi|default:nota.total_ipi_valor|floatformat:2 }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Total Nota</th>
+                                    <td>R$ {{ nota.valor_total|default:nota.total_nota|floatformat:2 }}</td>
+                                    <th>Valor Carteira</th>
+                                    <td>R$ {{ valor_carteira|floatformat:2 }}</td>
+                                    <th>Total NF + CARTEIRA</th>
+                                    <td>R$ {{ total_geral|floatformat:2 }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="content-card">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h3 class="text-white"><i class="fas fa-edit"></i> Configurar Parcelas</h3>
+                </div>
+
+                <!-- Informações das Instituições -->
+                <div class="alert alert-info mb-4">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <strong><i class="fas fa-university"></i> Instituição (Futura):</strong> {{ conta_parcelas.nome }}
+                        </div>
+                        <div class="col-md-6">
+                            {% if tem_carteira %}
+                            <strong><i class="fas fa-wallet"></i> Instituição (Carteira):</strong> {{ conta_carteira.nome }}
+                            {% else %}
+                            <strong><i class="fas fa-wallet"></i> Carteira:</strong> Não
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Formulário -->
+                <form method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="numero_nota" value="{{ nota.numero_nota|default:nota.nro_nota }}">
+                    <input type="hidden" name="conta_financeira_parcelas" value="{{ conta_parcelas.id }}">
+                    <input type="hidden" name="tem_carteira" value="{% if tem_carteira %}1{% else %}0{% endif %}">
+                    {% if conta_carteira %}
+                    <input type="hidden" name="conta_financeira_carteira" value="{{ conta_carteira.id }}">
+                    {% endif %}
+                    
+                    <h5 class="text-white mb-3">Configurar Parcelas</h5>
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Referência</th>
+                                    <th>Nº</th>
+                                    <th>Valor</th>
+                                    <th>Data Vencimento</th>
+                                    <th>Instituição</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for parcela in parcelas_nf %}
+                                <tr>
+                                    <td><span class="badge bg-primary">NT:{{ nota.numero_nota|default:nota.nro_nota }} {{ parcela.numero_parcela }}/{{ total_parcelas }}</span></td>
+                                    <td>{{ parcela.numero_parcela }}/{{ total_parcelas }}</td>
+                                    <td>R$ {{ parcela.valor|floatformat:2 }}</td>
+                                    <td>
+                                        <input type="date" 
+                                               class="form-control form-control-sm" 
+                                               name="data_vencimento_{{ parcela.id|default:parcela.numero_parcela }}"
+                                               value="{{ parcela.data_vencimento|date:'Y-m-d' }}"
+                                               required
+                                               style="max-width: 180px; color: #000 !important; background-color: #fff;">
+                                    </td>
+                                    <td>
+                                        <select class="form-select form-select-sm" name="instituicao_{{ parcela.id|default:parcela.numero_parcela }}" style="max-width: 200px; color: #000 !important; background-color: #fff;">
+                                            {% for conta in contas_financeiras %}
+                                            <option value="{{ conta.id }}" {% if conta.id == conta_parcelas.id %}selected{% endif %}>
+                                                {{ conta.nome }}
+                                            </option>
+                                            {% endfor %}
+                                        </select>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                                
+                                {% for parcela in parcelas_carteira %}
+                                <tr style="background-color: rgba(34, 197, 94, 0.1);">
+                                    <td><span class="badge bg-success">{{ parcela.referencia }}</span></td>
+                                    <td>{{ parcela.numero_parcela }}/{{ total_parcelas }}</td>
+                                    <td>R$ {{ parcela.valor|floatformat:2 }}</td>
+                                    <td>
+                                        <input type="date" 
+                                               class="form-control form-control-sm" 
+                                               name="data_vencimento_carteira_{{ parcela.numero_parcela }}"
+                                               value="{{ parcela.data_vencimento|date:'Y-m-d' }}"
+                                               required
+                                               style="max-width: 180px; color: #000 !important; background-color: #fff;">
+                                    </td>
+                                    <td>
+                                        <select class="form-select form-select-sm" name="instituicao_carteira_{{ parcela.numero_parcela }}" style="max-width: 200px; color: #000 !important; background-color: #fff;">
+                                            {% for conta in contas_financeiras %}
+                                            <option value="{{ conta.id }}" {% if conta.id == conta_carteira.id %}selected{% endif %}>
+                                                {{ conta.nome }}
+                                            </option>
+                                            {% endfor %}
+                                        </select>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                            <tfoot>
+                                <tr style="background-color: rgba(14, 165, 233, 0.15); font-weight: bold;">
+                                    <td colspan="2" class="text-end">TOTAL PARCELAS NF:</td>
+                                    <td>R$ {{ nota.valor_total|default:nota.total_nota|floatformat:2 }}</td>
+                                    <td colspan="3"></td>
+                                </tr>
+                                {% if tem_carteira %}
+                                <tr style="background-color: rgba(34, 197, 94, 0.15); font-weight: bold;">
+                                    <td colspan="2" class="text-end">TOTAL PARCELAS CARTEIRA:</td>
+                                    <td>R$ {{ valor_carteira|floatformat:2 }}</td>
+                                    <td colspan="3"></td>
+                                </tr>
+                                <tr style="background-color: rgba(99, 102, 241, 0.2); font-weight: bold; border-top: 2px solid rgba(125,211,252,0.5);">
+                                    <td colspan="2" class="text-end">TOTAL GERAL:</td>
+                                    <td>R$ {{ total_geral|floatformat:2 }}</td>
+                                    <td colspan="3"></td>
+                                </tr>
+                                {% endif %}
+                            </tfoot>
+                        </table>
+                    </div>
+
+                    {% if tem_carteira %}
+                    <div class="alert alert-info mt-3">
+                        <i class="fas fa-info-circle"></i> <strong>Total:</strong> {{ total_parcelas }} parcelas do Futura + {{ total_parcelas }} parcelas de Carteira = {{ total_parcelas|add:total_parcelas }} parcelas no total
+                    </div>
+                    {% endif %}
+
+                    <!-- Botões -->
+                    <div class="d-flex justify-content-end gap-2 mt-4">
+                        <a href="{% url 'lista_notas_fiscais' %}" class="btn btn-secondary">
+                            <i class="fas fa-times me-2"></i>Cancelar
+                        </a>
+                        <button type="submit" class="btn btn-success">
+                            <i class="fas fa-save me-2"></i>Salvar Parcelas
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -31,12 +31,22 @@ class PermissaoMenuAdmin(admin.ModelAdmin):
     search_fields = ['usuario__username', 'grupo__name', 'menu__nome']
     list_editable = ['pode_visualizar', 'pode_criar', 'pode_editar', 'pode_excluir']
     autocomplete_fields = ['usuario', 'grupo', 'menu']
+    fields = ['tipo', 'usuario', 'grupo', 'menu', 'pode_visualizar', 'pode_criar', 'pode_editar', 'pode_excluir']
     
     def get_identificador(self, obj):
         if obj.tipo == 'usuario':
             return f"Usuário: {obj.usuario.username}"
         return f"Grupo: {obj.grupo.name}"
     get_identificador.short_description = 'Identificador'
+    
+    def save_model(self, request, obj, form, change):
+        # Auto-define o tipo baseado nos campos preenchidos
+        if not obj.tipo or obj.tipo == '':
+            if obj.usuario is not None:
+                obj.tipo = 'usuario'
+            elif obj.grupo is not None:
+                obj.tipo = 'grupo'
+        super().save_model(request, obj, form, change)
 
 
 class PerfilUsuarioInline(admin.StackedInline):

@@ -9,21 +9,40 @@ def encontrar_menu(url_menu):
     """
     Busca um menu de forma inteligente:
     1. Primeiro tenta URL exata
-    2. Se não encontrar e URL não começa com /, adiciona / no início e final
-    3. Se ainda não encontrar, busca pelo módulo
+    2. Se URL termina com / mas não é completa (ex: /cadastros/), tenta encontrar o dashboard do módulo
+    3. Se não começa com /, busca pelo nome do módulo
     """
     # Tenta URL exata primeiro
     menu = Menu.objects.filter(url=url_menu, ativo=True).first()
     if menu:
         return menu
     
-    # Se não começa com /, tenta adicionar barras
-    if not url_menu.startswith('/'):
-        url_com_barras = f'/{url_menu}/'
-        menu = Menu.objects.filter(url=url_com_barras, ativo=True).first()
+    # Se começa com / e termina com / mas não encontrou (ex: /cadastros/)
+    # Tenta encontrar o dashboard desse módulo
+    if url_menu.startswith('/') and url_menu.endswith('/'):
+        # Remove as barras para pegar o nome: /cadastros/ -> cadastros
+        nome_modulo = url_menu.strip('/')
+        
+        # Tenta encontrar menu Dashboard desse módulo
+        menu = Menu.objects.filter(
+            modulo__nome__iexact=nome_modulo,
+            nome__iexact='dashboard',
+            ativo=True
+        ).first()
         if menu:
             return menu
         
+        # Se não tem dashboard, pega o primeiro menu do módulo
+        menu = Menu.objects.filter(
+            modulo__nome__iexact=nome_modulo,
+            ativo=True,
+            menu_pai__isnull=True
+        ).first()
+        if menu:
+            return menu
+    
+    # Se não começa com /, tenta buscar pelo nome do módulo
+    if not url_menu.startswith('/'):
         # Tenta buscar pelo módulo (qualquer menu do módulo)
         menu = Menu.objects.filter(
             modulo__nome__iexact=url_menu,

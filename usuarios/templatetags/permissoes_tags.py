@@ -104,10 +104,10 @@ def tem_permissao_menu(context, url_menu, acao='visualizar'):
     if user.is_superuser:
         return True
     
-    # Verifica se o menu existe
-    try:
-        menu = Menu.objects.get(url=url_menu, ativo=True)
-    except Menu.DoesNotExist:
+    # Verifica se o menu existe usando encontrar_menu
+    from usuarios.decorators import encontrar_menu
+    menu = encontrar_menu(url_menu)
+    if not menu:
         return False
     
     # Mapeia ação para campo
